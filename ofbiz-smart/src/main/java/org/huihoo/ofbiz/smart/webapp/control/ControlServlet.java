@@ -38,14 +38,14 @@ public class ControlServlet extends HttpServlet {
   private volatile Properties appConfigProp;
 
   @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
+  public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
           IOException {
     this.doPost(req, resp);
   }
 
 
   @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
+  public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
           IOException {
     // 开发模式下，每次读取映射配置文件
     if (C.ENV_MODE_DEVELOP.equals(actionMap.envMode)) {
@@ -108,7 +108,7 @@ public class ControlServlet extends HttpServlet {
       serviceDispatcher = new ServiceDispatcher(prmaryDelegator, serviceResourceName);
 
       // 将Delegator和ServiceDispatcher和请求路径后缀保存在服务器全局上下文中
-      ServletContext servletContext = getServletContext();
+      ServletContext servletContext = config.getServletContext();
 
       servletContext.setAttribute(C.ACTION_URI_SUFFIX, actionMap.actionUriSuffix);
       servletContext.setAttribute(C.CTX_DELEGATOR, prmaryDelegator);

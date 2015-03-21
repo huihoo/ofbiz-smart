@@ -131,23 +131,16 @@ public class RequestHandler {
         }
         
         if (C.EVENT_JAVA.equalsIgnoreCase(eventType)) {
-          
-          
           callNormalJavaEvent(actionMap, event, req, resp);
-          
         } else if (C.EVENT_SERVICE.equalsIgnoreCase(eventType)) {
-          
           Map<String, Object> webContext = buildWebContext(req, resp, actionMap);
-          
           if(cloneCurrentAction.sea != null){
             ModelService modelService = serviceDispatcher.getLocalContext(event.sname);
             modelService.sea = cloneCurrentAction.sea;
           }
-          
           returnResult = serviceDispatcher.runSync(event.sname, webContext);
-          
+          doResponse(req, resp, returnResult, actionMap, cloneCurrentAction);
         } else if (C.EVENT_SIMPLE.equalsIgnoreCase(eventType)) {
-          
           Map<String, Object> webContext = buildWebContext(req, resp, actionMap);
           ModelService modelService = new ModelService();
           modelService.name = event.type + event.invoke;
@@ -178,23 +171,16 @@ public class RequestHandler {
               }
             }
           }
-
         } else if (C.EVENT_AUTO.equalsIgnoreCase(eventType)) {
-          
           returnResult = doAutoAction(req, resp, cloneCurrentAction, actionMap, serviceDispatcher);
-          
+          doResponse(req, resp, returnResult, actionMap, cloneCurrentAction);
         } else if (C.EVENT_NONE.equalsIgnoreCase(eventType)) {
-          
           // TODO
         } else if (C.EVENT_API.equalsIgnoreCase(eventType)) {
-          
           returnResult = doApiAction(req, resp, actionMap, serviceDispatcher);
           doResponse(req, resp, returnResult, actionMap, cloneCurrentAction);
-          
         } else {
-          
           Debug.logWaring("不支持的事件处理类型[" + eventType + "]", module);
-          
         }
         
         if(aii != null && interceptor != null && 
