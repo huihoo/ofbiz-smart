@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ofbiz.huihoo.com/dtds/services.xsd">
+
+	<service name="createOrder" engine="java" location="service.OrderService"
+		invoke="createOrder" persist="true" export="true">
+		<description>创建订单</description>
+	</service>
+</services>

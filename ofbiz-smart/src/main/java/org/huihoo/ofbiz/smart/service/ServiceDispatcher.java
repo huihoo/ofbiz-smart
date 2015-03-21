@@ -49,6 +49,13 @@ public class ServiceDispatcher {
   protected Map<String, ModelService> localContext = null;
   protected String serviceResourceName = null;
 
+  
+  public ServiceDispatcher(Delegator delegator)
+          throws GenericServiceException {
+    this(delegator, null);
+  }
+  
+  
   public ServiceDispatcher(Delegator delegator, String serviceResourceName)
           throws GenericServiceException {
     factory = new GenericEngineFactory(this);
@@ -58,7 +65,6 @@ public class ServiceDispatcher {
     if (delegator == null) {
       Debug.logWaring("[ServiceDispatcher初始化] : 未找到Delegator实例，不能应用于持久化场景.", module);
     }
-
   }
 
   public ModelService getLocalContext(String localName) throws GenericServiceException {
@@ -407,5 +413,10 @@ public class ServiceDispatcher {
 
   public void setDelegator(Delegator delegator) {
     this.delegator = delegator;
+  }
+
+
+  public Map<String, ModelService> getLocalContext() {
+    return localContext;
   }
 }

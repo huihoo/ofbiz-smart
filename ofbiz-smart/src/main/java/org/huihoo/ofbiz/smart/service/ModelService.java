@@ -186,4 +186,35 @@ public class ModelService implements Serializable, Cloneable {
     this.useTransaction = useTransaction;
   }
 
+
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("ModelService [name=");
+    builder.append(name);
+    builder.append(", engineName=");
+    builder.append(engineName);
+    builder.append(", location=");
+    builder.append(location);
+    builder.append(", invoke=");
+    builder.append(invoke);
+    builder.append(", defaultEntityName=");
+    builder.append(defaultEntityName);
+    builder.append(", description=");
+    builder.append(description);
+    builder.append(", sea=");
+    builder.append(sea);
+    builder.append(", persist=");
+    builder.append(persist);
+    builder.append(", auth=");
+    builder.append(auth);
+    builder.append(", export=");
+    builder.append(export);
+    builder.append(", useTransaction=");
+    builder.append(useTransaction);
+    builder.append("]");
+    return builder.toString();
+  }
+
 }
