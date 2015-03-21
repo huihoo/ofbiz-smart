@@ -25,7 +25,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.utils.CommUtils;
 import org.huihoo.ofbiz.smart.base.utils.Debug;

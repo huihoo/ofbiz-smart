@@ -14,10 +14,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -34,8 +34,14 @@ import org.huihoo.ofbiz.smart.entity.GenericEntityException;
 import org.huihoo.ofbiz.smart.service.GenericServiceException;
 import org.huihoo.ofbiz.smart.service.ServiceDispatcher;
 import org.huihoo.ofbiz.smart.webapp.control.ControlServlet;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import entity.Customer;
+import entity.Order;
+import entity.Product;
+
 
 
 
@@ -82,7 +88,6 @@ public class ControlServletTest {
     
     when(req.getSession()).thenReturn(session);
     when(req.getContextPath()).thenReturn("");
-    when(req.getServletPath()).thenReturn("/customer/new");
     when(req.getPathInfo()).thenReturn("");
     when(req.getMethod()).thenReturn("post");
     
@@ -96,8 +101,7 @@ public class ControlServletTest {
     when(resp.getWriter()).thenReturn(out);
 
     when(req.getRequestURI()).thenReturn("/customer/new");
-
-
+    when(req.getServletPath()).thenReturn("/customer/new");
 
     Map<String, String> bizParaMap = new HashMap<String, String>();
     bizParaMap.put("name", "Huangbaihua");
@@ -122,16 +126,61 @@ public class ControlServletTest {
       when(req.getParameter(entry.getKey())).thenReturn(entry.getValue());
     }
 
-    ControlServlet controlServlet = new ControlServlet();
+    
     try {
+      ControlServlet controlServlet = new ControlServlet();
       controlServlet.init(config);
       controlServlet.doPost(req, resp);
       out.flush();
-
       String response = readResponseFile();
-      Debug.logInfo("response->"+response, module);
+      Debug.logDebug("response->"+response, module);
+      Assert.assertEquals(true, response.indexOf("success") != -1);    
       
-    } catch (ServletException e) {
+      Customer customer = (Customer) delegator.findById("Customer", 1L);
+      Assert.assertNotNull(customer);
+      Assert.assertEquals(1, customer.getId().longValue());
+      
+      //=============================================================
+      //
+      //=============================================================
+      Product testProduct = new Product();
+      testProduct.setName("Test-Product");
+      testProduct.setSku("SKU-001");
+      delegator.save(testProduct);
+      
+      when(req.getRequestURI()).thenReturn("/order/create");
+      when(req.getServletPath()).thenReturn("/order/create");
+
+      bizParaMap = new HashMap<String, String>();
+      bizParaMap.put("customerId", "1");
+      bizParaMap.put("productId", "1");
+      bizParaMap.put("orderQty", "2");
+
+      paramVetor = new Vector<String>();
+      bizParaSet = bizParaMap.entrySet();
+      bizIt = bizParaSet.iterator();
+      bizIt = bizParaSet.iterator();
+      while (bizIt.hasNext()) {
+        Entry<String, String> entry = bizIt.next();
+        paramVetor.add(entry.getKey());
+      }
+
+      when(req.getParameterNames()).thenReturn(paramVetor.elements());
+
+      bizIt = bizParaSet.iterator();
+      while (bizIt.hasNext()) {
+        Entry<String, String> entry = bizIt.next();
+        when(req.getParameter(entry.getKey())).thenReturn(entry.getValue());
+      }
+      controlServlet.doPost(req, resp);
+      out.flush();
+      response = readResponseFile();
+      Debug.logDebug("response->"+response, module);
+      Order order = (Order) delegator.findById("Order", 1L);  
+      Assert.assertNotNull(order);
+      Assert.assertEquals(1, order.getId().longValue());
+      
+    } catch (ServletException | GenericEntityException e) {
       e.printStackTrace();
     }
 

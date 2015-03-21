@@ -24,19 +24,19 @@ public class OrderService {
     Debug.logDebug("Order Ctx->" + CommUtils.printMap(ctx), module);
     Map<String, Object> success = ServiceUtils.returnSuccess();
     
-    Long customerId = (Long) ctx.get("customerId");
-    Long productId = (Long) ctx.get("productId");
-    BigDecimal orderQty = (BigDecimal) ctx.get("orderQty");
+    Long customerId = Long.valueOf( (String) ctx.get("customerId") );
+    Long productId = Long.valueOf( (String) ctx.get("productId") );
+    BigDecimal orderQty = new BigDecimal( (String)  ctx.get("orderQty"));
     
     Delegator delegator = (Delegator) ctx.get(C.CTX_DELEGATOR);
     try {
       Customer customer = (Customer) delegator.findById("Customer", customerId);
       if(customer == null)
-        return ServiceUtils.returnMessage("CUSTOMER_NOT_EXIST", "客户["+customerId+"]不存在");
+        return ServiceUtils.returnProplem("CUSTOMER_NOT_EXIST", "客户["+customerId+"]不存在");
       
       Product product = (Product) delegator.findById("Product", productId);
       if(product == null)
-        return ServiceUtils.returnMessage("PRODUCT_NOT_EXIST", "产品["+customerId+"]不存在");
+        return ServiceUtils.returnProplem("PRODUCT_NOT_EXIST", "产品["+customerId+"]不存在");
         
       Order order = new Order();
       order.setOrderDate(new Date());
