@@ -1,6 +1,7 @@
 package entity;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -9,6 +10,7 @@ import javax.persistence.Table;
 @Table(name = "test_customer")
 public class Customer extends BaseModel {
   @ManyToOne
+  @JoinColumn(name="status_code")
   CustomerStatus statusCode;
 
   String name;
@@ -49,6 +51,21 @@ public class Customer extends BaseModel {
 
   public void setBillingAddress(Address billingAddress) {
     this.billingAddress = billingAddress;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("Customer [statusCode=");
+    builder.append(statusCode);
+    builder.append(", name=");
+    builder.append(name);
+    builder.append(", shippingAddress=");
+    builder.append(shippingAddress);
+    builder.append(", billingAddress=");
+    builder.append(billingAddress);
+    builder.append("]");
+    return builder.toString();
   }
 
 

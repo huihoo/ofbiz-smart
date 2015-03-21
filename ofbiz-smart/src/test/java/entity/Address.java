@@ -1,6 +1,7 @@
 package entity;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -9,6 +10,7 @@ import javax.persistence.Table;
 @Table(name = "test_address")
 public class Address extends BaseModel {
   @ManyToOne
+  @JoinColumn(name="country_code")
   Country countryCode;
 
   String line1;
@@ -55,6 +57,23 @@ public class Address extends BaseModel {
 
   public void setRegion(String region) {
     this.region = region;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("Address [countryCode=");
+    builder.append(countryCode);
+    builder.append(", line1=");
+    builder.append(line1);
+    builder.append(", line2=");
+    builder.append(line2);
+    builder.append(", city=");
+    builder.append(city);
+    builder.append(", region=");
+    builder.append(region);
+    builder.append("]");
+    return builder.toString();
   }
 
 

@@ -53,5 +53,20 @@ public class OrderDetail extends BaseModel {
     this.shipQty = shipQty;
   }
 
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("OrderDetail [order=");
+    builder.append(order);
+    builder.append(", product=");
+    builder.append(product);
+    builder.append(", orderQty=");
+    builder.append(orderQty);
+    builder.append(", shipQty=");
+    builder.append(shipQty);
+    builder.append("]");
+    return builder.toString();
+  }
+
 
 }
