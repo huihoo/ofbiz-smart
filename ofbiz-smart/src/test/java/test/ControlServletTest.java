@@ -1,4 +1,4 @@
-package webapp;
+package test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 
@@ -28,14 +27,9 @@ import javax.servlet.http.HttpSession;
 
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.utils.Debug;
-import org.huihoo.ofbiz.smart.entity.Delegator;
-import org.huihoo.ofbiz.smart.entity.EbeanDelegator;
 import org.huihoo.ofbiz.smart.entity.GenericEntityException;
-import org.huihoo.ofbiz.smart.service.GenericServiceException;
-import org.huihoo.ofbiz.smart.service.ServiceDispatcher;
 import org.huihoo.ofbiz.smart.webapp.control.ControlServlet;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import entity.Customer;
@@ -46,23 +40,10 @@ import entity.Product;
 
 
 
-public class ControlServletTest {
+public class ControlServletTest extends BaseTest{
   private static final String module = ControlServletTest.class.getName();
   private static final File responseFile = new File("response.txt");
 
-  Delegator delegator;
-  ServiceDispatcher dispatcher;
-  @Before
-  public void init() {
-    Properties p = new Properties();
-    try {
-      p.load(getClass().getResourceAsStream("/datasource-test.properties"));
-      delegator = new EbeanDelegator("h2", "entity", p);
-      dispatcher = new ServiceDispatcher(delegator);
-    } catch (GenericEntityException | IOException | GenericServiceException e) {
-      e.printStackTrace();
-    }
-  }
 
   @Test
   public void testAllInOne() throws IOException {

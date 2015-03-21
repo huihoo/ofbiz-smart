@@ -1,6 +1,6 @@
 package test;
 
-import java.io.IOException;
+
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,16 +8,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Random;
 
 import org.huihoo.ofbiz.smart.base.utils.CommUtils;
 import org.huihoo.ofbiz.smart.base.utils.Debug;
-import org.huihoo.ofbiz.smart.entity.Delegator;
-import org.huihoo.ofbiz.smart.entity.EbeanDelegator;
 import org.huihoo.ofbiz.smart.entity.GenericEntityException;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import entity.Address;
@@ -29,21 +25,9 @@ import entity.OrderDetail;
 import entity.OrderStatus;
 import entity.Product;
 
-public class DelegatorTest {
+public class DelegatorTest  extends BaseTest{
   private static final String module = DelegatorTest.class.getName();
-  Delegator delegator;
-
-  @Before
-  public void init() {
-    Properties p = new Properties();
-    try {
-      p.load(getClass().getResourceAsStream("/datasource-test.properties"));
-      delegator = new EbeanDelegator("h2", "entity", p);
-    } catch (GenericEntityException | IOException e) {
-      e.printStackTrace();
-    }
-  }
-
+  
 
   @SuppressWarnings("unchecked")
   @Test
