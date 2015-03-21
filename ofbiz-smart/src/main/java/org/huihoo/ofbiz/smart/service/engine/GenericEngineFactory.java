@@ -39,37 +39,40 @@ public class GenericEngineFactory {
    * @throws GenericServiceException
    */
   public GenericEngine getGenericEngine(String engineName) throws GenericServiceException {
-    String className = null;
-    //FIXME 服务引擎的可配置化
-    if ("java".equals(engineName)) {
-      className = "com.malllike.service.engine.StandardJavaEngine";
-    }else if("simple".equals(engineName)){ 
-      className = "com.malllike.service.engine.SimpleServiceEngine";
-    }else {
-      throw new GenericServiceException("不支持的服务引擎[" + engineName + "]");
-    }
-
     GenericEngine engine = engines.get(engineName);
     if (engine == null) {
       synchronized (GenericEngineFactory.class) {
         engine = engines.get(engineName);
         if (engine == null) {
           try {
+            
+            String className = null;
+            String packageName = getClass().getPackage().getName();
+            
+            if ("java".equals(engineName)) {
+              className = packageName+"."+"StandardJavaEngine";
+            }else if("simple".equals(engineName)){ 
+              className = packageName+"."+"SimpleServiceEngine";
+            }
+            
             ClassLoader loader = Thread.currentThread().getContextClassLoader();
             Class<?> c = loader.loadClass(className);
             Constructor<GenericEngine> cn =
                     CommUtils.cast(c.getConstructor(ServiceDispatcher.class));
+            
             engine = cn.newInstance(dispatcher);
+            
           } catch (Exception e) {
             throw new GenericServiceException(e.getMessage(), e);
           }
+          
           if (engine != null) {
             engines.put(engineName, engine);
           }
+          
         }
       }
     }
-
     return engine;
   }
 
