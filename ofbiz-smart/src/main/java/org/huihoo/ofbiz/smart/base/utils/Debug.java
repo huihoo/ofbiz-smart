@@ -40,23 +40,25 @@ public class Debug {
           logger.trace(msg);
         else
           logger.trace(msg, t);
+        break;
       case Debug.INFO:
         if (t == null)
           logger.info(msg);
         else
           logger.info(msg, t);
+        break;
       case Debug.WARING:
         if (t == null)
           logger.warn(msg);
         else
           logger.warn(msg, t);
+        break;
       case Debug.ERROR:
         if (t == null)
           logger.error(msg);
         else
           logger.error(msg, t);
         break;
-      default:
       case Debug.DEBUG:
         if(!logger.isDebugEnabled())
           return ;
