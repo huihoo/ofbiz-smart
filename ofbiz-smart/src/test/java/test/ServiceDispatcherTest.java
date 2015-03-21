@@ -1,6 +1,7 @@
 package test;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -16,6 +17,9 @@ import org.huihoo.ofbiz.smart.service.ServiceDispatcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import entity.Customer;
+import entity.Product;
 
 public class ServiceDispatcherTest {
   private static final String module = ServiceDispatcherTest.class.getName();
@@ -34,13 +38,34 @@ public class ServiceDispatcherTest {
   }
 
   @Test
-  public void testAllInOne() {
+  public void testAllInOne() throws GenericEntityException {
     Assert.assertNotNull(delegator);
     Assert.assertNotNull(dispatcher);
     Debug.logDebug(""+dispatcher.getLocalContext(), module);
     
     Map<String,Object> ctx = new HashMap<>();
-    Map<String,Object> result = dispatcher.runSync("createOrder", ctx);
+    ctx.put("name", "Peter");
+    ctx.put("countryCode", "CN");
+    ctx.put("line1", "line-1");
+    ctx.put("line2", "line-2");
+    ctx.put("city", "ChengDu");
+    Map<String,Object> result = dispatcher.runSync("createCustomer", ctx);
+    Assert.assertEquals(true, ServiceUtils.isSuccess(result));
+    
+    Customer customer = (Customer) result.get("customer");
+    Assert.assertEquals("Peter", customer.getName());
+    
+    Product testProduct = new Product();
+    testProduct.setName("Test-Product");
+    testProduct.setSku("SKU-001");
+    delegator.save(testProduct);
+    
+    ctx = new HashMap<>();
+    ctx.put("customerId", customer.getId());
+    ctx.put("productId", testProduct.getId());
+    ctx.put("orderQty", BigDecimal.ONE);
+    
+    result = dispatcher.runSync("createOrder", ctx);
     Debug.logDebug(""+CommUtils.printMap(result), module);
     Assert.assertEquals(true, ServiceUtils.isSuccess(result));
   }
