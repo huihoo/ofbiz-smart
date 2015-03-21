@@ -83,7 +83,7 @@ public class ServiceDispatcher {
     try {
       // 1. 尝试用服务资源实现类来去获取服务配置目录
       URL resourceURL = null;
-      if (this.serviceResourceName != null) {
+      if (CommUtils.isNotEmpty(this.serviceResourceName)) {
         Class<?> resourceClazz =
                 ServiceDispatcher.class.getClassLoader().loadClass(this.serviceResourceName);
         ServiceResource sr = (ServiceResource) resourceClazz.newInstance();
