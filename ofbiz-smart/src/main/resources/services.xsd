@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+	<xs:element name="services">
+		<xs:annotation>
+			<xs:documentation>
+				<![CDATA[
+					服务配置的根元素。
+				]]>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element maxOccurs="unbounded" name="description"
+					type="xs:string">
+					<xs:annotation>
+						<xs:documentation>
+							<![CDATA[
+								服务的描述信息。
+							]]>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element maxOccurs="unbounded" name="vendor" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>
+							<![CDATA[
+								服务的提供者。
+							]]>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element maxOccurs="unbounded" name="version" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>
+							<![CDATA[
+								服务的版本。
+							]]>
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element maxOccurs="unbounded" name="service">
+					<xs:annotation>
+						<xs:documentation>
+							<![CDATA[
+								服务定义。
+							]]>
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element maxOccurs="unbounded" name="description"
+								type="xs:string">
+								<![CDATA[
+									该服务的描述信息。
+								]]>
+							</xs:element>
+
+							<xs:element name="sea" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>
+										<![CDATA[
+											指定当前服务事件处理的实现类
+										]]>
+									</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attributeGroup ref="attlist.sea"></xs:attributeGroup>
+								</xs:complexType>
+							</xs:element>
+
+						</xs:sequence>
+
+						<xs:attributeGroup ref="attlist.service" />
+
+
+
+					</xs:complexType>
+
+
+
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- 服务定义元素的属性 -->
+	<xs:attributeGroup name="attlist.service">
+		<xs:attribute type="xs:string" name="name" use="required">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						服务的名称，名称必须是唯一的。
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="engine" use="required">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						服务引擎类型
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:token">
+					<xs:enumeration value="java"></xs:enumeration>
+					<xs:enumeration value="simple"></xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute type="xs:string" name="location">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						服务实现现所在位置，目前为实现类的路径。
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute type="xs:string" name="invoke">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						服务调用的具体方法。
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute type="xs:string" name="default-entity-name">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						当前服务所需要的默认业务实体名称。
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="use-transaction" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						服务是否使用事务，默认不使用。
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:token">
+					<xs:enumeration value="true"></xs:enumeration>
+					<xs:enumeration value="false"></xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+
+		<xs:attribute name="persist" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						服务是否需要有持久化，默认不需要。
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:token">
+					<xs:enumeration value="true"></xs:enumeration>
+					<xs:enumeration value="false"></xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+
+
+		<xs:attribute name="export" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						服务是否对外提供服务
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:token">
+					<xs:enumeration value="true"></xs:enumeration>
+					<xs:enumeration value="false"></xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+
+
+	</xs:attributeGroup>
+
+
+
+	<xs:attributeGroup name="attlist.sea">
+		<xs:attribute name="name" use="required">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						服务处理事件实现类的全路径名称。
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+
+		<xs:attribute name="trigger-at" use="required">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						定义在什么时候触发: before在服务调用前触发；success在服务调用成功后触发；all 调用前，成功后都触发
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:token">
+					<xs:enumeration value="all"></xs:enumeration>
+					<xs:enumeration value="before"></xs:enumeration>
+					<xs:enumeration value="success"></xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:attributeGroup>
+
+</xs:schema>
