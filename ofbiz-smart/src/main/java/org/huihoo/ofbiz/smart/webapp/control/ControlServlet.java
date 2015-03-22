@@ -1,7 +1,10 @@
 package org.huihoo.ofbiz.smart.webapp.control;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.servlet.ServletConfig;
@@ -11,9 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
-
-
-import org.xml.sax.SAXException;
 
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.utils.CommUtils;
@@ -27,6 +27,7 @@ import org.huihoo.ofbiz.smart.webapp.control.ConfigXMLLoader.Action;
 import org.huihoo.ofbiz.smart.webapp.control.ConfigXMLLoader.ActionMap;
 import org.huihoo.ofbiz.smart.webapp.control.ConfigXMLLoader.Event;
 import org.huihoo.ofbiz.smart.webapp.control.ConfigXMLLoader.Response;
+import org.xml.sax.SAXException;
 
 public class ControlServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
@@ -95,11 +96,27 @@ public class ControlServlet extends HttpServlet {
       String appConfigFile = config.getInitParameter("app-config-file");
       apiRouterGateway = config.getInitParameter("api-router-gateway");
       appConfigProp = new Properties();
-      InputStream is =
-              Thread.currentThread().getContextClassLoader().getResourceAsStream(appConfigFile);
-      appConfigProp.load(is);
-
-
+      
+      ClassLoader cL = Thread.currentThread().getContextClassLoader();
+      InputStream is = cL.getResourceAsStream(appConfigFile);
+      
+      if(is == null){//针对Mock测试时的处理
+        URL url = Thread.currentThread().getContextClassLoader().getResource("");
+        if("file".equals(url.getProtocol())){
+          String path = url.getPath();
+          if(path.startsWith("/"))
+            path = path.substring(1);
+          
+          int tIdx = path.indexOf("target");
+          if(tIdx != -1)
+            path = path.substring(0,tIdx +"/target".length());
+          
+          appConfigProp.load(new FileInputStream(new File(path+"/classes/"+appConfigFile)));
+        }
+      }else{
+        appConfigProp.load(is);
+      }
+      
       String primaryDatasourceName = appConfigProp.getProperty("datasource.default");
       serviceResourceName = appConfigProp.getProperty("service.resource.name");
       String entityBasePackage = appConfigProp.getProperty("entity.base.package");

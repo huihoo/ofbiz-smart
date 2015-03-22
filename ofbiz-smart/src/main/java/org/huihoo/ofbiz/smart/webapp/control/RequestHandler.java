@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -663,8 +664,10 @@ public class RequestHandler {
         }
       }
     } else {
-      Enumeration<?> pNames = request.getParameterNames();
+      boolean hasMoreFlag = false;
+      Enumeration<String> pNames = request.getParameterNames();
       while (pNames.hasMoreElements()) {
+        hasMoreFlag = true;
         String pName = (String) pNames.nextElement();
         if (pName.startsWith("s_chk")) {
           String[] arrayValue = request.getParameterValues(pName);
@@ -684,6 +687,14 @@ public class RequestHandler {
           context.put(pName, pValue);
           request.setAttribute(pName, pValue);
         }
+      }
+      //=======================================================
+      //在Mock测试时,pNames有值，可pNames.hasMoreElements()为flase
+      //所以当它为flase时，用别外一种方式来封装context
+      //=======================================================
+      if(!hasMoreFlag){
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        BeanUtils.populate(context, parameterMap);
       }
     }
 
