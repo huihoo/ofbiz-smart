@@ -174,7 +174,7 @@ public class RequestHandler {
           returnResult = doAutoAction(req, resp, cloneCurrentAction, actionMap, serviceDispatcher);
           doResponse(req, resp, returnResult, actionMap, cloneCurrentAction);
         } else if (C.EVENT_NONE.equalsIgnoreCase(eventType)) {
-          // TODO
+          doResponse(req, resp, returnResult, actionMap, cloneCurrentAction);
         } else if (C.EVENT_API.equalsIgnoreCase(eventType)) {
           returnResult = doApiAction(req, resp, actionMap, serviceDispatcher);
           doResponse(req, resp, returnResult, actionMap, cloneCurrentAction);
