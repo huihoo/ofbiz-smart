@@ -177,7 +177,7 @@ public class RequestHandler {
             webContext.put("condition", convertCondition(event.condition, req));
           }
           returnResult = serviceDispatcher.runSync(modelService.name, webContext);
-
+          
           // 如果指定调用的服务，还可以调用服务
           if (CommUtils.isNotEmpty(event.sname) && returnResult != null) {
             if (ServiceUtils.isSuccess(returnResult)) {
@@ -189,6 +189,7 @@ public class RequestHandler {
               }
             }
           }
+          
         } else if (C.EVENT_AUTO.equalsIgnoreCase(eventType)) {
           returnResult = doAutoAction(req, resp, cloneCurrentAction, actionMap, serviceDispatcher);
           doResponse(req, resp, returnResult, actionMap, cloneCurrentAction);
@@ -206,8 +207,6 @@ public class RequestHandler {
           aii.success(req, resp, returnResult);
         }
       }
-
-      
       
       Debug.logInfo("请求[" + target + "]耗时:" + (System.currentTimeMillis() - beginTime) + " ms.",module);
 
@@ -236,12 +235,11 @@ public class RequestHandler {
   }
 
   private void doResponse(HttpServletRequest req, HttpServletResponse resp,
-          Map<String, Object> resultMap, ActionMap actionMap, Action action) throws IOException,
-          ViewHandlerException {
+                          Map<String, Object> resultMap, ActionMap actionMap, Action action)
+                                  throws IOException,ViewHandlerException{
     String ajaxHeader = req.getHeader("x-requested-with");
     boolean isAjaxReq = CommUtils.isNotEmpty(ajaxHeader);
     Response eventResp = action.response;
-
     String responseType = eventResp.type;
 
     if (resultMap != null) {
@@ -252,8 +250,7 @@ public class RequestHandler {
           req.getSession().setAttribute(C.TIP_FLASH_SUCCESS, resultMap.get(C.TIP_FLASH_SUCCESS));
         } else {
           if (resultMap.containsKey(C.TIP_FLASH_ERROR))
-            req.getSession().setAttribute(C.TIP_FLASH_ERROR,
-                    resultMap.get(ServiceUtils.RESPONSE_MESSAGE));
+            req.getSession().setAttribute(C.TIP_FLASH_ERROR,resultMap.get(ServiceUtils.RESPONSE_MESSAGE));
         }
       }
     }
@@ -575,6 +572,21 @@ public class RequestHandler {
   private void redirect(HttpServletRequest req, HttpServletResponse resp,
           Map<String, Object> resultMap, Response eventResp, ActionMap actionMap)
           throws IOException {
+    if(ServiceUtils.isSuccess(resultMap)){
+      String rkey = "redirect://";
+      String redirectAttr = (String) resultMap.get(rkey);
+      if(CommUtils.isNotEmpty(redirectAttr)){
+        String redirectTo = redirectAttr.substring(rkey.length());
+        String urlParam = (String) resultMap.get("urlParam");
+        String realRedirectTo = "";
+        if(CommUtils.isNotEmpty(urlParam))
+          realRedirectTo = redirectTo + actionMap.actionUriSuffix +"?"+urlParam;
+        else
+          realRedirectTo = redirectTo + actionMap.actionUriSuffix;
+        resp.sendRedirect(req.getContextPath() + realRedirectTo);
+        return ;
+      }
+    }
     resp.sendRedirect(req.getContextPath() + eventResp.value + actionMap.actionUriSuffix);
   }
 

@@ -1,20 +1,16 @@
 /*******************************************************************************
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  *******************************************************************************/
 package org.huihoo.ofbiz.smart.webapp.control;
 
@@ -30,37 +26,33 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
 import org.huihoo.ofbiz.smart.base.utils.StringUtils;
 import org.huihoo.ofbiz.smart.service.ModelService.ServiceEventAction;
 
 /**
- * 核心配置文件加载器
+ * <p>
+ * 请求映射心配置文件加载器
+ * </P>
  * 
  * @author huangbohua
- * 
+ * @version 1.0
  */
 public class ConfigXMLLoader {
-
-
-
   private static final String DEFAULT_CONFIG_FILE_NAME = "/action-map.xml";
-
+  
   public static ActionMap actionMap = new ActionMap();
-
+  
   public static void loadXmlConfig(String name) throws ParserConfigurationException, SAXException,
           IOException {
-    if (name == null) name = DEFAULT_CONFIG_FILE_NAME;
-
-
+    if (name == null) 
+      name = DEFAULT_CONFIG_FILE_NAME;
+    
     SAXParserFactory factory = SAXParserFactory.newInstance();
     SAXParser parser = factory.newSAXParser();
     InputStream in = ConfigXMLLoader.class.getResourceAsStream(name);
     parser.parse(in, new SaxHandler());
-
-
   }
-
+  
   public static class SaxHandler extends DefaultHandler {
     private String content = null;
     private Action action = null;
@@ -154,7 +146,6 @@ public class ConfigXMLLoader {
         case "more-styles":
           action.moreJavascripts = content;
           break;
-
       }
     }
 
@@ -162,8 +153,6 @@ public class ConfigXMLLoader {
     public void characters(char[] ch, int start, int length) throws SAXException {
       content = new String(ch, start, length);
     }
-
-
   }
 
   public static class ActionMap implements Cloneable {
@@ -212,9 +201,6 @@ public class ConfigXMLLoader {
       builder.append("]");
       return builder.toString();
     }
-
-
-
   }
 
   public static class Action implements Cloneable {
@@ -304,11 +290,7 @@ public class ConfigXMLLoader {
     public String interceptorName;
     public String triggerAt;
 
-    @Override
-    public String toString() {
-      return "ActionInterceptor [interceptorName=" + interceptorName + ", triggerAt=" + triggerAt
-              + "]";
-    }
+    
 
     @Override
     public Object clone() {
@@ -319,6 +301,19 @@ public class ConfigXMLLoader {
         e.printStackTrace();
       }
       return o;
+    }
+
+
+
+    @Override
+    public String toString() {
+      StringBuilder builder = new StringBuilder();
+      builder.append("ActionInterceptor [interceptorName=");
+      builder.append(interceptorName);
+      builder.append(", triggerAt=");
+      builder.append(triggerAt);
+      builder.append("]");
+      return builder.toString();
     }
   }
 
@@ -342,8 +337,18 @@ public class ConfigXMLLoader {
 
     @Override
     public String toString() {
-      return "Response [type=" + type + ", layout=" + layout + ", value=" + value + "]";
+      StringBuilder builder = new StringBuilder();
+      builder.append("Response [type=");
+      builder.append(type);
+      builder.append(", layout=");
+      builder.append(layout);
+      builder.append(", value=");
+      builder.append(value);
+      builder.append("]");
+      return builder.toString();
     }
+
+    
   }
 
 }

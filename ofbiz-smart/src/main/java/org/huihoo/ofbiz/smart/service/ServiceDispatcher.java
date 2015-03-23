@@ -1,20 +1,16 @@
 /*******************************************************************************
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  *******************************************************************************/
 package org.huihoo.ofbiz.smart.service;
 
@@ -57,7 +53,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * </p>
  * 
  * @author huangbohua
- *
+ * 
  */
 public class ServiceDispatcher {
   private static final String module = ServiceDispatcher.class.getName();
@@ -67,13 +63,12 @@ public class ServiceDispatcher {
   protected Map<String, ModelService> localContext = null;
   protected String serviceResourceName = null;
 
-  
-  public ServiceDispatcher(Delegator delegator)
-          throws GenericServiceException {
+
+  public ServiceDispatcher(Delegator delegator) throws GenericServiceException {
     this(delegator, null);
   }
-  
-  
+
+
   public ServiceDispatcher(Delegator delegator, String serviceResourceName)
           throws GenericServiceException {
     factory = new GenericEngineFactory(this);
@@ -220,8 +215,8 @@ public class ServiceDispatcher {
       Debug.logError(e, "获取服务引擎[" + modelService.engineName + "]发生异常:" + e.getMessage(), module);
       return ServiceUtils.returnError("ERROR");
     }
-    
-    
+
+
     ServiceEventActionInterface sea = null;
     if (CommUtils.isNotEmpty(modelService.sea)) {
       String seaName = modelService.sea.seaName;
@@ -229,17 +224,19 @@ public class ServiceDispatcher {
       try {
         // FIXME 可以将服务事件处理缓存起来
         seaClazz =
-                Thread.currentThread().getContextClassLoader()
-                        .loadClass(modelService.sea.seaName);
+                Thread.currentThread().getContextClassLoader().loadClass(modelService.sea.seaName);
         sea = (ServiceEventActionInterface) seaClazz.newInstance();
       } catch (ClassNotFoundException e) {
-        Debug.logError(e, "ServiceEventActionInterface[" + seaName + "]未找到:"+ e.getMessage(), module);
+        Debug.logError(e, "ServiceEventActionInterface[" + seaName + "]未找到:" + e.getMessage(),
+                module);
         return ServiceUtils.returnError("ERROR");
       } catch (InstantiationException e) {
-        Debug.logError(e, "ServiceEventActionInterface[" + seaName + "]实例化错误:"+ e.getMessage(), module);
+        Debug.logError(e, "ServiceEventActionInterface[" + seaName + "]实例化错误:" + e.getMessage(),
+                module);
         return ServiceUtils.returnError("ERROR");
       } catch (IllegalAccessException e) {
-        Debug.logError(e, "ServiceEventActionInterface[" + seaName + "]非法访问错误:"+ e.getMessage(), module);
+        Debug.logError(e, "ServiceEventActionInterface[" + seaName + "]非法访问错误:" + e.getMessage(),
+                module);
         return ServiceUtils.returnError("ERROR");
       }
     }
@@ -262,8 +259,9 @@ public class ServiceDispatcher {
       if (modelService.persist) context.put(C.CTX_DELEGATOR, this.delegator);
 
       if (sea != null) {
-        if(modelService.sea != null 
-                && ("all".equals(modelService.sea.triggerAt) || "before".equals(modelService.sea.triggerAt))){
+        if (modelService.sea != null
+                && ("all".equals(modelService.sea.triggerAt) || "before"
+                        .equals(modelService.sea.triggerAt))) {
           sea.before(context);
         }
       }
@@ -271,8 +269,9 @@ public class ServiceDispatcher {
       result = engine.runSync(localName, context);
 
       if (sea != null) {
-        if(modelService.sea != null 
-                && ("all".equals(modelService.sea.triggerAt) || "success".equals(modelService.sea.triggerAt))){
+        if (modelService.sea != null
+                && ("all".equals(modelService.sea.triggerAt) || "success"
+                        .equals(modelService.sea.triggerAt))) {
           sea.success(context, result);
         }
       }
@@ -282,7 +281,8 @@ public class ServiceDispatcher {
       }
 
       long costTime = System.currentTimeMillis() - begineTime;
-      Debug.logInfo("调用服务[%s][%s][%s]耗时[%s]毫秒", module, localName, modelService.location,modelService.invoke, costTime);
+      Debug.logInfo("调用服务[%s][%s][%s]耗时[%s]毫秒", module, localName, modelService.location,
+              modelService.invoke, costTime);
       Debug.logDebug("" + result, module);
       return result;
     } catch (GenericServiceException e) {

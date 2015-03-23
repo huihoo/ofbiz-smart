@@ -1,20 +1,16 @@
 /*******************************************************************************
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  *******************************************************************************/
 package org.huihoo.ofbiz.smart.service.engine;
 
@@ -43,7 +39,6 @@ import org.huihoo.ofbiz.smart.service.ServiceDispatcher;
 
 
 
-
 public class SimpleServiceEngine extends GenericAsyncEngine {
   private static final String module = SimpleServiceEngine.class.getName();
 
@@ -56,24 +51,23 @@ public class SimpleServiceEngine extends GenericAsyncEngine {
   public Map<String, Object> runSync(String localName, Map<String, Object> context)
           throws GenericServiceException {
     if (localName == null) {
-      Debug.logError("本地服务名称为空",module);
+      Debug.logError("本地服务名称为空", module);
       throw new GenericServiceException("本地服务名称为空");
     }
 
     if (context == null) {
-      Debug.logError("服务参数上下文为空",module);
+      Debug.logError("服务参数上下文为空", module);
       throw new GenericServiceException("服务参数上下文为空");
     }
 
     ModelService modelService = this.dispatcher.getLocalContext(localName);
     if (modelService == null) {
-      Debug.logError("名为[" + localName + "]的服务模型为空",module);
+      Debug.logError("名为[" + localName + "]的服务模型为空", module);
       throw new GenericServiceException("名为[" + localName + "]的服务模型为空");
     }
 
     if (modelService.invoke == null || modelService.defaultEntityName == null) {
-      throw new GenericServiceException("服务 [" + modelService.name
-              + "] 缺失 invoke 或 default-entity-name 参数");
+      throw new GenericServiceException("服务 [" + modelService.name+ "] 缺失 invoke 或 default-entity-name 参数");
     }
 
     Delegator delegator = (Delegator) context.get(C.CTX_DELEGATOR);
@@ -130,7 +124,7 @@ public class SimpleServiceEngine extends GenericAsyncEngine {
       } else if ("findByAnd".equals(modelService.invoke)) {
         Map<String, Object> fields = (Map<String, Object>) context.get("fields");
         List<String> orderBy = (List<String>) context.get("orderBy");
-        if(CommUtils.isEmpty(orderBy)){
+        if (CommUtils.isEmpty(orderBy)) {
           orderBy = new ArrayList<String>();
           orderBy.add("updatedAt desc");
         }
@@ -142,7 +136,7 @@ public class SimpleServiceEngine extends GenericAsyncEngine {
         Map<String, Object> fields = (Map<String, Object>) context.get("fields");
         Set<String> fieldsToSelect = (Set<String>) context.get("fieldsToSelect");
         List<String> orderBy = (List<String>) context.get("orderBy");
-        if(CommUtils.isEmpty(orderBy)){
+        if (CommUtils.isEmpty(orderBy)) {
           orderBy = new ArrayList<String>();
           orderBy.add("updatedAt desc");
         }
@@ -165,7 +159,7 @@ public class SimpleServiceEngine extends GenericAsyncEngine {
       }
       return success;
     } catch (GenericEntityException e) {
-      Debug.logError(e,e.getMessage(), module);
+      Debug.logError(e, e.getMessage(), module);
       Map<String, Object> errorMap = ServiceUtils.returnError(e.getMessage());
       errorMap.put(C.TIP_FLASH_ERROR, e.getMessage());
       return errorMap;
@@ -177,7 +171,7 @@ public class SimpleServiceEngine extends GenericAsyncEngine {
    * 设置字段类型为<code>com.avaje.ebean.Model</code>的属性;
    * </p>
    * <p>
-   *    
+   * 
    * </p>
    * 
    * @param obj 要设置的对象
@@ -198,37 +192,37 @@ public class SimpleServiceEngine extends GenericAsyncEngine {
         try {
           String fName = cName.substring(0, fDotIdx);
           cTypeClazz = PropertyUtils.getPropertyType(obj, fName);
-          //如果是集合类型，获取集合里的对象类型
-          if(cTypeClazz.getName().endsWith("List")){  
-             Field f = obj.getClass().getDeclaredField(fName);
-             //java.util.List<?>
-             String fTypeName = f.getGenericType().toString();
-             String targetClazzName = fTypeName.substring(fTypeName.indexOf("<")+1,fTypeName.indexOf(">"));
-             List<Object> objList = new ArrayList<>();
-             String ppName = cName.substring(fDotIdx + 1);
-             Object cEntryValue = cEntry.getValue();
-             
-             Object pValue = null;
-             //如果是数组
-             if(cEntryValue instanceof String[]){
-               String[] cEntryValueArry = (String[])cEntryValue;
-               StringBuffer sb = new StringBuffer();
-               for(int i = 0; i < cEntryValueArry.length; i++){
-                 sb.append(cEntryValueArry[i]);
-                 if(i < cEntryValueArry.length -1)
-                   sb.append("#");
-               }
-               //拼接条件字符串
-               String condition = ppName+"@in@"+sb.toString();
-               pValue = delegator.findList(targetClazzName, condition, null, null, false);
-               objList.addAll((List<?>)pValue);
-             }else{
-               Map<String, Object> fields = CommUtils.toMap(ppName, cEntryValue);
-               pValue = delegator.findUniqueByAnd(targetClazzName, fields, false);
-               objList.add(pValue);
-             }
-             BeanUtils.copyProperty(obj, pName, objList);
-          }else{
+          // 如果是集合类型，获取集合里的对象类型
+          if (cTypeClazz.getName().endsWith("List")) {
+            Field f = obj.getClass().getDeclaredField(fName);
+            // java.util.List<?>
+            String fTypeName = f.getGenericType().toString();
+            String targetClazzName =
+                    fTypeName.substring(fTypeName.indexOf("<") + 1, fTypeName.indexOf(">"));
+            List<Object> objList = new ArrayList<>();
+            String ppName = cName.substring(fDotIdx + 1);
+            Object cEntryValue = cEntry.getValue();
+
+            Object pValue = null;
+            // 如果是数组
+            if (cEntryValue instanceof String[]) {
+              String[] cEntryValueArry = (String[]) cEntryValue;
+              StringBuffer sb = new StringBuffer();
+              for (int i = 0; i < cEntryValueArry.length; i++) {
+                sb.append(cEntryValueArry[i]);
+                if (i < cEntryValueArry.length - 1) sb.append("#");
+              }
+              // 拼接条件字符串
+              String condition = ppName + "@in@" + sb.toString();
+              pValue = delegator.findList(targetClazzName, condition, null, null, false);
+              objList.addAll((List<?>) pValue);
+            } else {
+              Map<String, Object> fields = CommUtils.toMap(ppName, cEntryValue);
+              pValue = delegator.findUniqueByAnd(targetClazzName, fields, false);
+              objList.add(pValue);
+            }
+            BeanUtils.copyProperty(obj, pName, objList);
+          } else {
             String ppName = cName.substring(fDotIdx + 1);
             Map<String, Object> fields = CommUtils.toMap(ppName, cEntry.getValue());
             Object pValue = delegator.findUniqueByAnd(cTypeClazz.getName(), fields, false);
@@ -236,7 +230,7 @@ public class SimpleServiceEngine extends GenericAsyncEngine {
           }
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException
                 | GenericEntityException | NoSuchFieldException | SecurityException e) {
-          Debug.logError(e,"设置属性[%s][%s]发生异常", module,cTypeClazz,cName);
+          Debug.logError(e, "设置属性[%s][%s]发生异常", module, cTypeClazz, cName);
         }
       }
     }
