@@ -57,7 +57,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class ServiceDispatcher {
   private static final String module = ServiceDispatcher.class.getName();
-
+  protected boolean isTestMode = false;
   protected Delegator delegator = null;
   protected GenericEngineFactory factory = null;
   protected Map<String, ModelService> localContext = null;
@@ -245,11 +245,16 @@ public class ServiceDispatcher {
       Debug.logError("服务引擎需要执行持久化服务,但是Delegator为空", module);
       return ServiceUtils.returnError("ERROR");
     }
-
+    
     // 是否使用事务
     boolean useTransaction =
             delegator != null && modelService.useTransaction && modelService.persist;
-    if (useTransaction) {
+    //==========================================================================
+    // 指定使用事务且不在测试模式时，开始一个事务;
+    // 如果在测试下，不开启事务，哪怕服务显示指定使用事务,此时希望测试环境来接管事务管理。
+    // 因为在有些测试环境下，不希望测试数据保存到数据库。
+    //==========================================================================
+    if (useTransaction && !isTestMode) { 
       delegator.beginTransaction();
     }
 
@@ -276,7 +281,7 @@ public class ServiceDispatcher {
         }
       }
 
-      if (useTransaction) {
+      if (useTransaction && !isTestMode) {
         delegator.commitTransaction();
       }
 
@@ -288,12 +293,12 @@ public class ServiceDispatcher {
     } catch (GenericServiceException e) {
       Debug.logError(e, "调用服务[%s][%s][%s]发生异常", module, localName, modelService.location,
               modelService.invoke);
-      if (useTransaction) {
+      if (useTransaction && !isTestMode) {
         delegator.rollback();
       }
       return ServiceUtils.returnError("ERROR");
     } finally {
-      if (useTransaction) {
+      if (useTransaction && !isTestMode) {
         delegator.endTransaction();
       }
     }
@@ -436,5 +441,16 @@ public class ServiceDispatcher {
 
   public Map<String, ModelService> getLocalContext() {
     return localContext;
+  }
+  
+
+  /**
+   * <p>
+   *    设置是否在测试模式下运行。如果是，则不使用事务。
+   * </p>
+   * @param isTestMode <code>true</code>是;<code>false</code>
+   */
+  public void setTestMode(boolean isTestMode) {
+    this.isTestMode = isTestMode;
   }
 }

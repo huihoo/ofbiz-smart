@@ -14,10 +14,11 @@ import org.junit.Test;
 public class PropertiesTest {
   @Test
   public void testIt() {
+    
     Locale locale = new Locale("zh");
-    ResourceBundle resourceBundle = PropertiesUtils.getResourceBundle("/test/AccountingUiLabels.xml", locale);
-    Assert.assertNotNull(resourceBundle);
-    String a = resourceBundle.getString("AccountingAHCElectronicCheck");
+    ResourceBundle resourceBundle = PropertiesUtils.getResourceBundle("/test/UiLabels.xml", locale);
+    String a = resourceBundle.getString("TransactionSuccessful");
+    
     Assert.assertEquals("电子资金转账账户：金融机构委员会/电子支票", a);
     
     locale = new Locale("en");

@@ -22,20 +22,16 @@ package test;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.huihoo.ofbiz.smart.entity.Delegator;
+import org.huihoo.ofbiz.smart.base.test.BaseTestCase;
 import org.huihoo.ofbiz.smart.entity.EbeanDelegator;
 import org.huihoo.ofbiz.smart.entity.GenericEntityException;
 import org.huihoo.ofbiz.smart.service.GenericServiceException;
 import org.huihoo.ofbiz.smart.service.ServiceDispatcher;
-import org.junit.Before;
 
 
-public class BaseTest {
+public class BaseTest extends BaseTestCase{
 
-  Delegator delegator;
-  ServiceDispatcher dispatcher;
-  
-  @Before
+  @Override
   public void init() {
     Properties p = new Properties();
     try {
