@@ -26,7 +26,7 @@ public abstract class BaseTestCase {
 
   @After
   public void endup() {
-    if (isTestMdoe) {
+    if (isTestMdoe && delegator != null) {
       delegator.rollback();
       delegator.endTransaction();
     }

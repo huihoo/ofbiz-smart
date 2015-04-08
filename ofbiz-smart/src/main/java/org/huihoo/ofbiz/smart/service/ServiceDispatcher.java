@@ -109,9 +109,10 @@ public class ServiceDispatcher {
 
       if (resourceURL.getProtocol().equals("file")) {
         String filePath = resourceURL.getFile();
-        Debug.logInfo("服务配置当前类加载所在目录 : " + filePath, module);
+        Debug.logInfo("服务配置原始目录 : " + filePath, module);
+        filePath = filePath.replaceAll("test-classes", "classes");
         File file = new File(filePath.substring(0, filePath.lastIndexOf("classes")) + "classes");
-        Debug.logInfo("服务配置当前类加载所在目录classPath根目录:" + file, module);
+        Debug.logInfo("服务配置原始目录转换后:" + file, module);
         if (file.isDirectory()) {
           File[] files = file.listFiles();
           for (int i = 0; i < files.length; i++) {
@@ -120,7 +121,7 @@ public class ServiceDispatcher {
             if (fName.endsWith(".xml") && fName.startsWith("service")) {
               SAXParser parser = parserFactor.newSAXParser();
               ServiceSaxHandler saxHandler = new ServiceSaxHandler(gobalLocalcontext);
-              Debug.logInfo("ServiceFile>" + f, module);
+              Debug.logDebug("ServiceFile>" + f, module);
               parser.parse(f, saxHandler);
             }
           }
