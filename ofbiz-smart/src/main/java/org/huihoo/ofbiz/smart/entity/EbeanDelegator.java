@@ -1,20 +1,16 @@
 /*******************************************************************************
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  *******************************************************************************/
 package org.huihoo.ofbiz.smart.entity;
 
@@ -147,7 +143,6 @@ public class EbeanDelegator implements Delegator {
           throws GenericEntityException {
     try {
       Class<?> entityClazz = classFromName(entityName);
-
       return server.find(entityClazz, id);
     } catch (Exception e) {
       Debug.logError(e, "findById exception", module);
@@ -458,7 +453,7 @@ public class EbeanDelegator implements Delegator {
     }
   }
 
-  
+
   @Override
   public Object findUniqueByAnd(String entityName, Map<String, Object> fields)
           throws GenericEntityException {
@@ -470,7 +465,7 @@ public class EbeanDelegator implements Delegator {
     }
   }
 
- 
+
   @Override
   public List<?> findByAnd(String entityName, Map<String, Object> fields)
           throws GenericEntityException {
@@ -482,7 +477,7 @@ public class EbeanDelegator implements Delegator {
     }
   }
 
-  
+
   @Override
   public List<?> findByAnd(String entityName, Map<String, Object> fields, List<String> orderBy)
           throws GenericEntityException {
@@ -529,7 +524,7 @@ public class EbeanDelegator implements Delegator {
     }
   }
 
- 
+
   @Override
   public Map<String, Object> findPageByCondition(String entityName, String condition,
           Set<String> fieldsToSelect, List<String> orderBy, int pageNo, int pageSize)
@@ -543,7 +538,7 @@ public class EbeanDelegator implements Delegator {
     }
   }
 
- 
+
   @Override
   public Map<String, Object> findPageByCondition(String entityName, String condition,
           Set<String> fieldsToSelect, int pageNo, int pageSize) throws GenericEntityException {
@@ -556,7 +551,7 @@ public class EbeanDelegator implements Delegator {
     }
   }
 
- 
+
   @Override
   public Map<String, Object> findPageByCondition(String entityName, String condition, int pageNo,
           int pageSize) throws GenericEntityException {
@@ -568,7 +563,7 @@ public class EbeanDelegator implements Delegator {
     }
   }
 
-  
+
   @Override
   public Map<String, Object> findPageByAnd(String entityName, Map<String, Object> fields,
           Set<String> fieldsToSelect, List<String> orderBy, int pageNo, int pageSize)
@@ -581,7 +576,7 @@ public class EbeanDelegator implements Delegator {
     }
   }
 
- 
+
   @Override
   public Map<String, Object> findPageByAnd(String entityName, Map<String, Object> fields,
           Set<String> fieldsToSelect, int pageNo, int pageSize) throws GenericEntityException {
@@ -649,8 +644,7 @@ public class EbeanDelegator implements Delegator {
 
   private void buildQueryCondition(String condition, ExpressionList<?> exp)
           throws GenericEntityException {
-    if (CommUtils.isEmpty(condition)) 
-      return ;
+    if (CommUtils.isEmpty(condition)) return;
     String[] conditionToken = condition.split(",");
     // TODO 采用antrl语法树构造加强
     for (String ec : conditionToken) {
@@ -659,15 +653,15 @@ public class EbeanDelegator implements Delegator {
       }
       String[] conditionPair = ec.split("@");
       if (conditionPair.length != 3)
-        throw new IllegalArgumentException("The pair[" + conditionPair + "] of condition["+ condition + "] is illegal");
+        throw new IllegalArgumentException("The pair[" + conditionPair + "] of condition["
+                + condition + "] is illegal");
 
       String fieldName = conditionPair[0];
       String operator = conditionPair[1];
       String condValue = conditionPair[2];
 
-      if(CommUtils.isEmpty(condValue))
-        continue;
-      
+      if (CommUtils.isEmpty(condValue)) continue;
+
       switch (operator) {
         case "in":
           Object[] valueArry = condValue.split("#");
@@ -708,40 +702,57 @@ public class EbeanDelegator implements Delegator {
           exp.isNotNull(fieldName);
           break;
         case "or":
-          //TODO
+          // TODO
           break;
         default:
-          throw new IllegalArgumentException("不支持的操作符:" + operator+ "");
+          throw new IllegalArgumentException("不支持的操作符:" + operator + "");
       }
     }
   }
 
-  
+
   @Override
   public List<Map<String, Object>> findListByRawQuerySql(String sql, List<?> params)
           throws GenericEntityException {
-    List<Map<String,Object>> mapList = new ArrayList<>();
-    
+    List<Map<String, Object>> mapList = new ArrayList<>();
+
     SqlQuery query = server.createSqlQuery(sql);
-    if(CommUtils.isNotEmpty(params)){
-      for(int i = 0; i < params.size(); i++){
-        query.setParameter(i+1, params.get(i));
+    if (CommUtils.isNotEmpty(params)) {
+      for (int i = 0; i < params.size(); i++) {
+        query.setParameter(i + 1, params.get(i));
       }
     }
     List<SqlRow> rows = query.findList();
-    if(rows != null && rows.size() > 0){
+    if (rows != null && rows.size() > 0) {
       for (SqlRow r : rows) {
-        Map<String,Object> rowMap = new HashMap<>();
-        
+        Map<String, Object> rowMap = new HashMap<>();
+
         Iterator<String> cKeys = r.keys();
-        while(cKeys.hasNext()){
+        while (cKeys.hasNext()) {
           String k = cKeys.next();
           rowMap.put(k, r.get(k));
         }
-        
+
         mapList.add(rowMap);
       }
     }
     return mapList;
+  }
+
+  @Override
+  public Object findUniqueByAnd(String entityName, Map<String, Object> fields,
+          Set<String> fieldsToSelect) throws GenericEntityException{
+    try {
+      Class<?> entityClazz = classFromName(entityName);
+      Query<?> query = server.find(entityClazz);
+      buildSelectFields(query, fieldsToSelect);
+      ExpressionList<?> expList = query.where();
+      if(CommUtils.isNotEmpty(fields))
+        expList.allEq(fields);      
+      return expList.findUnique();
+    } catch (Exception e) {
+      Debug.logError(e, "toJson exception", module);
+      throw new GenericEntityException(e);
+    }
   }
 }

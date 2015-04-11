@@ -1,20 +1,16 @@
 /*******************************************************************************
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  *******************************************************************************/
 package org.huihoo.ofbiz.smart.entity;
 
@@ -183,6 +179,7 @@ public interface Delegator {
    */
   public int executeRawSql(String rawSql) throws GenericEntityException;
 
+
   /**
    * <p>
    * 根据主键ID查找业务实体
@@ -238,6 +235,20 @@ public interface Delegator {
    */
   public Object findUniqueByAnd(String entityName, Map<String, Object> fields, boolean useCache)
           throws GenericEntityException;
+
+  /**
+   * <p>
+   * 根据所给的条件进行And查询唯一记录,所有的条件均是And(与)的关系。
+   * </p>
+   * 
+   * @param entityName 要查找到的业务实体名称
+   * @param fields 条件字段<code>Map</code>集合。<code>key</code>为业务实体属性字段,<code>value</code>为字段对应的值
+   * @param fieldsToSelect 要返回的业务实体属性字段集合，如果指定，仅该集合中的字段返回值，其它字段为<code>null</code>
+   * @return 找到的业务实体<code>List</code>集合
+   * @throws GenericEntityException
+   */
+  public Object findUniqueByAnd(String entityName, Map<String, Object> fields,
+          Set<String> fieldsToSelect) throws GenericEntityException;
 
 
   /**
