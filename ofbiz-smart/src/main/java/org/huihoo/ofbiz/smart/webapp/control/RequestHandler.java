@@ -39,6 +39,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.json.JSONObject;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -48,8 +50,7 @@ import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.utils.CommUtils;
 import org.huihoo.ofbiz.smart.base.utils.Debug;
 import org.huihoo.ofbiz.smart.base.utils.ServiceUtils;
-import org.huihoo.ofbiz.smart.entity.Delegator;
-import org.huihoo.ofbiz.smart.entity.GenericEntityException;
+import org.huihoo.ofbiz.smart.base.utils.json.JsonConfigExtends;
 import org.huihoo.ofbiz.smart.service.GenericServiceException;
 import org.huihoo.ofbiz.smart.service.ModelService;
 import org.huihoo.ofbiz.smart.service.ServiceDispatcher;
@@ -596,10 +597,13 @@ public class RequestHandler {
     resp.setContentType(CONTENT_TYPE_JSON);
     if (returnResult != null) {
       Map<String, Object> resultMap = (Map<String, Object>) returnResult;
-      Delegator delegator = (Delegator) req.getAttribute(C.CTX_DELEGATOR);
+//      Delegator delegator = (Delegator) req.getAttribute(C.CTX_DELEGATOR);
       try {
-        resp.getWriter().print(delegator.toJson(resultMap));
-      } catch (GenericEntityException e) {
+    	  /**关于json调整**/
+    	  JSONObject jsonObject = JSONObject.fromObject(resultMap,JsonConfigExtends.getJsonconfig());
+//    	  resp.getWriter().print(delegator.toJson(resultMap));
+    	  resp.getWriter().print(jsonObject.toString());
+      } catch (Exception e) {
         Debug.logError(e, "解析返回结果错误", module);
         resp.getWriter().print(ERROR_JSON);
       }

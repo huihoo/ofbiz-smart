@@ -4,7 +4,7 @@
 
 	<groupId>org.huihoo</groupId>
 	<artifactId>ofbiz-smart</artifactId>
-	<version>0.7.7</version>
+	<version>0.7.8</version>
 	<packaging>jar</packaging>
 
 	<name>ofbiz-smart</name>
@@ -139,7 +139,13 @@
 			<version>1.4.185</version>
 			<scope>test</scope>
 		</dependency>
-
+		
+		<dependency>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib</artifactId>
+			<version>2.4</version>
+			<classifier>jdk15</classifier><!--指定jdk版本 -->
+		</dependency>
 
 	</dependencies>
 
