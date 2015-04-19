@@ -436,9 +436,8 @@ public class RequestHandler {
     serviceDispatcher.putModelService(modelService);
 
     // 条件转换
-    if (CommUtils.isNotEmpty(action.event.condition)) {
-      webContext.put("condition", convertCondition(action.event.condition, req));
-    }
+    webContext.put("condition", convertCondition(action.event.condition, req));
+   
 
     Map<String, Object> resultMap = serviceDispatcher.runSync(modelService.name, webContext);
 
