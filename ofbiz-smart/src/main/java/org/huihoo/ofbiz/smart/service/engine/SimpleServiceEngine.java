@@ -105,10 +105,10 @@ public class SimpleServiceEngine extends GenericAsyncEngine {
         success.put("model", obj);
       } else if ("findById".equals(modelService.invoke)) {
         Object id = context.get("id");
-        if (CommUtils.isEmpty(id)) {
-          return ServiceUtils.returnError("需要设置实体对象主键的值");
+        Object obj = null;
+        if (CommUtils.isNotEmpty(id)) {
+          obj = delegator.findById(defaultEntityName, id, useCache);
         }
-        Object obj = delegator.findById(defaultEntityName, id, useCache);
         success.put("model", obj);
       } else if ("remove".equals(modelService.invoke)) {
         Object id = context.get("id");
