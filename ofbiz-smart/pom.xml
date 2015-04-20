@@ -4,7 +4,7 @@
 
 	<groupId>org.huihoo</groupId>
 	<artifactId>ofbiz-smart</artifactId>
-	<version>0.7.8</version>
+	<version>0.7.9.1</version>
 	<packaging>jar</packaging>
 
 	<name>ofbiz-smart</name>

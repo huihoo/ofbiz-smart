@@ -22,7 +22,7 @@
 	version="2.1">
 	<tlibversion>1.0</tlibversion>
 	<jspversion>2.0</jspversion>
-	<shortname>dnx</shortname>
+	<shortname>hh</shortname>
 	<info>自定义标签库</info>
 	<uri>http://huihoo.com/tags</uri>
 
@@ -31,7 +31,7 @@
 				分页标签
 			</description>
 		<name>pagination</name>
-		<tagclass>com.malllike.webapp.taglib.PaginationTag</tagclass>
+		<tagclass>org.huihoo.ofbiz.smart.webapp.taglib.PaginationTag</tagclass>
 		<attribute>
 			<description>
 					总记录数
