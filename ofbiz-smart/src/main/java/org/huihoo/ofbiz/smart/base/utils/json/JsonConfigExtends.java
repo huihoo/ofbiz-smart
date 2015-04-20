@@ -8,6 +8,7 @@ public class JsonConfigExtends {
 	static{
 		jsonConfig.registerJsonValueProcessor(Timestamp.class , new JsonDateValueProcessor()); 
 		jsonConfig.registerJsonValueProcessor(Date.class , new JsonDateValueProcessor()); 
+		jsonConfig.registerJsonValueProcessor(java.util.Date.class , new JsonDateValueProcessor()); 
 	}
 	
 	public static net.sf.json.JsonConfig getJsonconfig(){
