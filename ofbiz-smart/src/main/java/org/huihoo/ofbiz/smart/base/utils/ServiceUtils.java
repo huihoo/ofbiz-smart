@@ -33,6 +33,7 @@ public class ServiceUtils {
   public static final String RESPOND_SUCCESS = "success";
   public static final String RESPOND_ERROR = "error";
   public static final String RESPOND_FAIL = "fail";
+  public static final String AUTH = "auth_fail";
   
   
   public static boolean isSuccess(Map<String, Object> result) {
@@ -64,6 +65,9 @@ public static Map<String, Object> returnError(String errorMessage) {
     return returnProplem(RESPOND_ERROR, errorMessage);
 }
 
+public static Map<String, Object> returnAuth(String errorMessage) {
+	return returnProplem(AUTH, errorMessage);
+}
 
 public static Map<String, Object> returnSuccess() {
     return returnMessage(RESPOND_SUCCESS, "SUCCESS");

@@ -34,6 +34,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.huihoo.ofbiz.smart.base.C;
+import org.huihoo.ofbiz.smart.base.auth.ILoginAuth;
 import org.huihoo.ofbiz.smart.base.utils.CommUtils;
 import org.huihoo.ofbiz.smart.base.utils.Debug;
 import org.huihoo.ofbiz.smart.base.utils.ServiceUtils;
@@ -200,7 +201,6 @@ public class ServiceDispatcher {
         return ServiceUtils.returnError("当前调用的服务[" + localName + "]为对外提供的服务，但是Export设置为了["
                 + modelService.export + "]");
       }
-
     } catch (GenericServiceException e) {
       Debug.logError(e, "获取服务[" + localName + "]发生异常:" + e.getMessage(), module);
       return ServiceUtils.returnError("ERROR");
@@ -247,6 +247,17 @@ public class ServiceDispatcher {
       return ServiceUtils.returnError("ERROR");
     }
     
+    // 将持久化服务对象添加至服务上下文
+    if (modelService.persist) context.put(C.CTX_DELEGATOR, this.delegator);
+    /**auth 为true时，需要登录认证，执行继续**/
+    if(modelService.auth){
+  	 ILoginAuth auth = (ILoginAuth)context.get(C.API_LOGIN_AUTH_KEY);
+  	 boolean bo = auth.loginAuth(context);
+  	 if(!bo){
+  	    return ServiceUtils.returnAuth("当前调用的服务[" + localName + "]需要登录认证，auth设置为了["
+  	                + modelService.auth + "],用户为未登录"); 
+  	 }
+    }
     // 是否使用事务
     boolean useTransaction =
             delegator != null && modelService.useTransaction && modelService.persist;
@@ -262,7 +273,7 @@ public class ServiceDispatcher {
     try {
       context.put(C.CTX_SERVICE_DISPATCHER, this);
       // 将持久化服务对象添加至服务上下文
-      if (modelService.persist) context.put(C.CTX_DELEGATOR, this.delegator);
+      //if (modelService.persist) context.put(C.CTX_DELEGATOR, this.delegator);
 
       if (sea != null) {
         if (modelService.sea != null

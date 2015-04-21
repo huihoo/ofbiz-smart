@@ -283,6 +283,7 @@ public class RequestHandler {
     webContext.put(C.IS_WEB_CONTEXT, true);
     webContext.put(C.CTX_REQUEST, req);
     webContext.put(C.CTX_RESPONSE, resp);
+    webContext.put(C.API_LOGIN_AUTH_KEY, req.getAttribute(C.API_LOGIN_AUTH_KEY));
     return webContext;
   }
 

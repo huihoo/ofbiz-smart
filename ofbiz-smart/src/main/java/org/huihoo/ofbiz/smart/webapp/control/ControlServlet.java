@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.huihoo.ofbiz.smart.base.C;
+import org.huihoo.ofbiz.smart.base.auth.ILoginAuth;
 import org.huihoo.ofbiz.smart.base.utils.CommUtils;
 import org.huihoo.ofbiz.smart.base.utils.Debug;
 import org.huihoo.ofbiz.smart.entity.Delegator;
@@ -43,6 +44,7 @@ import org.huihoo.ofbiz.smart.webapp.control.ConfigXMLLoader.Event;
 import org.huihoo.ofbiz.smart.webapp.control.ConfigXMLLoader.Response;
 import org.xml.sax.SAXException;
 
+
 public class ControlServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
   private static final String module = ControlServlet.class.getName();
@@ -51,6 +53,7 @@ public class ControlServlet extends HttpServlet {
   private volatile ServiceDispatcher serviceDispatcher;
   private volatile Delegator prmaryDelegator;
   private volatile Properties appConfigProp;
+  private volatile ILoginAuth loginAuth;
 
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
@@ -83,6 +86,7 @@ public class ControlServlet extends HttpServlet {
     req.setAttribute(C.CTX_DELEGATOR, prmaryDelegator);
     req.setAttribute(C.CTX_SERVICE_DISPATCHER, serviceDispatcher);
     req.setAttribute(C.CTX_APP_CONFIG_PROP, appConfigProp);
+    req.setAttribute(C.API_LOGIN_AUTH_KEY, loginAuth);
 
     // 如果配置了API服务路由网关入口，增加一个单独的Action,专门处理API请求
     if (CommUtils.isNotEmpty(apiRouterGateway)) {
@@ -133,7 +137,6 @@ public class ControlServlet extends HttpServlet {
 
       prmaryDelegator = new EbeanDelegator(primaryDatasourceName, entityBasePackage, appConfigProp);
       serviceDispatcher = new ServiceDispatcher(prmaryDelegator, serviceResourceName);
-
       // 将Delegator和ServiceDispatcher和请求路径后缀保存在服务器全局上下文中
       ServletContext servletContext = config.getServletContext();
 
@@ -141,7 +144,19 @@ public class ControlServlet extends HttpServlet {
       servletContext.setAttribute(C.CTX_DELEGATOR, prmaryDelegator);
       servletContext.setAttribute(C.CTX_SERVICE_DISPATCHER, serviceDispatcher);
       servletContext.setAttribute(C.CTX_APP_CONFIG_PROP, appConfigProp);
-
+      /**登录认证class**/
+      String apiLoginAuth = config.getInitParameter("api-login-auth");
+      /**为null使用默认的**/
+      if(null == apiLoginAuth || "".equals(apiLoginAuth)){
+    	  apiLoginAuth = "org.huihoo.ofbiz.smart.base.auth.impl.LoginAuth"; 
+      }
+      Object ob = Class.forName(apiLoginAuth).newInstance();
+      if(ob instanceof ILoginAuth){
+    	  loginAuth = (ILoginAuth)ob;
+    	  servletContext.setAttribute(C.API_LOGIN_AUTH_KEY, ob);
+      }else{
+    	  throw new ServletException("API login authentication org.huihoo.ofbiz.smart.base.auth.impl.LoginAuth is not inherited");
+      }
     } catch (GenericServiceException e) {
       throw new ServletException(e);
     } catch (GenericEntityException e) {
@@ -152,7 +167,15 @@ public class ControlServlet extends HttpServlet {
       throw new ServletException(e);
     } catch (SAXException e) {
       throw new ServletException(e);
-    }
+    } catch (InstantiationException e) {
+      throw new ServletException(e);
+	} catch (IllegalAccessException e) {
+	  throw new ServletException(e);
+	} catch (ClassNotFoundException e) {
+	  throw new ServletException(e);
+	}catch(Exception e){
+	  throw new ServletException(e);
+	}
   }
 
 

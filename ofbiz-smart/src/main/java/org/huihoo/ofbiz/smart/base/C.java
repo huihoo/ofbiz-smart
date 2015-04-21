@@ -142,6 +142,10 @@ public class C {
    */
   public static final String IS_EXPORT_API = "__is_export_api__";
 
+  /**
+   * 标识API登录验证key
+   */
+  public static final String API_LOGIN_AUTH_KEY = "api_login_auth_key";
 
 
 }
