@@ -755,4 +755,16 @@ public class EbeanDelegator implements Delegator {
       throw new GenericEntityException(e);
     }
   }
+
+  @Override
+  public void update(Object entity) throws GenericEntityException {
+	 try {
+	      server.update(entity);
+	    } catch (Exception e) {
+	      Debug.logError(e, "update exception", module);
+	      throw new GenericEntityException(e);
+	    }
+  }
+  
+  
 }

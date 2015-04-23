@@ -602,5 +602,13 @@ public interface Delegator {
    */
   public List<Map<String, Object>> findListByRawQuerySql(String sql, List<?> params)
           throws GenericEntityException;
+  
+  
+  /**
+   * 修改操作
+   * @param entity
+   * @throws GenericEntityException
+   */
+  public void update(Object entity)throws GenericEntityException;
 
 }
