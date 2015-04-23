@@ -140,10 +140,10 @@ public class SimpleServiceEngine extends GenericAsyncEngine {
           orderBy = new ArrayList<String>();
           orderBy.add("updatedAt desc");
         }
-        Integer pageNo = (Integer) context.get("pageNo");
-        Integer pageSize = (Integer) context.get("pageSize");
-        if (pageNo == null) pageNo = 1;
-        if (pageSize == null) pageSize = 20;
+        
+        Integer pageNo = Integer.valueOf( (context.get("pageNo") == null ? 1 :context.get("pageNo") ) + "" );
+        Integer pageSize = Integer.valueOf( (context.get("pageSize") == null ? 20 :context.get("pageSize") ) + "" );
+        
         Map<String, Object> pMap = null;
         if (CommUtils.isNotEmpty(condition))
           pMap =
