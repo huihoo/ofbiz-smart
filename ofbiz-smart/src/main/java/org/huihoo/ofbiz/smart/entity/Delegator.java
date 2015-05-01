@@ -167,6 +167,18 @@ public interface Delegator {
    * @throws GenericEntityException
    */
   public int executeRawSql(String rawSql, List<?> params) throws GenericEntityException;
+  
+  /**
+   * <p>
+   * 执行原生的更新或删除语句
+   * </p>
+   * 
+   * @param rawSql 要执行的 原生的更新或删除语句
+   * @param params 参数集合。注意： 参数的个数和顺序必须和语句中的占位符?相匹配
+   * @return SQL语句影响的记录数
+   * @throws GenericEntityException
+   */
+  public int executeRawSql(String rawSql, Object... params) throws GenericEntityException;
 
   /**
    * <p>

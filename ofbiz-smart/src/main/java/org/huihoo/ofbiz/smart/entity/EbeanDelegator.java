@@ -109,7 +109,7 @@ public class EbeanDelegator implements Delegator {
   @Override
   public int executeRawSql(String rawSql) throws GenericEntityException {
     try {
-      return executeRawSql(rawSql, null);
+      return executeRawSql(rawSql, new ArrayList<Object>());
     } catch (Exception e) {
       Debug.logError(e, "executeRawSql exception", module);
       throw new GenericEntityException(e);
@@ -764,6 +764,15 @@ public class EbeanDelegator implements Delegator {
 	      Debug.logError(e, "update exception", module);
 	      throw new GenericEntityException(e);
 	    }
+  }
+
+  @Override
+  public int executeRawSql(String rawSql, Object... params) throws GenericEntityException {
+    if(params.length > 0){
+      List<Object> list =  Arrays.asList(params);
+      return executeRawSql(rawSql, list);
+    }
+    return 0;
   }
   
   
