@@ -137,6 +137,9 @@ public class ConfigXMLLoader {
         case "config-properties-file":
           actionMap.configPropertiesFile = content;
           break;
+        case "upload-relative-path":
+          actionMap.uploadRelativePath = content;
+          break;
         case "page-title":
           action.pageTitle = content;
           break;
