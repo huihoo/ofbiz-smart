@@ -109,7 +109,7 @@ public class RequestHandler {
       String allowMethod = currentAction.allowMethod;
       if (CommUtils.isNotEmpty(allowMethod) && !C.ALLOW_ALL.equals(allowMethod)
               && !reqMethod.equalsIgnoreCase(allowMethod)) {
-        Debug.logWaring("不支持的请求方法 " + reqMethod + " " + allowMethod, module);
+        Debug.logWarn("不支持的请求方法 " + reqMethod + " " + allowMethod, module);
         resp.sendError(400, "NOT SUPPORT METHOD");
         return;
       }
@@ -200,7 +200,7 @@ public class RequestHandler {
           returnResult = doApiAction(req, resp, actionMap, serviceDispatcher);
           doResponse(req, resp, returnResult, actionMap, cloneCurrentAction);
         } else {
-          Debug.logWaring("不支持的事件处理类型[" + eventType + "]", module);
+          Debug.logWarn("不支持的事件处理类型[" + eventType + "]", module);
         }
         
         if(aii != null && interceptor != null && 
@@ -294,7 +294,7 @@ public class RequestHandler {
     Properties prop = (Properties) req.getAttribute(C.CTX_APP_CONFIG_PROP);
     String configKeyAndSecrets = prop.getProperty("api.keys_and_secrets");
     if (CommUtils.isEmpty(configKeyAndSecrets)) {
-      Debug.logWaring("配置文件缺失名为 api.keys_and_secrets 针对API请求Key和Secret的设置", module);
+      Debug.logWarn("配置文件缺失名为 api.keys_and_secrets 针对API请求Key和Secret的设置", module);
     } else {
       String[] keySecretTokens = configKeyAndSecrets.split(",");
       for (String kst : keySecretTokens) {
@@ -390,14 +390,16 @@ public class RequestHandler {
     if (target.indexOf("/index") != -1 || target.indexOf("/list") != -1) {
       action.event.invoke = "findPageByCondition";
       action.response.type = C.RESP_INCLUDE_VIEW;
-      action.response.layout = "/layout.jsp";
+      if(action.response.layout == null)
+        action.response.layout = "/layout.jsp";
       action.response.value = "/" + moduleName + "/list.jsp";
     }
     // 新增页面
     else if (target.indexOf("/create") != -1) {
       action.event.invoke = "findById";
       action.response.type = C.RESP_INCLUDE_VIEW;
-      action.response.layout = "/layout.jsp";
+      if(action.response.layout == null)
+        action.response.layout = "/layout.jsp";
       action.response.value = "/" + moduleName + "/form.jsp";
     }
     // 新增保存
@@ -416,7 +418,8 @@ public class RequestHandler {
     else if (target.indexOf("/view") != -1 || target.indexOf("/edit") != -1) {
       action.event.invoke = "findById";
       action.response.type = C.RESP_INCLUDE_VIEW;
-      action.response.layout = "/layout.jsp";
+      if(action.response.layout == null)
+        action.response.layout = "/layout.jsp";
       action.response.value = "/" + moduleName + "/form.jsp";
     }
 
