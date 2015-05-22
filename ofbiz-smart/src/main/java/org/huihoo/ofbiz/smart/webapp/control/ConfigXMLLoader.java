@@ -146,7 +146,7 @@ public class ConfigXMLLoader {
         case "more-css":
           action.moreCss = content;
           break;
-        case "more-styles":
+        case "more-javascripts":
           action.moreJavascripts = content;
           break;
       }

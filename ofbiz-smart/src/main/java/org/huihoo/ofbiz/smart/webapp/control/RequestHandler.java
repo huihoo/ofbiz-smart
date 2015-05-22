@@ -101,9 +101,21 @@ public class RequestHandler {
       }
 
       if (currentAction == null) {
-        Debug.logError("请求[" + target + "]未找到对应的Action", module);
-        resp.sendError(404, target + " NOT FOUND");
-        return;
+        if("/".equals(req.getRequestURI())){
+          String homePage = (String) req.getAttribute("homePage");
+          if(CommUtils.isEmpty(homePage)){
+            Debug.logError("请求[" + target + "]未找到对应的Action", module);
+            resp.sendError(404, target + " NOT FOUND");
+            return;
+          }else{
+            resp.sendRedirect(req.getContextPath()+homePage);
+            return ;
+          }
+        }else{
+          Debug.logError("请求[" + target + "]未找到对应的Action", module);
+          resp.sendError(404, target + " NOT FOUND");
+          return;
+        }
       }
 
       String allowMethod = currentAction.allowMethod;
@@ -262,7 +274,7 @@ public class RequestHandler {
     } else {
       // 2. 生成Response
       if (C.RESP_INCLUDE_VIEW.equalsIgnoreCase(responseType)) {
-        includeView(req, resp, resultMap, eventResp, actionMap);
+        includeView(req, resp, resultMap,action,eventResp, actionMap);
       } else if (C.RESP_REDIRECT.equalsIgnoreCase(responseType)) {
         redirect(req, resp, resultMap, eventResp, actionMap);
       } else if (C.RESP_JSON.equalsIgnoreCase(responseType)) {
@@ -556,8 +568,10 @@ public class RequestHandler {
    * @throws ViewHandlerException
    */
   private void includeView(HttpServletRequest req, HttpServletResponse resp,
-          Map<String, Object> resultMap, Response eventResp, ActionMap actionMap)
+          Map<String, Object> resultMap, Action currentAction, Response eventResp, ActionMap actionMap)
           throws ViewHandlerException {
+    req.setAttribute("moreCss", currentAction.moreCss);
+    req.setAttribute("moreJavascripts", currentAction.moreJavascripts);
     req.setAttribute("reqUri", req.getRequestURI());
     req.setAttribute("jspViewBasePath", actionMap.jspViewBasePath);
     if (resultMap != null) {

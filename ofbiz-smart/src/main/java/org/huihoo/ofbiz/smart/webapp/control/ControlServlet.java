@@ -87,7 +87,7 @@ public class ControlServlet extends HttpServlet {
     req.setAttribute(C.CTX_SERVICE_DISPATCHER, serviceDispatcher);
     req.setAttribute(C.CTX_APP_CONFIG_PROP, appConfigProp);
     req.setAttribute(C.API_LOGIN_AUTH_KEY, loginAuth);
-
+    req.setAttribute("homePage", homePage);
     // 如果配置了API服务路由网关入口，增加一个单独的Action,专门处理API请求
     if (CommUtils.isNotEmpty(apiRouterGateway)) {
       Action apiAction = new Action();
@@ -104,6 +104,7 @@ public class ControlServlet extends HttpServlet {
 
   private String serviceResourceName;
   private String apiRouterGateway;
+  private String homePage;
 
   @Override
   public void init(ServletConfig config) throws ServletException {
@@ -113,6 +114,7 @@ public class ControlServlet extends HttpServlet {
       actionMap = ConfigXMLLoader.actionMap;
       String appConfigFile = config.getInitParameter("app-config-file");
       apiRouterGateway = config.getInitParameter("api-router-gateway");
+      homePage = config.getInitParameter("home-page"); //首页地址
       appConfigProp = new Properties();
 
       ClassLoader cL = Thread.currentThread().getContextClassLoader();
