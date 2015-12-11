@@ -1,5 +1,7 @@
-OFBiz Smart 最新版本开发已转到 
+#OFBiz Smart 1.0 
 
-https://github.com/huihoo/ofbiz-smart
+原来基础之上的一个稳定版本,修复若干Bug. 增加若干实用特性。
 
-这里作为OFBiz Smart交流社区和GitHub镜像仓库。
+#OFBiz Smart 2.0
+
+基于Moqui设计思想，全新设计。
