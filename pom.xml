@@ -263,6 +263,8 @@
 		</plugins>
 	</reporting>
 	<modules>
-		
+
+	<module>ofbiz-smart-framework</module>
+	<module>ofbiz-smart-petclinic</module>
 	</modules>
 </project>
