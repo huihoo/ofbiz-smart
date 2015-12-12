@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.huihoo</groupId>
+	<artifactId>ofbiz-smart</artifactId>
+	<version>1.0.0</version>
+	<packaging>pom</packaging>
+
+	<name>ofbiz-smart</name>
+	<url>http://code.huihoo.com/huihoo/ofbiz-smart</url>
+	<description>A tiny,smart,powerful web framework inspired by OFBiz framework,ROR,Jodd and Spring Boot.
+	</description>
+	
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>huihoo</name>
+		<url>http://huihoo.com</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>huangbaihua</id>
+			<name>黄柏华</name>
+			<url>https://github.com/huangbaihua001</url>
+			<email>huangbaihua001@163.com</email>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.7</java.version>
+		<junit.version>4.12</junit.version>
+		<logback.classic.version>1.1.3</logback.classic.version>
+		<ebean.orm.version>[4.1,5)</ebean.orm.version>
+		<ebean.orm.agent.version>4.1.2</ebean.orm.agent.version>
+		<ebean.agentloader.version>1.1.1</ebean.agentloader.version>
+		<servlet.version>3.0.1</servlet.version>
+		<slf4j.version>1.7.12</slf4j.version>
+		<asm.version>5.0.4</asm.version>
+		<ongl.version>3.0.11</ongl.version>
+		<javassit.version>3.12.1.GA</javassit.version>
+		<mockito.version>1.10.19</mockito.version>
+		<mysql.jdbc.version>5.1.26</mysql.jdbc.version>
+		<h2.database.version>1.4.185</h2.database.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- slf4j -->
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId>
+				<version>${slf4j.version}</version>
+				<scope>runtime</scope>
+			</dependency>
+			
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>${logback.classic.version}</version>
+			</dependency>
+			<!-- sl4fj end -->
+
+			<dependency>
+				<artifactId>asm-all</artifactId>
+				<groupId>org.ow2.asm</groupId>
+				<version>${asm.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>ognl</groupId>
+				<artifactId>ognl</artifactId>
+				<version>${ongl.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>javassist</groupId>
+				<artifactId>javassist</artifactId>
+				<version>${javassit.version}</version>
+			</dependency>
+			
+			<!-- ORM see https://github.com/ebean-orm/avaje-ebeanorm -->
+			<dependency>
+				<groupId>org.avaje.ebeanorm</groupId>
+				<artifactId>avaje-ebeanorm</artifactId>
+				<version>${ebean.orm.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.avaje.ebeanorm</groupId>
+				<artifactId>avaje-ebeanorm-agent</artifactId>
+				<version>${ebean.orm.agent.version}</version>
+				<scope>runtime</scope>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.avaje</groupId>
+				<artifactId>avaje-agentloader</artifactId>
+				<version>${ebean.agentloader.version}</version>
+				<scope>runtime</scope>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.zaxxer</groupId>
+				<artifactId>HikariCP</artifactId>
+				<version>2.4.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-all</artifactId>
+				<version>${mockito.version}</version>
+				<scope>test</scope>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-dbcp2</artifactId>
+				<version>2.1</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>com.mchange</groupId>
+				<artifactId>c3p0</artifactId>
+				<version>0.9.5</version>
+				<scope>test</scope>
+			</dependency>
+			
+			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>${mysql.jdbc.version}</version>
+				<scope>test</scope>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<version>${h2.database.version}</version>
+				<scope>test</scope>
+			</dependency>
+			
+		</dependencies>
+	</dependencyManagement>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestFile>
+							src/main/resources/META-INF/MANIFEST.MF
+						</manifestFile>
+						<manifest>
+							<addClasspath>true</addClasspath>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.7</version>
+				<configuration>
+					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<configuration>
+					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.1</version>
+				<configuration>
+					<doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
+					<!-- <docletPath>/Applications/UMLGraph-5.7_2.3-SNAPSHOT/lib/UmlGraph.jar</docletPath> -->
+					<docletArtifact>
+						<groupId>org.umlgraph</groupId>
+						<artifactId>umlgraph</artifactId>
+						<version>5.6.6</version>
+					</docletArtifact>
+					<additionalparam>-views -all</additionalparam>
+					<useStandardDocletOptions>true</useStandardDocletOptions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+	<modules>
+		
+	</modules>
+</project>
