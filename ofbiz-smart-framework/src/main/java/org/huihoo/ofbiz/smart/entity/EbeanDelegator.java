@@ -305,7 +305,7 @@ public class EbeanDelegator implements Delegator {
   public void executeWithInTx(TxRunnable txRunnable) {
     try {
       beginTransaction();
-      txRunnable.run(this);
+      txRunnable.run();
     }catch(Exception e){
       Log.e(e, "EbeanDeletagor.execute() occurs an exception.", TAG);
       rollback();
@@ -318,7 +318,7 @@ public class EbeanDelegator implements Delegator {
   public Object executeWithInTx(TxCallable txCallable) {
     try {
       beginTransaction();
-      return txCallable.call(this);
+      return txCallable.call();
     }catch(Exception e){
       Log.e(e, "EbeanDeletagor.execute() occurs an exception.", TAG);
       rollback();
