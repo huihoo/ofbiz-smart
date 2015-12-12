@@ -17,7 +17,7 @@ import java.util.Set;
  */
 public interface Delegator {
   
-  Object useDataSource(String name);
+  Delegator useDataSource(String name);
   //======================================================================================
   //                                 Transaction Operation
   // =====================================================================================

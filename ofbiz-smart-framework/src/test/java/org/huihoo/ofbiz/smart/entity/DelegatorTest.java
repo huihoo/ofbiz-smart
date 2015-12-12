@@ -8,6 +8,10 @@ public class DelegatorTest {
   
   @Test
   public void testInItEbeanDelegator() {
-    
+    try {
+      Delegator delegator = new EbeanDelegator();
+    } catch (GenericEntityException e) {
+      e.printStackTrace();
+    }
   }
 }   
