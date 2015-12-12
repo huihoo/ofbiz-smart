@@ -11,7 +11,7 @@
 	<url>http://code.huihoo.com/huihoo/ofbiz-smart</url>
 	<description>A tiny,smart,powerful web framework inspired by OFBiz framework,ROR,Jodd and Spring Boot.
 	</description>
-	
+
 	<licenses>
 		<license>
 			<name>Apache License 2.0</name>
@@ -51,6 +51,13 @@
 		<asm.version>5.0.4</asm.version>
 		<ongl.version>3.0.11</ongl.version>
 		<javassit.version>3.12.1.GA</javassit.version>
+
+		<servlet.api.version>3.0</servlet.api.version>
+		<jsp.api.version>2.2</jsp.api.version>
+		<el.api.version>2.2</el.api.version>
+		<tablib.version>1.1.2</tablib.version>
+		<jstl.version>1.2</jstl.version>
+
 		<mockito.version>1.10.19</mockito.version>
 		<mysql.jdbc.version>5.1.26</mysql.jdbc.version>
 		<h2.database.version>1.4.185</h2.database.version>
@@ -64,14 +71,14 @@
 				<artifactId>slf4j-api</artifactId>
 				<version>${slf4j.version}</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>jcl-over-slf4j</artifactId>
 				<version>${slf4j.version}</version>
 				<scope>runtime</scope>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-classic</artifactId>
@@ -96,28 +103,62 @@
 				<artifactId>javassist</artifactId>
 				<version>${javassit.version}</version>
 			</dependency>
-			
+
 			<!-- ORM see https://github.com/ebean-orm/avaje-ebeanorm -->
 			<dependency>
 				<groupId>org.avaje.ebeanorm</groupId>
 				<artifactId>avaje-ebeanorm</artifactId>
 				<version>${ebean.orm.version}</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.avaje.ebeanorm</groupId>
 				<artifactId>avaje-ebeanorm-agent</artifactId>
 				<version>${ebean.orm.agent.version}</version>
 				<scope>runtime</scope>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.avaje</groupId>
 				<artifactId>avaje-agentloader</artifactId>
 				<version>${ebean.agentloader.version}</version>
 				<scope>runtime</scope>
 			</dependency>
-			
+
+
+			<!-- Java EE -->
+			<dependency>
+				<groupId>org.glassfish</groupId>
+				<artifactId>javax.servlet</artifactId>
+				<version>${servlet.api.version}</version>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet.jsp</groupId>
+				<artifactId>jsp-api</artifactId>
+				<version>${jsp.api.version}</version>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.el</groupId>
+				<artifactId>el-api</artifactId>
+				<version>${el.api.version}</version>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>taglibs</groupId>
+				<artifactId>standard</artifactId>
+				<version>${tablib.version}</version>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>jstl</groupId>
+				<artifactId>jstl</artifactId>
+				<version>${jstl.version}</version>
+				<scope>runtime</scope>
+			</dependency>
+
+
 			<dependency>
 				<groupId>com.zaxxer</groupId>
 				<artifactId>HikariCP</artifactId>
@@ -130,14 +171,14 @@
 				<version>${junit.version}</version>
 				<scope>test</scope>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-all</artifactId>
 				<version>${mockito.version}</version>
 				<scope>test</scope>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-dbcp2</artifactId>
@@ -151,21 +192,21 @@
 				<version>0.9.5</version>
 				<scope>test</scope>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
 				<version>${mysql.jdbc.version}</version>
 				<scope>test</scope>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>com.h2database</groupId>
 				<artifactId>h2</artifactId>
 				<version>${h2.database.version}</version>
 				<scope>test</scope>
 			</dependency>
-			
+
 		</dependencies>
 	</dependencyManagement>
 
@@ -264,7 +305,7 @@
 	</reporting>
 	<modules>
 
-	<module>ofbiz-smart-framework</module>
-	<module>ofbiz-smart-petclinic</module>
+		<module>ofbiz-smart-framework</module>
+		<module>ofbiz-smart-petclinic</module>
 	</modules>
 </project>

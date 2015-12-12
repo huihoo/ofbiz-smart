@@ -31,7 +31,7 @@ public class CommUtil {
   public final static Object[] EMPTY_ARGS = new Object[] {};
   public final static Class<?>[] EMPTY_CLAZZ = new Class<?>[] {};
   public static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
-  private final static String module = CommUtil.class.getName();
+  private final static String tag = CommUtil.class.getName();
 
 
   public static boolean isNumber(String input) {
@@ -80,7 +80,7 @@ public class CommUtil {
     if (data.length % 2 == 1) {
       IllegalArgumentException e = new IllegalArgumentException(
               "You must pass an even sized array to the toMap method (size = " + data.length + ")");
-      Debug.logError(e, "data size is illegal.", module);
+      Log.e(e, "data size is illegal.", tag);
       throw e;
     }
     Map<String, Object> map = new HashMap<String, Object>();
@@ -152,7 +152,7 @@ public class CommUtil {
       }
       return toHexString(byteData);
     } catch (NoSuchAlgorithmException e) {
-      Debug.logError(e, "Failed to generate MD5 : " + e.getMessage(), module);
+      Log.e(e, "Failed to generate MD5 : " + e.getMessage(), tag);
       return null;
     }
   }
@@ -165,7 +165,7 @@ public class CommUtil {
       byte[] rawHmac = mac.doFinal(data.getBytes());
       return toHexString(rawHmac);
     } catch (Exception e) {
-      Debug.logError(e, "Failed to generate HMAC : " + e.getMessage(), module);
+      Log.e(e, "Failed to generate HMAC : " + e.getMessage(), tag);
       return null;
     }
   }
