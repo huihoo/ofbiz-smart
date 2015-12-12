@@ -43,7 +43,7 @@
 		<java.version>1.7</java.version>
 		<junit.version>4.12</junit.version>
 		<logback.classic.version>1.1.3</logback.classic.version>
-		<ebean.orm.version>[4.1,5)</ebean.orm.version>
+		<ebean.orm.version>6.13.4</ebean.orm.version>
 		<ebean.orm.agent.version>4.1.2</ebean.orm.agent.version>
 		<ebean.agentloader.version>1.1.1</ebean.agentloader.version>
 		<servlet.version>3.0.1</servlet.version>
@@ -110,7 +110,7 @@
 				<artifactId>avaje-ebeanorm</artifactId>
 				<version>${ebean.orm.version}</version>
 			</dependency>
-
+			
 			<dependency>
 				<groupId>org.avaje.ebeanorm</groupId>
 				<artifactId>avaje-ebeanorm-agent</artifactId>
