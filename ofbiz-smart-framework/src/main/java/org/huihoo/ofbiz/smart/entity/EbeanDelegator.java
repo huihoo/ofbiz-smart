@@ -149,7 +149,7 @@ public class EbeanDelegator implements Delegator {
   @Override
   public void removeById(Object id) throws GenericEntityException {
     // TODO Auto-generated method stub
-
+    
   }
 
   @Override
@@ -301,6 +301,30 @@ public class EbeanDelegator implements Delegator {
     return 0;
   }
 
+  @Override
+  public void executeWithInTx(TxRunnable txRunnable) {
+    try {
+      beginTransaction();
+      txRunnable.run(this);
+    }catch(Exception e){
+      Log.e(e, "EbeanDeletagor.execute() occurs an exception.", TAG);
+      rollback();
+    }finally{
+      endTransaction();
+    }
+  }
 
-
+  @Override
+  public Object executeWithInTx(TxCallable txCallable) {
+    try {
+      beginTransaction();
+      return txCallable.call(this);
+    }catch(Exception e){
+      Log.e(e, "EbeanDeletagor.execute() occurs an exception.", TAG);
+      rollback();
+      return null;
+    }finally{
+      endTransaction();
+    }
+  }
 }

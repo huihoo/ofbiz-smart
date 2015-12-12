@@ -25,7 +25,8 @@ public interface Delegator {
   void rollback();
   void commitTransaction();
   void endTransaction();
-  
+  void executeWithInTx(TxRunnable txRunnable);
+  Object executeWithInTx(TxCallable txCallable);
   //======================================================================================
   //                                 Entity Save,Update,Remove
   // =====================================================================================
