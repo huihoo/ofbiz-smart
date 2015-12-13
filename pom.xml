@@ -131,7 +131,6 @@
 				<groupId>org.glassfish</groupId>
 				<artifactId>javax.servlet</artifactId>
 				<version>${servlet.api.version}</version>
-				<scope>runtime</scope>
 			</dependency>
 			<dependency>
 				<groupId>javax.servlet.jsp</groupId>
