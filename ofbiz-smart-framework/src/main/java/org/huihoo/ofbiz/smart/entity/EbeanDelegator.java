@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.avaje.ebean.*;
 import com.avaje.ebean.text.PathProperties;
 import org.huihoo.ofbiz.smart.base.C;
-import org.huihoo.ofbiz.smart.base.GeneralException;
 import org.huihoo.ofbiz.smart.base.cache.Cache;
 import org.huihoo.ofbiz.smart.base.cache.LocalConcurrentLRUCache;
 import org.huihoo.ofbiz.smart.base.location.FlexibleLocation;
