@@ -419,15 +419,26 @@ public class EbeanDelegator implements Delegator {
   }
 
   @Override
-  public int countByAnd(Class<?> entityClazz, Map<String, Object> andMap) {
-
-    return 0;
+  public int countByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException{
+    try {
+      return currentServerMap.get(CURRENT_SERVER_NAME).find(entityClazz).where().allEq(andMap).findRowCount();
+    } catch (Exception e) {
+      Log.e(e, "EbeanDeletagor.countByAnd() occurs an exception.", TAG);
+      throw new GenericEntityException(e);
+    }
   }
 
   @Override
-  public int countByCond(Class<?> entityClazz, String cond) {
-
-    return 0;
+  public int countByCond(Class<?> entityClazz, String cond) throws GenericEntityException{
+    try {
+      Query<?> query = currentServerMap.get(CURRENT_SERVER_NAME).find(entityClazz);
+      ExpressionList<?> expList = query.where();
+      buildExpressList(expList, cond, null);
+      return expList.findRowCount();
+    } catch (Exception e) {
+      Log.e(e, "EbeanDeletagor.countByCond() occurs an exception.", TAG);
+      throw new GenericEntityException(e);
+    }
   }
 
   @Override
@@ -533,7 +544,7 @@ public class EbeanDelegator implements Delegator {
       beginTransaction();
       txRunnable.run();
     }catch(Exception e){
-      Log.e(e, "EbeanDeletagor.execute() occurs an exception.", TAG);
+      Log.e(e, "EbeanDeletagor.executeWithInTx() occurs an exception.", TAG);
       rollback();
     }finally{
       endTransaction();
@@ -546,7 +557,7 @@ public class EbeanDelegator implements Delegator {
       beginTransaction();
       return txCallable.call();
     }catch(Exception e){
-      Log.e(e, "EbeanDeletagor.execute() occurs an exception.", TAG);
+      Log.e(e, "EbeanDeletagor.executeWithInTx() occurs an exception.", TAG);
       rollback();
       return null;
     }finally{
