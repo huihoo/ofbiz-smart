@@ -15,20 +15,71 @@ import java.util.Set;
  * </p>
  * 
  * @author huangbaihua
- *
+ * @since  1.0
  */
 public interface Delegator {
-  
+  /**
+   * <p>
+   *  使用指定的数据源,实现方应该可以通过指定的名称，切换到该数据源下。以支持多数据源特性。
+   * </p>
+   * @param name 要使用的数据源名称
+   * @return <code>{@link Delegator}</code>本身，返回自己的目的是可以实现接口的链式访问。
+   */
   Delegator useDataSource(String name);
+
+  /**
+   *<p>
+   *     获取当前接口实例的<code>{@link Cache}</code>。<br/>
+   *     获取持有的缓存实例，主要是为了能对它进行一些常用操作，比如清空缓存或是查看相关统计数据，如缓存命中率等。<br/>
+   *     实现方应该提供一个{@link Cache}的实现，以满足需要缓存数据的接口需求。
+   *</p>
+   *
+   * @return
+   */
   Cache getCache();
   //======================================================================================
   //                                 Transaction Operation
   // =====================================================================================
+
+  /**
+   * <p>
+   *     开启一个事务
+   * </p>
+   */
   void beginTransaction();
+
+  /**
+   * <p>
+   *     回滚一个事务
+   * </p>
+   */
   void rollback();
+
+  /**
+   * <p>
+   *     提交一个事务
+   * </p>
+   */
   void commitTransaction();
+
+  /**
+   * <p>
+   *     结束一个事务
+   * </p>
+   */
   void endTransaction();
+
+  /**
+   *
+   * @param txRunnable
+   */
   void executeWithInTx(TxRunnable txRunnable);
+
+  /**
+   *
+   * @param txCallable
+   * @return
+   */
   Object executeWithInTx(TxCallable txCallable);
   //======================================================================================
   //                                 Entity Save,Update,Remove
