@@ -666,123 +666,23 @@ public class EbeanDelegator implements Delegator {
         String[] condToken = cond.split("," + C.EXPR_OR + ",");
         String leftCond = condToken[0];
         String rightCond = condToken[1];
-        exp.or(buildOrExpr(leftCond),buildOrExpr(rightCond));
-      } else if (cond.indexOf(C.EXPR_EQ) >= 0) {
-        String[] condToken = cond.split("," + C.EXPR_EQ + ",");
-        String fieldName = condToken[0];
-        String condValue = condToken[1];
-        if (CommUtil.isNotEmpty(condValue)) {
-          exp.eq(fieldName, condValue);
-        }
-      } else if(cond.indexOf(C.EXPR_NE) >= 0) {
-        String[] condToken = cond.split("," + C.EXPR_NE + ",");
-        String fieldName = condToken[0];
-        String condValue = condToken[1];
-        if (CommUtil.isNotEmpty(condValue)) {
-          exp.ne(fieldName, condValue);
-        }
-      } else if(cond.indexOf(C.EXPR_IN) >= 0) {
-        String[] condToken = cond.split("," + C.EXPR_IN + ",");
-        String fieldName = condToken[0];
-        String condValue = condToken[1];
-        if (CommUtil.isNotEmpty(condValue)) {
-          Object[] valueArray = condValue.split("#");
-          exp.in(fieldName, Arrays.asList(valueArray));
-        }
-      } else if(cond.indexOf(C.EXPR_NIN) >= 0) {
-        String[] condToken = cond.split("," + C.EXPR_NIN + ",");
-        String fieldName = condToken[0];
-        String condValue = condToken[1];
-        if (CommUtil.isNotEmpty(condValue)) {
-          Object[] valueArray = condValue.split("#");
-          exp.not(server.getExpressionFactory().in(fieldName,Arrays.asList(valueArray)));
-        }
-      } else if(cond.indexOf(C.EXPR_LE) >= 0) {
-        String[] condToken = cond.split("," + C.EXPR_LE + ",");
-        String fieldName = condToken[0];
-        String condValue = condToken[1];
-        if (CommUtil.isNotEmpty(condValue)) {
-          exp.le(fieldName, condValue);
-        }
-      } else if(cond.indexOf(C.EXPR_LT) >= 0) {
-        String[] condToken = cond.split("," + C.EXPR_LT + ",");
-        String fieldName = condToken[0];
-        String condValue = condToken[1];
-        if (CommUtil.isNotEmpty(condValue)) {
-          exp.lt(fieldName, condValue);
-        }
-      } else if(cond.indexOf(C.EXPR_GE) >= 0) {
-        String[] condToken = cond.split("," + C.EXPR_GE + ",");
-        String fieldName = condToken[0];
-        String condValue = condToken[1];
-        if (CommUtil.isNotEmpty(condValue)) {
-          exp.ge(fieldName, condValue);
-        }
-      } else if(cond.indexOf(C.EXPR_GT) >= 0) {
-        String[] condToken = cond.split("," + C.EXPR_GT + ",");
-        String fieldName = condToken[0];
-        String condValue = condToken[1];
-        if (CommUtil.isNotEmpty(condValue)) {
-          exp.gt(fieldName, condValue);
-        }
-      } else if(cond.indexOf(C.EXPR_IS_NULL) >= 0) {
-        String[] condToken = cond.split("," + C.EXPR_IS_NULL + ",");
-        String fieldName = condToken[0];
-        String condValue = condToken[1];
-        if (CommUtil.isNotEmpty(condValue)) {
-          exp.isNull(fieldName);
-        }
-      } else if(cond.indexOf(C.EXPR_IS_NOT_NULL) >= 0) {
-        String[] condToken = cond.split("," + C.EXPR_IS_NOT_NULL + ",");
-        String fieldName = condToken[0];
-        String condValue = condToken[1];
-        if (CommUtil.isNotEmpty(condValue)) {
-          exp.isNotNull(fieldName);
-        }
-      } else if(cond.indexOf(C.EXPR_LIKE) >= 0) {
-        String[] condToken = cond.split("," + C.EXPR_LIKE + ",");
-        String fieldName = condToken[0];
-        String condValue = condToken[1];
-        if (CommUtil.isNotEmpty(condValue)) {
-          exp.like(fieldName, "%" + condValue + "%");
-        }
-      } else if(cond.indexOf(C.EXPR_LLIKE) >= 0) {
-        String[] condToken = cond.split("," + C.EXPR_LLIKE + ",");
-        String fieldName = condToken[0];
-        String condValue = condToken[1];
-        if (CommUtil.isNotEmpty(condValue)) {
-          exp.like(fieldName, "%" + condValue);
-        }
-      } else if(cond.indexOf(C.EXPR_RLIKE) >= 0) {
-        String[] condToken = cond.split("," + C.EXPR_RLIKE + ",");
-        String fieldName = condToken[0];
-        String condValue = condToken[1];
-        if (CommUtil.isNotEmpty(condValue)) {
-          exp.like(fieldName, condValue + "%");
-        }
-      } else if(cond.indexOf(C.EXPR_BETWEEN) >= 0) {
-        String[] condToken = cond.split("," + C.EXPR_BETWEEN + ",");
-        String fieldName = condToken[0];
-        String condValue = condToken[1];
-        if (CommUtil.isNotEmpty(condValue)) {
-          Object[] valueArray = condValue.split("#");
-          exp.between(fieldName,valueArray[0],valueArray[1]);
-        }
-      }else {
-        throw new IllegalArgumentException("Unsupported expression operator with in " + cond + "");
+        exp.or(setExpression(leftCond,null),setExpression(rightCond,null));
+      } else {
+        setExpression(cond,exp);
       }
     }
   }
 
   /**
    * <p>
-   *     根据条件字符串 构建 {@link com.avaje.ebean.Expression} 对象
+   *     根据条件字符串，设置查询表达式对象，如果参数<code>exp</code>为空，构建<code>{@link com.avaje.ebean.Expression}</code>并返回，
+   *     否则设置的是<code>{@link com.avaje.ebean.ExpressionList}</code>对象
    * </p>
-   * @see #buildQueryExpression(String, ExpressionList)
-   * @param cond 指定的条件值
-   * @return  {@link com.avaje.ebean.Expression} 对象
+   * @param cond  指定的条件字符串
+   * @param exp   要设置的<code>{@link com.avaje.ebean.ExpressionList}</code>
+   * @return    如果参数exp为空，返回<code>{@link com.avaje.ebean.Expression}</code>，否则返回<code>NULL</code>
    */
-  private Expression buildOrExpr(String cond) {
+  private Expression setExpression(String cond,ExpressionList<?> exp) {
     if (CommUtil.isNotEmpty(cond)) {
       EbeanServer server = currentServerMap.get(CURRENT_SERVER_NAME);
       ExpressionFactory ef = server.getExpressionFactory();
@@ -791,14 +691,22 @@ public class EbeanDelegator implements Delegator {
         String fieldName = condToken[0];
         String condValue = condToken[1];
         if (CommUtil.isNotEmpty(condValue)) {
-          return ef.eq(fieldName, condValue);
+          if (exp != null) {
+            exp.eq(fieldName, condValue);
+          } else {
+            return ef.eq(fieldName, condValue);
+          }
         }
       } else if(cond.indexOf(C.EXPR_NE) >= 0) {
         String[] condToken = cond.split("," + C.EXPR_NE + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
         if (CommUtil.isNotEmpty(condValue)) {
-          return ef.ne(fieldName, condValue);
+          if (exp != null) {
+            exp.ne(fieldName, condValue);
+          } else {
+            return ef.ne(fieldName, condValue);
+          }
         }
       } else if(cond.indexOf(C.EXPR_IN) >= 0) {
         String[] condToken = cond.split("," + C.EXPR_IN + ",");
@@ -806,7 +714,11 @@ public class EbeanDelegator implements Delegator {
         String condValue = condToken[1];
         if (CommUtil.isNotEmpty(condValue)) {
           Object[] valueArray = condValue.split("#");
-          return ef.in(fieldName, Arrays.asList(valueArray));
+          if (exp != null) {
+            exp.in(fieldName, Arrays.asList(valueArray));
+          } else {
+            return ef.in(fieldName, Arrays.asList(valueArray));
+          }
         }
       } else if(cond.indexOf(C.EXPR_NIN) >= 0) {
         String[] condToken = cond.split("," + C.EXPR_NIN + ",");
@@ -814,70 +726,110 @@ public class EbeanDelegator implements Delegator {
         String condValue = condToken[1];
         if (CommUtil.isNotEmpty(condValue)) {
           Object[] valueArray = condValue.split("#");
-          return ef.not(server.getExpressionFactory().in(fieldName,Arrays.asList(valueArray)));
+          if (exp != null) {
+            exp.not(server.getExpressionFactory().in(fieldName,Arrays.asList(valueArray)));
+          } else {
+            return ef.not(server.getExpressionFactory().in(fieldName, Arrays.asList(valueArray)));
+          }
         }
       } else if(cond.indexOf(C.EXPR_LE) >= 0) {
         String[] condToken = cond.split("," + C.EXPR_LE + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
         if (CommUtil.isNotEmpty(condValue)) {
-          return ef.le(fieldName, condValue);
+          if (exp != null) {
+            exp.le(fieldName, condValue);
+          } else {
+            return ef.le(fieldName, condValue);
+          }
         }
       } else if(cond.indexOf(C.EXPR_LT) >= 0) {
         String[] condToken = cond.split("," + C.EXPR_LT + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
         if (CommUtil.isNotEmpty(condValue)) {
-          return ef.lt(fieldName, condValue);
+          if (exp != null) {
+            exp.lt(fieldName, condValue);
+          } else {
+            return ef.lt(fieldName, condValue);
+          }
         }
       } else if(cond.indexOf(C.EXPR_GE) >= 0) {
         String[] condToken = cond.split("," + C.EXPR_GE + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
         if (CommUtil.isNotEmpty(condValue)) {
-          return ef.ge(fieldName, condValue);
+          if (exp != null) {
+            exp.ge(fieldName, condValue);
+          } else {
+            return ef.ge(fieldName, condValue);
+          }
         }
       } else if(cond.indexOf(C.EXPR_GT) >= 0) {
         String[] condToken = cond.split("," + C.EXPR_GT + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
         if (CommUtil.isNotEmpty(condValue)) {
-          return ef.gt(fieldName, condValue);
+          if (exp != null) {
+            exp.gt(fieldName, condValue);
+          } else {
+            return ef.gt(fieldName, condValue);
+          }
         }
       } else if(cond.indexOf(C.EXPR_IS_NULL) >= 0) {
         String[] condToken = cond.split("," + C.EXPR_IS_NULL + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
         if (CommUtil.isNotEmpty(condValue)) {
-          return ef.isNull(fieldName);
+          if (exp != null) {
+            exp.isNull(fieldName);
+          } else {
+            return ef.isNull(fieldName);
+          }
         }
       } else if(cond.indexOf(C.EXPR_IS_NOT_NULL) >= 0) {
         String[] condToken = cond.split("," + C.EXPR_IS_NOT_NULL + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
         if (CommUtil.isNotEmpty(condValue)) {
-          return ef.isNotNull(fieldName);
+          if (exp != null) {
+            exp.isNotNull(fieldName);
+          } else {
+            return ef.isNotNull(fieldName);
+          }
         }
       } else if(cond.indexOf(C.EXPR_LIKE) >= 0) {
         String[] condToken = cond.split("," + C.EXPR_LIKE + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
         if (CommUtil.isNotEmpty(condValue)) {
-          return ef.like(fieldName, "%" + condValue + "%");
+          if (exp != null) {
+            exp.like(fieldName, "%" + condValue + "%");
+          } else {
+            return ef.like(fieldName, "%" + condValue + "%");
+          }
         }
       } else if(cond.indexOf(C.EXPR_LLIKE) >= 0) {
         String[] condToken = cond.split("," + C.EXPR_LLIKE + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
         if (CommUtil.isNotEmpty(condValue)) {
-          return ef.like(fieldName, "%" + condValue);
+          if (exp != null) {
+            exp.like(fieldName, "%" + condValue);
+          } else {
+            return ef.like(fieldName, "%" + condValue);
+          }
         }
       } else if(cond.indexOf(C.EXPR_RLIKE) >= 0) {
         String[] condToken = cond.split("," + C.EXPR_RLIKE + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
         if (CommUtil.isNotEmpty(condValue)) {
-          return ef.like(fieldName, condValue + "%");
+          if (exp != null) {
+            exp.like(fieldName, condValue + "%");
+          } else {
+            return ef.like(fieldName, condValue + "%");
+          }
         }
       } else if(cond.indexOf(C.EXPR_BETWEEN) >= 0) {
         String[] condToken = cond.split("," + C.EXPR_BETWEEN + ",");
@@ -885,7 +837,11 @@ public class EbeanDelegator implements Delegator {
         String condValue = condToken[1];
         if (CommUtil.isNotEmpty(condValue)) {
           Object[] valueArray = condValue.split("#");
-          return ef.between(fieldName,valueArray[0],valueArray[1]);
+          if (exp != null) {
+            exp.between(fieldName,valueArray[0],valueArray[1]);
+          } else {
+            return ef.between(fieldName, valueArray[0], valueArray[1]);
+          }
         }
       }
     }
