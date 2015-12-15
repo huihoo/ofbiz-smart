@@ -1,11 +1,14 @@
 package org.huihoo.ofbiz.smart.entity;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.avaje.ebean.*;
 import com.avaje.ebean.text.PathProperties;
+import com.zaxxer.hikari.HikariDataSource;
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.cache.Cache;
 import org.huihoo.ofbiz.smart.base.cache.LocalConcurrentLRUCache;
@@ -27,7 +30,7 @@ public class EbeanDelegator implements Delegator {
   /** 所有可用数据源服务器缓存<code>Map</code>*/
   private final ConcurrentHashMap<String, EbeanServer> concMap = new ConcurrentHashMap<String, EbeanServer>();
   
-  public EbeanDelegator() throws GenericEntityException {
+  public EbeanDelegator() throws GenericEntityException{
     Properties applicationProps = new Properties();
     try {
       applicationProps.load(FlexibleLocation.resolveLocation(C.APPLICATION_CONFIG_NAME).openStream());
@@ -63,6 +66,23 @@ public class EbeanDelegator implements Delegator {
       ServerConfig config = new ServerConfig();
       config.setName(dsName);
       config.loadFromProperties(applicationProps);
+      String providerName = applicationProps.getProperty(C.CONFIG_DATASOURCE + "."
+                                                         + dsName + "." + C.CONFIG_DATASOURCE_PROVIDER);
+
+      if (CommUtil.isNotEmpty(providerName)) {
+        try {
+          DataSourceProvider dsp = ((DataSourceProvider) Class.forName(providerName).newInstance());
+          config.setDataSource(dsp.datasource(applicationProps,dsName));
+          Log.i("Using datasource [" + providerName + "] for replacing default.",TAG);
+        } catch (ClassNotFoundException e) {
+          Log.w("DataSourceProvider [" + providerName + "] init fail. Use default.",TAG);
+        } catch (InstantiationException e) {
+          Log.w("DataSourceProvider [" + providerName + "] init fail. Use default.",TAG);
+        } catch (IllegalAccessException e) {
+          Log.w("DataSourceProvider [" + providerName + "] init fail. Use default.",TAG);
+        }
+      }
+
       EbeanServer ebeanServer = EbeanServerFactory.create(config);
       concMap.put(dsName, ebeanServer);
       
@@ -71,7 +91,18 @@ public class EbeanDelegator implements Delegator {
       }
     }
   }
-  
+
+  @Override
+  public Connection getConnection() throws GenericEntityException{
+    try {
+      return currentServerMap.get(CURRENT_SERVER_NAME)
+              .getPluginApi()
+              .getServerConfig().getDataSource().getConnection();
+    } catch (SQLException e) {
+      throw new GenericEntityException(e);
+    }
+  }
+
   @Override
   public EbeanDelegator useDataSource(String name) {
     if (name == null) {

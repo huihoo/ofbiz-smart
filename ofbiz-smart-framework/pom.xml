@@ -59,6 +59,12 @@
 			<artifactId>jstl</artifactId>
 		</dependency>
 
+
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+		</dependency>
+
 		<!-- test -->
 		<dependency>
 			<groupId>junit</groupId>

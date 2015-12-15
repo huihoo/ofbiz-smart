@@ -2,6 +2,7 @@ package org.huihoo.ofbiz.smart.entity;
 
 import org.huihoo.ofbiz.smart.base.cache.Cache;
 
+import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,13 @@ import java.util.Set;
  * @since  1.0
  */
 public interface Delegator {
+  /**
+   *<p>
+   *     获取原始的数据库连接
+   *</p>
+   * @return
+   */
+  Connection getConnection() throws GenericEntityException;
   /**
    * <p>
    *  使用指定的数据源,实现方应该可以通过指定的名称，切换到该数据源下。以支持多数据源特性。

@@ -8,6 +8,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -17,7 +19,7 @@ public class DelegatorTest extends BaseTestCase{
   private final static String TAG = DelegatorTest.class.getName();
 
   @Test
-  public void testAllInOne() throws GenericEntityException, ParseException {
+  public void testAllInOne() throws GenericEntityException, ParseException, SQLException {
     Customer customer = new Customer();
     customer.setLastName("Peter");
     customer.setGender("Male");
@@ -119,6 +121,8 @@ public class DelegatorTest extends BaseTestCase{
     Assert.assertEquals(true,pageResult.get(C.PAGE_LIST) instanceof List<?>);
 
 
+
+
     pageResult = delegator.findPageByAnd(Customer.class,CommUtil.toMap("gender","Male"),1,10,selectToFields,
                                                                       Arrays.asList(new String[]{"createdAt asc"}));
     Assert.assertNotNull(pageResult);
@@ -170,5 +174,9 @@ public class DelegatorTest extends BaseTestCase{
     Assert.assertEquals(1,pageResult.get(C.PAGE_TOTAL_PAGE));
     Assert.assertEquals(true,pageResult.get(C.PAGE_LIST) instanceof List<?>);
     Assert.assertEquals("Peter",((Customer)((List<?>)pageResult.get(C.PAGE_LIST)).get(0)).getLastName());
+
+    Connection con = delegator.getConnection();
+    Assert.assertNotNull("raw connection ---> " + con);
+    con.close();
   }
 }   

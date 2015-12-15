@@ -9,6 +9,7 @@ public final class C {
   public static final String CONFIG_DATASOURCE = "datasource";
   public static final String CONFIG_DATASOURCE_DEFAULT = "datasource.default";
   public static final String CONFIG_DATASOURCE_USERNAME = "username";
+  public static final String CONFIG_DATASOURCE_PROVIDER = "provider";
   //============================================
   //            Pagination Flag
   //============================================
