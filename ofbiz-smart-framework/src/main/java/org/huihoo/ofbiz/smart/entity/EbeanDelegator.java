@@ -8,10 +8,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.avaje.ebean.*;
 import com.avaje.ebean.text.PathProperties;
-import com.zaxxer.hikari.HikariDataSource;
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.cache.Cache;
-import org.huihoo.ofbiz.smart.base.cache.LocalConcurrentLRUCache;
+import org.huihoo.ofbiz.smart.base.cache.DefaultCache;
 import org.huihoo.ofbiz.smart.base.location.FlexibleLocation;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
@@ -49,7 +48,8 @@ public class EbeanDelegator implements Delegator {
         throw new GenericEntityException("Class [" + dbCacheProvider + "] not found.");
       }
     } else {
-      CACHE = new LocalConcurrentLRUCache<>(128, 32);
+      CACHE = new DefaultCache<>();
+      CACHE.start("EntityCache");
     }
     defaultDataSourceName = applicationProps.getProperty(C.CONFIG_DATASOURCE_DEFAULT);
     
