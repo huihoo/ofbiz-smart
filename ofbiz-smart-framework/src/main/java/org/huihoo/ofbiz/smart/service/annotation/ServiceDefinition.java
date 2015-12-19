@@ -41,6 +41,8 @@ public @interface ServiceDefinition {
     /** 是否对外提供远程调用 */
     boolean export() default false;
 
+    String entityName() default "";
+
     /** 输入参数集合 */
     InParameter[]  inParameters() default @InParameter(name = "");
 
