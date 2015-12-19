@@ -3,6 +3,12 @@ package org.huihoo.ofbiz.smart.base;
 public final class C {
   public static final String APPLICATION_CONFIG_NAME = "/application.properties";
   public static final String UTF_8 = "UTF-8";
+  public static final String PROFILE_NAME = "profile";
+  public static final String PROFILE_PRODUCTION = "production";
+  //============================================
+  //            Service Config Flag
+  //============================================
+  public static final String SERVICE_SCANNING_NAMES = "service.scanning.names";
   //============================================
   //            Datasource Config Flag
   //============================================
