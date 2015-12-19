@@ -23,6 +23,9 @@ public @interface ServiceDefinition {
     /** 服务的名称 */
     String name();
 
+    /** 服务的类型 */
+    String type();
+
     /** 服务的描述 */
     String description() default "";
 

@@ -7,9 +7,9 @@ import java.util.Map;
 
 public interface GenericEngine {
 
-    Map<String, Object> runSync(String localName, Map<String, Object> ctx) throws GenericServiceException;
+    String getName();
 
-
+    Map<String, Object> runSync(String serviceName, Map<String, Object> ctx) throws GenericServiceException;
 
     void runAsync(String localName, Map<String, Object> ctx) throws GenericServiceException;
 }
