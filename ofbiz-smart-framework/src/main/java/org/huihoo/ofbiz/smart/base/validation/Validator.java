@@ -85,7 +85,7 @@ public class Validator {
                 validateField(constraintViolations,profile,f, value);
             }
         } catch (NotFoundException e) {
-            e.printStackTrace();
+            Log.w("Unable to validate for object[%s] : %s", TAG, target,e.getMessage());
         }
 
         return constraintViolations;
@@ -188,16 +188,15 @@ public class Validator {
             }
 
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            Log.w("Unable to validate for field[%s] : %s", TAG, f,e.getMessage());
         } catch (InstantiationException e) {
-            e.printStackTrace();
+            Log.w("Unable to validate for field[%s] : %s", TAG, f,e.getMessage());
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            Log.w("Unable to validate for field[%s] : %s", TAG, f,e.getMessage());
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            Log.w("Unable to validate for field[%s] : %s", TAG, f,e.getMessage());
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            Log.w("Unable to validate for field[%s] : %s", TAG, f,e.getMessage());
         }
-
     }
 }
