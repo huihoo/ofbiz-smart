@@ -4,6 +4,7 @@ package org.huihoo.ofbiz.smart.entity;
 import com.avaje.ebean.Model;
 import com.avaje.ebean.annotation.WhenCreated;
 import com.avaje.ebean.annotation.WhenModified;
+import org.huihoo.ofbiz.smart.base.validation.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -16,18 +17,27 @@ public class Customer extends Model{
     @Id
     Long id;
 
+    @Min(2)
+    @Max(20)
     int level;
 
+    @DecimalMin("1000.00")
+    @DecimalMax("2000.00")
     BigDecimal salary;
 
+    @Required
     String firstName;
 
+    @Required
     String lastName;
 
+    @Required
     String status;
 
+    @Required
     String gender;
 
+    @Required
     Date birthday;
 
     boolean tracked;

@@ -9,5 +9,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 public @interface Required {
+
     String message() default "This value is required.";
+
+    ValidateProfile profile() default ValidateProfile.ALL;
 }

@@ -18,5 +18,8 @@ public @interface Range {
     String message() default "This value should be between %s and %s.";
 
     long min() default 0;
+
     long max() default Long.MAX_VALUE;
+
+    ValidateProfile profile() default ValidateProfile.ALL;
 }

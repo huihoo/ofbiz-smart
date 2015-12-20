@@ -9,6 +9,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 public @interface Pattern {
+
     String message() default "This value seems to be invalid.";
+
     String value();
+
+    ValidateProfile profile() default ValidateProfile.ALL;
 }

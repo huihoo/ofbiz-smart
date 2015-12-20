@@ -1,5 +1,6 @@
 package org.huihoo.ofbiz.smart.base.validation;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -9,6 +10,8 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+@Documented
+@Constraint(validatedBy = {})
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 public @interface DecimalRange {
@@ -16,4 +19,6 @@ public @interface DecimalRange {
 
     String min();
     String max();
+
+    ValidateProfile profile() default ValidateProfile.ALL;
 }

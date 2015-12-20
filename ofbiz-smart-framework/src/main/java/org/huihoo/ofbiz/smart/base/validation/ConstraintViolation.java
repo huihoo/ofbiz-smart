@@ -8,6 +8,10 @@ public class ConstraintViolation implements Serializable{
     private String filedMessage;
     private Object filedOriginalValue;
 
+    public ConstraintViolation() {
+
+    }
+
     public ConstraintViolation(String fieldName, String filedMessage, Object filedOriginalValue) {
         this.fieldName = fieldName;
         this.filedMessage = filedMessage;
@@ -36,5 +40,16 @@ public class ConstraintViolation implements Serializable{
 
     public void setFiledOriginalValue(Object filedOriginalValue) {
         this.filedOriginalValue = filedOriginalValue;
+    }
+
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("ConstraintViolation{");
+        sb.append("fieldName='").append(fieldName).append('\'');
+        sb.append(", filedMessage='").append(filedMessage).append('\'');
+        sb.append(", filedOriginalValue=").append(filedOriginalValue);
+        sb.append('}');
+        return sb.toString();
     }
 }

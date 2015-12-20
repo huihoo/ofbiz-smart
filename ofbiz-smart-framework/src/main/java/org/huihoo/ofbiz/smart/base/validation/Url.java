@@ -9,5 +9,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 public @interface Url {
+
     String message() default "This value should be a valid url.";
+
+    ValidateProfile profile() default ValidateProfile.ALL;
 }
