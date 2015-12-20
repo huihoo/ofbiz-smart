@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <property key="btnOk">
+        <value xml:lang="en_US">OK</value>
+        <value xml:lang="zh_CN">确定</value>
+    </property>
+    <property key="btnCancle">
+        <value xml:lang="en_US">Cancle</value>
+        <value xml:lang="zh_CN">取消</value>
+    </property>
+</resource>
