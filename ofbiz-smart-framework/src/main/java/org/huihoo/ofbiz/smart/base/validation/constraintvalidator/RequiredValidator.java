@@ -8,8 +8,6 @@ import org.huihoo.ofbiz.smart.base.validation.Required;
 
 public class RequiredValidator implements ConstraintValidator<Required,Object>{
 
-
-
     @Override
     public void initialize(Required constraintAnnotation) {
     }

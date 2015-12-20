@@ -11,10 +11,6 @@ public class AlphanumValidator implements ConstraintValidator<Alphanum,CharSeque
     public static final String REGEX_ALPHANUM = "^[a-zA-Z0-9]+$";
     public static final java.util.regex.Pattern ALPHANUM_PATTERN = java.util.regex.Pattern.compile(REGEX_ALPHANUM);
 
-
-
-
-
     @Override
     public void initialize(Alphanum constraintAnnotation) {
 

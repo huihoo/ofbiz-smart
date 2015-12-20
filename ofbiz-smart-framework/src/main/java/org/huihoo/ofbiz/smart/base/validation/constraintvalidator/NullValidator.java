@@ -11,7 +11,6 @@ import java.math.BigInteger;
 public class NullValidator implements ConstraintValidator<Null,Object>{
 
 
-
     @Override
     public void initialize(Null constraintAnnotation) {
     }
