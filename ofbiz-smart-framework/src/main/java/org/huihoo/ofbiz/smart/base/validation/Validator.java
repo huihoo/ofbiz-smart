@@ -6,10 +6,12 @@ import java.util.List;
 
 public class Validator {
 
+    static {
+
+    }
 
     public static List<ConstraintViolation> validate(Object target) {
         List<ConstraintViolation> constraintViolations = new ArrayList<>();
         return constraintViolations;
     }
-
 }
