@@ -246,6 +246,7 @@ public class Expr {
   }
 
   public String build() {
+    Log.d("Expr:" + EXPR_SB, TAG);
     return EXPR_SB.toString();
   }
 }
