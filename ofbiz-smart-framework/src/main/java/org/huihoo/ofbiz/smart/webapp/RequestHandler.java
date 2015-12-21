@@ -4,5 +4,5 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public interface RequestHandler {
-    void handleRequest(HttpServletRequest req, HttpServletResponse resp);
+  void handleRequest(HttpServletRequest req, HttpServletResponse resp);
 }

@@ -9,16 +9,17 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * <p>
- *    检查要验证的字符串是否是有效的邮箱
+ * 检查要验证的字符串是否是有效的邮箱
  * </p>
+ * 
  * @since 1.0
  */
 @Documented
 @Constraint(validatedBy = {})
-@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER})
 @Retention(RUNTIME)
 public @interface Email {
-    String message() default "This value should be a valid email.";
+  String message() default "This value should be a valid email.";
 
-    ValidateProfile profile() default ValidateProfile.ALL;
+  ValidateProfile profile() default ValidateProfile.ALL;
 }

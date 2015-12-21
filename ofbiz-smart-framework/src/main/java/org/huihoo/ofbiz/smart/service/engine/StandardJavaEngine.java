@@ -8,17 +8,17 @@ import java.util.Map;
 
 public class StandardJavaEngine extends GenericAsyncEngine {
 
-    public StandardJavaEngine(ServiceDispatcher serviceDispatcher) {
-        super(serviceDispatcher);
-    }
+  public StandardJavaEngine(ServiceDispatcher serviceDispatcher) {
+    super(serviceDispatcher);
+  }
 
-    @Override
-    public Map<String, Object> runSync(String serviceName, Map<String, Object> ctx) throws GenericServiceException {
-        return null;
-    }
+  @Override
+  public Map<String, Object> runSync(String serviceName, Map<String, Object> ctx) throws GenericServiceException {
+    return null;
+  }
 
-    @Override
-    public String getName() {
-        return "java";
-    }
+  @Override
+  public String getName() {
+    return "java";
+  }
 }

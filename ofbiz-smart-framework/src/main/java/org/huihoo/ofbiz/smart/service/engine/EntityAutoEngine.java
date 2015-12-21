@@ -9,17 +9,17 @@ import java.util.Map;
 
 public class EntityAutoEngine extends GenericAsyncEngine {
 
-    public EntityAutoEngine(ServiceDispatcher serviceDispatcher) {
-        super(serviceDispatcher);
-    }
+  public EntityAutoEngine(ServiceDispatcher serviceDispatcher) {
+    super(serviceDispatcher);
+  }
 
-    @Override
-    public Map<String, Object> runSync(String serviceName, Map<String, Object> ctx) throws GenericServiceException {
-        return null;
-    }
+  @Override
+  public Map<String, Object> runSync(String serviceName, Map<String, Object> ctx) throws GenericServiceException {
+    return null;
+  }
 
-    @Override
-    public String getName() {
-        return "entityAuto";
-    }
+  @Override
+  public String getName() {
+    return "entityAuto";
+  }
 }

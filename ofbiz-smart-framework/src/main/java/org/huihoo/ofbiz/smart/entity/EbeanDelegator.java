@@ -3,89 +3,99 @@ package org.huihoo.ofbiz.smart.entity;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.avaje.ebean.*;
-import com.avaje.ebean.text.PathProperties;
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.cache.Cache;
-import org.huihoo.ofbiz.smart.base.cache.DefaultCache;
+import org.huihoo.ofbiz.smart.base.cache.SimpleCacheManager;
 import org.huihoo.ofbiz.smart.base.location.FlexibleLocation;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 
+import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.EbeanServerFactory;
+import com.avaje.ebean.Expression;
+import com.avaje.ebean.ExpressionFactory;
+import com.avaje.ebean.ExpressionList;
+import com.avaje.ebean.PagedList;
+import com.avaje.ebean.Query;
+import com.avaje.ebean.SqlQuery;
+import com.avaje.ebean.SqlRow;
+import com.avaje.ebean.SqlUpdate;
 import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.text.PathProperties;
 
 public class EbeanDelegator implements Delegator {
   private final String TAG = EbeanDelegator.class.getName();
-  private volatile Cache<String,Object> CACHE;
+  private volatile Cache<String, Object> CACHE;
   /** 当前数据源服务器键名 */
-  private final String CURRENT_SERVER_NAME = "_current_server_" ;
+  private final String CURRENT_SERVER_NAME = "_current_server_";
   /** 默认数据源名称 */
   private final String defaultDataSourceName;
-  /** 当前数据源服务器缓存<code>Map</code>*/
+  /** 当前数据源服务器缓存<code>Map</code> */
   private final ConcurrentHashMap<String, EbeanServer> currentServerMap = new ConcurrentHashMap<String, EbeanServer>();
-  /** 所有可用数据源服务器缓存<code>Map</code>*/
+  /** 所有可用数据源服务器缓存<code>Map</code> */
   private final ConcurrentHashMap<String, EbeanServer> concMap = new ConcurrentHashMap<String, EbeanServer>();
-  
-  public EbeanDelegator() throws GenericEntityException{
+
+  @SuppressWarnings("unchecked")
+  public EbeanDelegator() throws GenericEntityException {
     Properties applicationProps = new Properties();
     try {
       applicationProps.load(FlexibleLocation.resolveLocation(C.APPLICATION_CONFIG_NAME).openStream());
     } catch (IOException e) {
       throw new GenericEntityException("Unable to load external properties");
     }
-    String dbCacheProvider = applicationProps.getProperty(C.CONFIG_DATASOURCE_CACHE_PROVIDER);
-    if (CommUtil.isNotEmpty(dbCacheProvider)) {
-      try {
-        CACHE = (Cache) Class.forName(dbCacheProvider).newInstance();
-      } catch (InstantiationException e) {
-        throw new GenericEntityException("Unable to init database cache provider [" + dbCacheProvider + "]");
-      } catch (IllegalAccessException e) {
-        throw new GenericEntityException("Unable to init database cache provider [" + dbCacheProvider + "]");
-      } catch (ClassNotFoundException e) {
-        throw new GenericEntityException("Class [" + dbCacheProvider + "] not found.");
-      }
-    } else {
-      CACHE = new DefaultCache<>();
-      CACHE.start("EntityCache");
-    }
+
+    CACHE = (Cache<String, Object>) SimpleCacheManager.createCache("EntityCache");
+
     defaultDataSourceName = applicationProps.getProperty(C.CONFIG_DATASOURCE_DEFAULT);
-    
+
     Set<String> dsNames = new LinkedHashSet<>();
     Enumeration<?> keys = applicationProps.keys();
-    while(keys.hasMoreElements()) {
+    while (keys.hasMoreElements()) {
       String k = (String) keys.nextElement();
       if (k.startsWith(C.CONFIG_DATASOURCE) && k.indexOf(C.CONFIG_DATASOURCE_USERNAME) >= 0) {
         dsNames.add(k.substring(C.CONFIG_DATASOURCE.length() + 1, k.indexOf("." + C.CONFIG_DATASOURCE_USERNAME)));
       }
     }
-    Log.d("Default datasouce[%s], Avaliable datasources[%s]", TAG, defaultDataSourceName,dsNames);
+    Log.d("Default datasouce[%s], Avaliable datasources[%s]", TAG, defaultDataSourceName, dsNames);
     for (String dsName : dsNames) {
       ServerConfig config = new ServerConfig();
       config.setName(dsName);
       config.loadFromProperties(applicationProps);
-      String providerName = applicationProps.getProperty(C.CONFIG_DATASOURCE + "."
-                                                         + dsName + "." + C.CONFIG_DATASOURCE_PROVIDER);
+      String providerName =
+          applicationProps.getProperty(C.CONFIG_DATASOURCE + "." + dsName + "." + C.CONFIG_DATASOURCE_PROVIDER);
 
       if (CommUtil.isNotEmpty(providerName)) {
         try {
           DataSourceProvider dsp = ((DataSourceProvider) Class.forName(providerName).newInstance());
-          config.setDataSource(dsp.datasource(applicationProps,dsName));
-          Log.i("Using datasource [" + providerName + "] for replacing default.",TAG);
+          config.setDataSource(dsp.datasource(applicationProps, dsName));
+          Log.i("Using datasource [" + providerName + "] for replacing default.", TAG);
         } catch (ClassNotFoundException e) {
-          Log.w("DataSourceProvider [" + providerName + "] init fail. Use default.",TAG);
+          Log.w("DataSourceProvider [" + providerName + "] init fail. Use default.", TAG);
         } catch (InstantiationException e) {
-          Log.w("DataSourceProvider [" + providerName + "] init fail. Use default.",TAG);
+          Log.w("DataSourceProvider [" + providerName + "] init fail. Use default.", TAG);
         } catch (IllegalAccessException e) {
-          Log.w("DataSourceProvider [" + providerName + "] init fail. Use default.",TAG);
+          Log.w("DataSourceProvider [" + providerName + "] init fail. Use default.", TAG);
         }
       }
 
       EbeanServer ebeanServer = EbeanServerFactory.create(config);
       concMap.put(dsName, ebeanServer);
-      
+
       if (dsName.equals(defaultDataSourceName)) {
         currentServerMap.put(CURRENT_SERVER_NAME, ebeanServer);
       }
@@ -93,11 +103,9 @@ public class EbeanDelegator implements Delegator {
   }
 
   @Override
-  public Connection getConnection() throws GenericEntityException{
+  public Connection getConnection() throws GenericEntityException {
     try {
-      return currentServerMap.get(CURRENT_SERVER_NAME)
-              .getPluginApi()
-              .getServerConfig().getDataSource().getConnection();
+      return currentServerMap.get(CURRENT_SERVER_NAME).getPluginApi().getServerConfig().getDataSource().getConnection();
     } catch (SQLException e) {
       throw new GenericEntityException(e);
     }
@@ -112,10 +120,6 @@ public class EbeanDelegator implements Delegator {
     return this;
   }
 
-  @Override
-  public Cache getCache() {
-    return CACHE;
-  }
 
   @Override
   public void beginTransaction() {
@@ -141,7 +145,7 @@ public class EbeanDelegator implements Delegator {
   public void save(Collection<?> entities) throws GenericEntityException {
     try {
       currentServerMap.get(CURRENT_SERVER_NAME).save(entities);
-    } catch(Exception e) {
+    } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.save() occurs an exception.", TAG);
       throw new GenericEntityException(e);
     }
@@ -151,7 +155,7 @@ public class EbeanDelegator implements Delegator {
   public void save(Object entity) throws GenericEntityException {
     try {
       currentServerMap.get(CURRENT_SERVER_NAME).save(entity);
-    } catch(Exception e) {
+    } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.save() occurs an exception.", TAG);
       throw new GenericEntityException(e);
     }
@@ -161,7 +165,7 @@ public class EbeanDelegator implements Delegator {
   public void update(Collection<?> entities) throws GenericEntityException {
     try {
       currentServerMap.get(CURRENT_SERVER_NAME).update(entities);
-    } catch(Exception e) {
+    } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.update() occurs an exception.", TAG);
       throw new GenericEntityException(e);
     }
@@ -171,7 +175,7 @@ public class EbeanDelegator implements Delegator {
   public void update(Object entity) throws GenericEntityException {
     try {
       currentServerMap.get(CURRENT_SERVER_NAME).update(entity);
-    } catch(Exception e) {
+    } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.update() occurs an exception.", TAG);
       throw new GenericEntityException(e);
     }
@@ -181,7 +185,7 @@ public class EbeanDelegator implements Delegator {
   public void remove(Collection<?> entities) throws GenericEntityException {
     try {
       currentServerMap.get(CURRENT_SERVER_NAME).deleteAll(entities);
-    } catch(Exception e) {
+    } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.remove() occurs an exception.", TAG);
       throw new GenericEntityException(e);
     }
@@ -191,17 +195,17 @@ public class EbeanDelegator implements Delegator {
   public void remove(Object entity) throws GenericEntityException {
     try {
       currentServerMap.get(CURRENT_SERVER_NAME).delete(entity);
-    } catch(Exception e) {
+    } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.remove() occurs an exception.", TAG);
       throw new GenericEntityException(e);
     }
   }
 
   @Override
-  public void removeById(Class<?> entityClazz,Object id) throws GenericEntityException {
+  public void removeById(Class<?> entityClazz, Object id) throws GenericEntityException {
     try {
-      currentServerMap.get(CURRENT_SERVER_NAME).delete(entityClazz,id);
-    } catch(Exception e) {
+      currentServerMap.get(CURRENT_SERVER_NAME).delete(entityClazz, id);
+    } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.removeById() occurs an exception.", TAG);
       throw new GenericEntityException(e);
     }
@@ -209,38 +213,36 @@ public class EbeanDelegator implements Delegator {
 
   @Override
   public Object findById(Class<?> entityClazz, Object id) throws GenericEntityException {
-    return findById(entityClazz,id,false);
+    return findById(entityClazz, id, false);
   }
 
   @Override
-  public Object findById(Class<?> entityClazz, Object id, boolean useCache)
-          throws GenericEntityException {
+  public Object findById(Class<?> entityClazz, Object id, boolean useCache) throws GenericEntityException {
     try {
       if (useCache) {
         String cacheKey = entityClazz + "#" + id;
         Object cachedObj = CACHE.get(cacheKey);
         if (cachedObj != null) {
-          Log.d("findById[" + cacheKey + "] from cache.",TAG);
+          Log.d("findById[" + cacheKey + "] from cache.", TAG);
           return cachedObj;
         }
-        Object fromDbObj = currentServerMap.get(CURRENT_SERVER_NAME).find(entityClazz,id);
+        Object fromDbObj = currentServerMap.get(CURRENT_SERVER_NAME).find(entityClazz, id);
         if (fromDbObj != null) {
-          CACHE.put(cacheKey,fromDbObj);
+          CACHE.put(cacheKey, fromDbObj);
         }
         return fromDbObj;
 
       } else {
-        return currentServerMap.get(CURRENT_SERVER_NAME).find(entityClazz,id);
+        return currentServerMap.get(CURRENT_SERVER_NAME).find(entityClazz, id);
       }
-    } catch(Exception e) {
+    } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.findById() occurs an exception.", TAG);
       throw new GenericEntityException(e);
     }
   }
 
   @Override
-  public List<Object> findIdsByAnd(Class<?> entityClazz, Map<String, Object> andMap)
-          throws GenericEntityException {
+  public List<Object> findIdsByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException {
     try {
       Query<?> query = currentServerMap.get(CURRENT_SERVER_NAME).find(entityClazz);
       ExpressionList<?> expList = query.where();
@@ -255,12 +257,11 @@ public class EbeanDelegator implements Delegator {
   }
 
   @Override
-  public List<Object> findIdsByCond(Class<?> entityClazz, String cond)
-          throws GenericEntityException {
+  public List<Object> findIdsByCond(Class<?> entityClazz, String cond) throws GenericEntityException {
     try {
       Query<?> query = currentServerMap.get(CURRENT_SERVER_NAME).find(entityClazz);
       ExpressionList<?> expList = query.where();
-      buildQueryExpression(cond,expList);
+      buildQueryExpression(cond, expList);
       return expList.findIds();
     } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.findIdsByCond() occurs an exception.", TAG);
@@ -269,14 +270,13 @@ public class EbeanDelegator implements Delegator {
   }
 
   @Override
-  public Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap)
-          throws GenericEntityException {
-    return findUniqueByAnd(entityClazz,andMap,new HashSet<String>(),false);
+  public Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException {
+    return findUniqueByAnd(entityClazz, andMap, new HashSet<String>(), false);
   }
 
   @Override
-  public Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap, Set<String> fieldsToSelect,boolean useCache)
-          throws GenericEntityException {
+  public Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap, Set<String> fieldsToSelect,
+      boolean useCache) throws GenericEntityException {
     try {
       if (CommUtil.isEmpty(andMap)) {
         return null;
@@ -286,13 +286,13 @@ public class EbeanDelegator implements Delegator {
       if (useCache) {
         Object cachedObj = CACHE.get(cacheKey);
         if (cachedObj != null) {
-          Log.d("findUniqueByAnd[" + cacheKey + "]from cache.",TAG);
+          Log.d("findUniqueByAnd[" + cacheKey + "]from cache.", TAG);
           return cachedObj;
         }
       }
 
       Query<?> query = currentServerMap.get(CURRENT_SERVER_NAME).find(entityClazz);
-      buildSelectFields(query,fieldsToSelect);
+      buildSelectFields(query, fieldsToSelect);
       ExpressionList<?> expList = query.where();
       expList.allEq(andMap);
 
@@ -301,7 +301,7 @@ public class EbeanDelegator implements Delegator {
         CACHE.put(cacheKey, fromDbObj);
       }
       return fromDbObj;
-    } catch(Exception e) {
+    } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.findUniqueByAnd() occurs an exception.", TAG);
       throw new GenericEntityException(e);
     }
@@ -309,88 +309,86 @@ public class EbeanDelegator implements Delegator {
 
   @Override
   public List<?> findList(Class<?> entityClazz, String cond) throws GenericEntityException {
-    return findList(entityClazz,cond,new HashSet<String>(),new ArrayList<String>(),false);
+    return findList(entityClazz, cond, new HashSet<String>(), new ArrayList<String>(), false);
   }
 
   @Override
-  public List<?> findList(Class<?> entityClazz, String cond, Set<String> fieldsToSelect,
-          List<String> orderBy) throws GenericEntityException {
-    return findList(entityClazz,cond,fieldsToSelect,orderBy,false);
+  public List<?> findList(Class<?> entityClazz, String cond, Set<String> fieldsToSelect, List<String> orderBy)
+      throws GenericEntityException {
+    return findList(entityClazz, cond, fieldsToSelect, orderBy, false);
   }
 
   @Override
-  public List<?> findList(Class<?> entityClazz, String cond, Set<String> fieldsToSelect,
-          List<String> orderBy, boolean useCache) throws GenericEntityException {
+  public List<?> findList(Class<?> entityClazz, String cond, Set<String> fieldsToSelect, List<String> orderBy,
+      boolean useCache) throws GenericEntityException {
     try {
       String cacheKey = entityClazz + "#" + cond + "#" + fieldsToSelect + "#" + orderBy;
       if (useCache) {
         List<?> cachedList = (List<?>) CACHE.get(cacheKey);
         if (cachedList != null) {
-          Log.d("findList[" + cacheKey + "]from cache.",TAG);
+          Log.d("findList[" + cacheKey + "]from cache.", TAG);
           return cachedList;
         }
       }
       Query<?> query = currentServerMap.get(CURRENT_SERVER_NAME).find(entityClazz);
-      buildSelectFields(query,fieldsToSelect);
+      buildSelectFields(query, fieldsToSelect);
       ExpressionList<?> expList = query.where();
       buildExpressList(expList, cond, orderBy);
       List<?> objList = expList.findList();
       if (useCache && objList != null) {
-        CACHE.put(cacheKey,objList);
+        CACHE.put(cacheKey, objList);
       }
       return objList;
-    } catch(Exception e) {
+    } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.findList() occurs an exception.", TAG);
       throw new GenericEntityException(e);
     }
   }
 
   @Override
-  public Map<String,Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, int pageNo,
-          int pageSize) throws GenericEntityException {
-    return findPageByAnd(entityClazz,andMap,pageNo,pageSize,new HashSet<String>(),new ArrayList<String>(),false);
+  public Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, int pageNo, int pageSize)
+      throws GenericEntityException {
+    return findPageByAnd(entityClazz, andMap, pageNo, pageSize, new HashSet<String>(), new ArrayList<String>(), false);
   }
 
   @Override
-  public Map<String,Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, int pageNo,
-          int pageSize, Set<String> fieldsToSelect, List<String> orderBy)
-                  throws GenericEntityException {
-    return findPageByAnd(entityClazz,andMap,pageNo,pageSize,fieldsToSelect,orderBy,false);
+  public Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, int pageNo, int pageSize,
+      Set<String> fieldsToSelect, List<String> orderBy) throws GenericEntityException {
+    return findPageByAnd(entityClazz, andMap, pageNo, pageSize, fieldsToSelect, orderBy, false);
   }
 
   @Override
-  public Map<String,Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, int pageNo,
-          int pageSize, Set<String> fieldsToSelect, List<String> orderBy, boolean useCache)
-                  throws GenericEntityException {
-    return doPagination(entityClazz,andMap,null,pageNo,pageSize,fieldsToSelect,orderBy,useCache);
+  public Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, int pageNo, int pageSize,
+      Set<String> fieldsToSelect, List<String> orderBy, boolean useCache) throws GenericEntityException {
+    return doPagination(entityClazz, andMap, null, pageNo, pageSize, fieldsToSelect, orderBy, useCache);
   }
 
   @Override
-  public Map<String,Object> findPageByCond(Class<?> entityClazz, String cond, int pageNo, int pageSize)
-          throws GenericEntityException {
+  public Map<String, Object> findPageByCond(Class<?> entityClazz, String cond, int pageNo, int pageSize)
+      throws GenericEntityException {
 
-    return findPageByCond(entityClazz,cond,pageNo,pageSize,new HashSet<String>(),new ArrayList<String>(),false);
+    return findPageByCond(entityClazz, cond, pageNo, pageSize, new HashSet<String>(), new ArrayList<String>(), false);
   }
 
   @Override
-  public Map<String,Object> findPageByCond(Class<?> entityClazz, String cond, int pageNo, int pageSize,
-          Set<String> fieldsToSelect, List<String> orderBy) throws GenericEntityException {
+  public Map<String, Object> findPageByCond(Class<?> entityClazz, String cond, int pageNo, int pageSize,
+      Set<String> fieldsToSelect, List<String> orderBy) throws GenericEntityException {
 
-    return findPageByCond(entityClazz,cond,pageNo,pageSize,fieldsToSelect,orderBy,false);
+    return findPageByCond(entityClazz, cond, pageNo, pageSize, fieldsToSelect, orderBy, false);
   }
 
   @Override
-  public Map<String,Object> findPageByCond(Class<?> entityClazz, String cond, int pageNo, int pageSize,
-          Set<String> fieldsToSelect, List<String> orderBy, boolean useCache)
-                  throws GenericEntityException {
-    return doPagination(entityClazz,null,cond,pageNo,pageSize,fieldsToSelect,orderBy,useCache);
+  public Map<String, Object> findPageByCond(Class<?> entityClazz, String cond, int pageNo, int pageSize,
+      Set<String> fieldsToSelect, List<String> orderBy, boolean useCache) throws GenericEntityException {
+    return doPagination(entityClazz, null, cond, pageNo, pageSize, fieldsToSelect, orderBy, useCache);
   }
 
   /**
    *
    * <p>
-   *     分页方法
+   * 分页方法
    * </p>
+   * 
    * @param entityClazz
    * @param andMap
    * @param cond
@@ -402,16 +400,17 @@ public class EbeanDelegator implements Delegator {
    * @return
    * @throws GenericEntityException
    */
-  private Map<String,Object> doPagination(Class<?> entityClazz, Map<String,Object> andMap,String cond, int pageNo, int pageSize,
-                                          Set<String> fieldsToSelect, List<String> orderBy, boolean useCache)
-                                                  throws GenericEntityException{
+  @SuppressWarnings("unchecked")
+  private Map<String, Object> doPagination(Class<?> entityClazz, Map<String, Object> andMap, String cond, int pageNo,
+      int pageSize, Set<String> fieldsToSelect, List<String> orderBy, boolean useCache) throws GenericEntityException {
     String findName = andMap == null ? "findPageByCond" : "findPageByAnd";
     try {
-      String cacheKey = entityClazz + "#" + (andMap == null ? cond : andMap)  + "#" + pageNo + "#" +pageSize + "#" + fieldsToSelect + "#" + orderBy;
+      String cacheKey = entityClazz + "#" + (andMap == null ? cond : andMap) + "#" + pageNo + "#" + pageSize + "#"
+          + fieldsToSelect + "#" + orderBy;
       if (useCache) {
-        Map<String,Object> cachedObj = (Map<String, Object>) CACHE.get(cacheKey);
+        Map<String, Object> cachedObj = (Map<String, Object>) CACHE.get(cacheKey);
         if (cachedObj != null) {
-          Log.d(findName + "[" + cacheKey + "]from cache.",TAG);
+          Log.d(findName + "[" + cacheKey + "]from cache.", TAG);
           return cachedObj;
         }
       }
@@ -437,19 +436,19 @@ public class EbeanDelegator implements Delegator {
       result.put(C.PAGE_PAGE_NO, pageNo);
 
       if (totalEntry > 0 && useCache) {
-        Log.d(findName + "[" + cacheKey + "]from cache.",TAG);
-        CACHE.put(cacheKey,result);
+        Log.d(findName + "[" + cacheKey + "]from cache.", TAG);
+        CACHE.put(cacheKey, result);
       }
 
       return result;
-    } catch(Exception e) {
-      Log.e(e, "EbeanDeletagor."+ findName + "() occurs an exception.", TAG);
+    } catch (Exception e) {
+      Log.e(e, "EbeanDeletagor." + findName + "() occurs an exception.", TAG);
       throw new GenericEntityException(e);
     }
   }
 
   @Override
-  public int countByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException{
+  public int countByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException {
     try {
       return currentServerMap.get(CURRENT_SERVER_NAME).find(entityClazz).where().allEq(andMap).findRowCount();
     } catch (Exception e) {
@@ -459,7 +458,7 @@ public class EbeanDelegator implements Delegator {
   }
 
   @Override
-  public int countByCond(Class<?> entityClazz, String cond) throws GenericEntityException{
+  public int countByCond(Class<?> entityClazz, String cond) throws GenericEntityException {
     try {
       Query<?> query = currentServerMap.get(CURRENT_SERVER_NAME).find(entityClazz);
       ExpressionList<?> expList = query.where();
@@ -472,20 +471,20 @@ public class EbeanDelegator implements Delegator {
   }
 
   @Override
-  public List<Map<String, Object>> findListByRawQuery(String query, List<?> params)
-          throws GenericEntityException {
-    return findListByRawQuery(query,params,false);
+  public List<Map<String, Object>> findListByRawQuery(String query, List<?> params) throws GenericEntityException {
+    return findListByRawQuery(query, params, false);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public List<Map<String, Object>> findListByRawQuery(String query, List<?> params,boolean useCache)
-          throws GenericEntityException {
-    try{
+  public List<Map<String, Object>> findListByRawQuery(String query, List<?> params, boolean useCache)
+      throws GenericEntityException {
+    try {
       String cacheKey = query + "#" + params;
       if (useCache) {
-        List<Map<String,Object>> cachedList = (List<Map<String, Object>>) CACHE.get(cacheKey);
+        List<Map<String, Object>> cachedList = (List<Map<String, Object>>) CACHE.get(cacheKey);
         if (cachedList != null) {
-          Log.d("findListByRawQuery[" + cacheKey + "]from cache.",TAG);
+          Log.d("findListByRawQuery[" + cacheKey + "]from cache.", TAG);
           return cachedList;
         }
       }
@@ -512,22 +511,22 @@ public class EbeanDelegator implements Delegator {
         }
       }
       if (CommUtil.isNotEmpty(mapList) && useCache) {
-        CACHE.put(cacheKey,mapList);
+        CACHE.put(cacheKey, mapList);
       }
       return mapList;
-    } catch(Exception e) {
+    } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.findListByRawQuery() occurs an exception.", TAG);
       throw new GenericEntityException(e);
     }
   }
 
   @Override
-  public int executeByRawSql(String sql) throws GenericEntityException{
-    return executeByRawSql(sql,new ArrayList<>());
+  public int executeByRawSql(String sql) throws GenericEntityException {
+    return executeByRawSql(sql, new ArrayList<>());
   }
 
   @Override
-  public int executeByRawSql(String sql, List<?> params) throws GenericEntityException{
+  public int executeByRawSql(String sql, List<?> params) throws GenericEntityException {
     try {
       SqlUpdate sqlUpdate = currentServerMap.get(CURRENT_SERVER_NAME).createSqlUpdate(sql);
       if (CommUtil.isNotEmpty(params)) {
@@ -537,19 +536,19 @@ public class EbeanDelegator implements Delegator {
         }
       }
       return sqlUpdate.execute();
-    } catch(Exception e) {
+    } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.executeByRawSql() occurs an exception.", TAG);
       throw new GenericEntityException(e);
     }
   }
 
   @Override
-  public int countByRawQuery(String query, String countAlias) throws GenericEntityException{
-    return countByRawQuery(query,countAlias,new ArrayList<>());
+  public int countByRawQuery(String query, String countAlias) throws GenericEntityException {
+    return countByRawQuery(query, countAlias, new ArrayList<>());
   }
 
   @Override
-  public int countByRawQuery(String query, String countAlias, List<?> params) throws GenericEntityException{
+  public int countByRawQuery(String query, String countAlias, List<?> params) throws GenericEntityException {
     try {
       if (query.indexOf(countAlias) == -1) {
         throw new GenericEntityException("The query[" + query + "] has no alias name [" + countAlias + "]");
@@ -562,7 +561,7 @@ public class EbeanDelegator implements Delegator {
         }
       }
       return sqlQuery.findUnique().getInteger(countAlias);
-    } catch(Exception e) {
+    } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.countByRawQuery() occurs an exception.", TAG);
       throw new GenericEntityException(e);
     }
@@ -573,10 +572,10 @@ public class EbeanDelegator implements Delegator {
     try {
       beginTransaction();
       txRunnable.run();
-    }catch(Exception e){
+    } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.executeWithInTx() occurs an exception.", TAG);
       rollback();
-    }finally{
+    } finally {
       endTransaction();
     }
   }
@@ -586,50 +585,52 @@ public class EbeanDelegator implements Delegator {
     try {
       beginTransaction();
       return txCallable.call();
-    }catch(Exception e){
+    } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.executeWithInTx() occurs an exception.", TAG);
       rollback();
       return null;
-    }finally{
+    } finally {
       endTransaction();
     }
   }
 
   /**
    * <p>
-   *     根据指定的条件字符串，排序字符串集合 构建<code>{@link com.avaje.ebean.Expression}</code>
+   * 根据指定的条件字符串，排序字符串集合 构建<code>{@link com.avaje.ebean.Expression}</code>
    * </p>
    * <p>
-   *     有关条件字符串的拼接规则，另见{@link #buildQueryExpression(String, ExpressionList)}
+   * 有关条件字符串的拼接规则，另见{@link #buildQueryExpression(String, ExpressionList)}
    * </p>
-   * @param expList      要构建的<code>{@link com.avaje.ebean.Expression}</code>对象
-   * @param condition    指定的条件字符串
-   * @param orderBy      指定的排序字符串集合<code>List</code>
+   * 
+   * @param expList 要构建的<code>{@link com.avaje.ebean.Expression}</code>对象
+   * @param condition 指定的条件字符串
+   * @param orderBy 指定的排序字符串集合<code>List</code>
    * @throws GenericEntityException
    */
   private void buildExpressList(ExpressionList<?> expList, String condition, List<String> orderBy)
-          throws GenericEntityException {
+      throws GenericEntityException {
     buildQueryExpression(condition, expList);
-    buildExprOrderBy(expList,orderBy);
+    buildExprOrderBy(expList, orderBy);
   }
 
   /**
    * <p>
-   *     根据指定的字段映射，排序字符串集合 构建<code>{@link com.avaje.ebean.Expression}</code>
+   * 根据指定的字段映射，排序字符串集合 构建<code>{@link com.avaje.ebean.Expression}</code>
    * </p>
-   * @param expList      要构建的<code>{@link com.avaje.ebean.Expression}</code>对象
-   * @param andMap       指定的条件字段映射
-   * @param orderBy      指定的排序字符串集合<code>List</code>
+   * 
+   * @param expList 要构建的<code>{@link com.avaje.ebean.Expression}</code>对象
+   * @param andMap 指定的条件字段映射
+   * @param orderBy 指定的排序字符串集合<code>List</code>
    * @throws GenericEntityException
    */
   private void buildExpressList(ExpressionList<?> expList, Map<String, Object> andMap, List<String> orderBy) {
     if (CommUtil.isNotEmpty(andMap)) {
       expList.allEq(andMap);
     }
-    buildExprOrderBy(expList,orderBy);
+    buildExprOrderBy(expList, orderBy);
   }
 
-  private void buildExprOrderBy(ExpressionList<?> expList,List<String> orderBy) {
+  private void buildExprOrderBy(ExpressionList<?> expList, List<String> orderBy) {
     if (CommUtil.isNotEmpty(orderBy)) {
       StringBuffer sb = new StringBuffer();
       for (String order : orderBy) {
@@ -641,30 +642,34 @@ public class EbeanDelegator implements Delegator {
 
   /**
    * <p>
-   *    以指定的条件字符串为基础，构建<code>{@link com.avaje.ebean.ExpressionList}</code>查询条件表达式对象。
+   * 以指定的条件字符串为基础，构建<code>{@link com.avaje.ebean.ExpressionList}</code>查询条件表达式对象。
    * </p>
    * <p>
-   *     条件表达式格式为: {fieldName,expr,condValue}{n+1}
-   *     <br/>
-   *     比如： 查找 status(状态)等于'active' 且 gender(性别)等于'M' 且 mobile(手机号) 包含 5227 的用户<br/>
-   *     则条件字符串为： {status,eq,active}{gender,eq,M}{mobile,like,5227}
+   * 条件表达式格式为: {fieldName,expr,condValue}{n+1} <br/>
+   * 比如： 查找 status(状态)等于'active' 且 gender(性别)等于'M' 且 mobile(手机号) 包含 5227 的用户<br/>
+   * 则条件字符串为： {status,eq,active}{gender,eq,M}{mobile,like,5227}
    *
    *
    * </p>
-   * <p>几种特殊性况</p>
+   * <p>
+   * 几种特殊性况
+   * </p>
    * <ul>
-   *  <li>OR : {fieldName,expr,condValue,or,fieldName,expr,condValue} 中间的or直接分隔了左右两边的条件，比如{gender,eq,M,or,age,le,25} 性别等于'M' 或 年龄小于等于 25</li>
-   *  <li>Between : {age,between,25#28} 年龄在 25到28 岁之间 。注意 条件值的拼接格式为 fromValue#toValue </li>
-   *  <li>In,NotIn : {id,in,1#2#3#4#5} ID在1,2,3,4,5中间 {id,notIn,4#5} ID不在4,5中间。注意多个值以#号分割 </li>
-   *  <li>IsNull,IsNutNull : {birthday,isNull,anyValue} {birthday,isNotNull,anyValue} 注意anyValue表示任意值，仅起到占位的作用，本身没有意义。</li>
+   * <li>OR : {fieldName,expr,condValue,or,fieldName,expr,condValue}
+   * 中间的or直接分隔了左右两边的条件，比如{gender,eq,M,or,age,le,25} 性别等于'M' 或 年龄小于等于 25</li>
+   * <li>Between : {age,between,25#28} 年龄在 25到28 岁之间 。注意 条件值的拼接格式为 fromValue#toValue</li>
+   * <li>In,NotIn : {id,in,1#2#3#4#5} ID在1,2,3,4,5中间 {id,notIn,4#5} ID不在4,5中间。注意多个值以#号分割</li>
+   * <li>IsNull,IsNutNull : {birthday,isNull,anyValue} {birthday,isNotNull,anyValue}
+   * 注意anyValue表示任意值，仅起到占位的作用，本身没有意义。</li>
    * </ul>
-   * @param condition  指定的条件字符串
-   * @param exp        要构建的<code>{@link com.avaje.ebean.ExpressionList}</code>查询条件表达式对象
+   * 
+   * @param condition 指定的条件字符串
+   * @param exp 要构建的<code>{@link com.avaje.ebean.ExpressionList}</code>查询条件表达式对象
    * @throws GenericEntityException
    */
-  private void buildQueryExpression(String condition, ExpressionList<?> exp) throws GenericEntityException{
+  private void buildQueryExpression(String condition, ExpressionList<?> exp) throws GenericEntityException {
     if (CommUtil.isEmpty(condition)) {
-      return ;
+      return;
     }
 
     List<Integer> leftBraceIdxList = new ArrayList<>();
@@ -685,35 +690,35 @@ public class EbeanDelegator implements Delegator {
     }
 
     for (int i = 0; i < leftBraceIdxList.size(); i++) {
-      String cond = condition.substring(leftBraceIdxList.get(i) + 1,rightBraceIdxList.get(i));
+      String cond = condition.substring(leftBraceIdxList.get(i) + 1, rightBraceIdxList.get(i));
 
       if (CommUtil.isEmpty(cond)) {
         continue;
       }
-      EbeanServer server = currentServerMap.get(CURRENT_SERVER_NAME);
 
-      //NOTICE (cond.indexOf(C.EXPR_OR) >= 0) MUST BE HERE...
-      if(cond.indexOf(C.EXPR_OR) >= 0) {
+      // NOTICE (cond.indexOf(C.EXPR_OR) >= 0) MUST BE HERE...
+      if (cond.indexOf(C.EXPR_OR) >= 0) {
         String[] condToken = cond.split("," + C.EXPR_OR + ",");
         String leftCond = condToken[0];
         String rightCond = condToken[1];
-        exp.or(setExpression(leftCond,null),setExpression(rightCond,null));
+        exp.or(setExpression(leftCond, null), setExpression(rightCond, null));
       } else {
-        setExpression(cond,exp);
+        setExpression(cond, exp);
       }
     }
   }
 
   /**
    * <p>
-   *     根据条件字符串，设置查询表达式对象，如果参数<code>exp</code>为空，构建<code>{@link com.avaje.ebean.Expression}</code>并返回，
-   *     否则设置的是<code>{@link com.avaje.ebean.ExpressionList}</code>对象
+   * 根据条件字符串，设置查询表达式对象，如果参数<code>exp</code>为空，构建<code>{@link com.avaje.ebean.Expression}</code> 并返回，
+   * 否则设置的是<code>{@link com.avaje.ebean.ExpressionList}</code>对象
    * </p>
-   * @param cond  指定的条件字符串
-   * @param exp   要设置的<code>{@link com.avaje.ebean.ExpressionList}</code>
-   * @return    如果参数exp为空，返回<code>{@link com.avaje.ebean.Expression}</code>，否则返回<code>NULL</code>
+   * 
+   * @param cond 指定的条件字符串
+   * @param exp 要设置的<code>{@link com.avaje.ebean.ExpressionList}</code>
+   * @return 如果参数exp为空，返回<code>{@link com.avaje.ebean.Expression}</code>，否则返回<code>NULL</code>
    */
-  private Expression setExpression(String cond,ExpressionList<?> exp) {
+  private Expression setExpression(String cond, ExpressionList<?> exp) {
     if (CommUtil.isNotEmpty(cond)) {
       EbeanServer server = currentServerMap.get(CURRENT_SERVER_NAME);
       ExpressionFactory ef = server.getExpressionFactory();
@@ -728,7 +733,7 @@ public class EbeanDelegator implements Delegator {
             return ef.eq(fieldName, condValue);
           }
         }
-      } else if(cond.indexOf("," + C.EXPR_NE + ",") >= 0) {
+      } else if (cond.indexOf("," + C.EXPR_NE + ",") >= 0) {
         String[] condToken = cond.split("," + C.EXPR_NE + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
@@ -739,7 +744,7 @@ public class EbeanDelegator implements Delegator {
             return ef.ne(fieldName, condValue);
           }
         }
-      } else if(cond.indexOf("," + C.EXPR_IN + ",") >= 0) {
+      } else if (cond.indexOf("," + C.EXPR_IN + ",") >= 0) {
         String[] condToken = cond.split("," + C.EXPR_IN + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
@@ -751,19 +756,19 @@ public class EbeanDelegator implements Delegator {
             return ef.in(fieldName, Arrays.asList(valueArray));
           }
         }
-      } else if(cond.indexOf("," + C.EXPR_NIN + ",") >= 0) {
+      } else if (cond.indexOf("," + C.EXPR_NIN + ",") >= 0) {
         String[] condToken = cond.split("," + C.EXPR_NIN + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
         if (CommUtil.isNotEmpty(condValue)) {
           Object[] valueArray = condValue.split("#");
           if (exp != null) {
-            exp.not(server.getExpressionFactory().in(fieldName,Arrays.asList(valueArray)));
+            exp.not(server.getExpressionFactory().in(fieldName, Arrays.asList(valueArray)));
           } else {
             return ef.not(server.getExpressionFactory().in(fieldName, Arrays.asList(valueArray)));
           }
         }
-      } else if(cond.indexOf("," + C.EXPR_LE + ",") >= 0) {
+      } else if (cond.indexOf("," + C.EXPR_LE + ",") >= 0) {
         String[] condToken = cond.split("," + C.EXPR_LE + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
@@ -774,7 +779,7 @@ public class EbeanDelegator implements Delegator {
             return ef.le(fieldName, condValue);
           }
         }
-      } else if(cond.indexOf("," + C.EXPR_LT + ",") >= 0) {
+      } else if (cond.indexOf("," + C.EXPR_LT + ",") >= 0) {
         String[] condToken = cond.split("," + C.EXPR_LT + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
@@ -785,7 +790,7 @@ public class EbeanDelegator implements Delegator {
             return ef.lt(fieldName, condValue);
           }
         }
-      } else if(cond.indexOf("," + C.EXPR_GE + ",") >= 0) {
+      } else if (cond.indexOf("," + C.EXPR_GE + ",") >= 0) {
         String[] condToken = cond.split("," + C.EXPR_GE + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
@@ -796,7 +801,7 @@ public class EbeanDelegator implements Delegator {
             return ef.ge(fieldName, condValue);
           }
         }
-      } else if(cond.indexOf("," + C.EXPR_GT + ",") >= 0) {
+      } else if (cond.indexOf("," + C.EXPR_GT + ",") >= 0) {
         String[] condToken = cond.split("," + C.EXPR_GT + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
@@ -807,7 +812,7 @@ public class EbeanDelegator implements Delegator {
             return ef.gt(fieldName, condValue);
           }
         }
-      } else if(cond.indexOf("," + C.EXPR_IS_NULL + ",") >= 0) {
+      } else if (cond.indexOf("," + C.EXPR_IS_NULL + ",") >= 0) {
         String[] condToken = cond.split("," + C.EXPR_IS_NULL + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
@@ -818,7 +823,7 @@ public class EbeanDelegator implements Delegator {
             return ef.isNull(fieldName);
           }
         }
-      } else if(cond.indexOf("," + C.EXPR_IS_NOT_NULL + ",") >= 0) {
+      } else if (cond.indexOf("," + C.EXPR_IS_NOT_NULL + ",") >= 0) {
         String[] condToken = cond.split("," + C.EXPR_IS_NOT_NULL + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
@@ -829,7 +834,7 @@ public class EbeanDelegator implements Delegator {
             return ef.isNotNull(fieldName);
           }
         }
-      } else if(cond.indexOf("," + C.EXPR_LIKE + ",") >= 0) {
+      } else if (cond.indexOf("," + C.EXPR_LIKE + ",") >= 0) {
         String[] condToken = cond.split("," + C.EXPR_LIKE + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
@@ -840,7 +845,7 @@ public class EbeanDelegator implements Delegator {
             return ef.like(fieldName, "%" + condValue + "%");
           }
         }
-      } else if(cond.indexOf("," + C.EXPR_LLIKE + ",") >= 0) {
+      } else if (cond.indexOf("," + C.EXPR_LLIKE + ",") >= 0) {
         String[] condToken = cond.split("," + C.EXPR_LLIKE + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
@@ -851,7 +856,7 @@ public class EbeanDelegator implements Delegator {
             return ef.like(fieldName, "%" + condValue);
           }
         }
-      } else if(cond.indexOf("," + C.EXPR_RLIKE + ",") >= 0) {
+      } else if (cond.indexOf("," + C.EXPR_RLIKE + ",") >= 0) {
         String[] condToken = cond.split("," + C.EXPR_RLIKE + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
@@ -862,14 +867,14 @@ public class EbeanDelegator implements Delegator {
             return ef.like(fieldName, condValue + "%");
           }
         }
-      } else if(cond.indexOf("," + C.EXPR_BETWEEN + ",") >= 0) {
+      } else if (cond.indexOf("," + C.EXPR_BETWEEN + ",") >= 0) {
         String[] condToken = cond.split("," + C.EXPR_BETWEEN + ",");
         String fieldName = condToken[0];
         String condValue = condToken[1];
         if (CommUtil.isNotEmpty(condValue)) {
           Object[] valueArray = condValue.split("#");
           if (exp != null) {
-            exp.between(fieldName,valueArray[0],valueArray[1]);
+            exp.between(fieldName, valueArray[0], valueArray[1]);
           } else {
             return ef.between(fieldName, valueArray[0], valueArray[1]);
           }
@@ -881,16 +886,17 @@ public class EbeanDelegator implements Delegator {
 
   /**
    * <p>
-   *     将传入的查询字段拼接成 特定格式的字符串，并应用到查询对象<code>{@link com.avaje.ebean.Query}</code>
+   * 将传入的查询字段拼接成 特定格式的字符串，并应用到查询对象<code>{@link com.avaje.ebean.Query}</code>
    * </p>
    * <p>
-   *     比如：传的字段Set集合为: <strong>[id,username,email,order.id,order.grandTotal]</strong>
+   * 比如：传的字段Set集合为: <strong>[id,username,email,order.id,order.grandTotal]</strong>
    * </p>
    * <p>
-   *     转换后字符串格式为： <strong>(id,username,email,order(id,grandTotal))</strong><br/>
-   *     该字符串做为参数 生成 <code>{@link com.avaje.ebean.text.PathProperties}</code>对象实例,并应用到Query查询对象上
+   * 转换后字符串格式为： <strong>(id,username,email,order(id,grandTotal))</strong><br/>
+   * 该字符串做为参数 生成 <code>{@link com.avaje.ebean.text.PathProperties}</code>对象实例,并应用到Query查询对象上
    * </p>
-   * @param query          <code>{@link com.avaje.ebean.Query}</code>查询对象
+   * 
+   * @param query <code>{@link com.avaje.ebean.Query}</code>查询对象
    * @param fieldsToSelect 要查询的字段集合
    */
   private void buildSelectFields(Query<?> query, Set<String> fieldsToSelect) {
@@ -937,7 +943,7 @@ public class EbeanDelegator implements Delegator {
         pathPropsSb.append(tmpSb.substring(0, tmpSb.length() - 1));
       }
       pathPropsSb.append(")");
-      Log.d("PathProperties:" + pathPropsSb.toString(),TAG);
+      Log.d("PathProperties:" + pathPropsSb.toString(), TAG);
       PathProperties pathProperties = PathProperties.parse(pathPropsSb.toString());
       pathProperties.apply(query);
     }

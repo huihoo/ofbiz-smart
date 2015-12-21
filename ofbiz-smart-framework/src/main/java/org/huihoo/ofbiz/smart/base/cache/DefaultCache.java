@@ -15,7 +15,6 @@ public class DefaultCache<K,V> implements Cache<K,V>{
     private final CacheManager CACHE_MANAGER = CacheManager.create();
 
     private volatile int timeToLiveSeconds;
-    private volatile int timeToIdleSeconds;
     private volatile int maxEntries;
 
     private volatile EvictionStrategy evictionStrategy;
@@ -57,7 +56,6 @@ public class DefaultCache<K,V> implements Cache<K,V>{
             .memoryStoreEvictionPolicy(mep)
             .eternal(false)
             .timeToLiveSeconds(timeToLiveSeconds == 0 ? DEFAULT_TIME_TO_LIVE_SECONDS : timeToLiveSeconds)
-            .timeToIdleSeconds(timeToIdleSeconds == 0 ? DEFAULT_TIME_TO_IDLE_SECONDS : timeToIdleSeconds)
             .diskExpiryThreadIntervalSeconds(0)
             .persistence(new PersistenceConfiguration().strategy(PersistenceConfiguration.Strategy.LOCALTEMPSWAP)));
 
@@ -79,10 +77,6 @@ public class DefaultCache<K,V> implements Cache<K,V>{
         this.timeToLiveSeconds = timeToLiveSeconds;
     }
 
-    @Override
-    public void setTimeToIdleSeconds(int timeToIdleSeconds) {
-        this.timeToIdleSeconds = timeToIdleSeconds;
-    }
 
     @Override
     public String getName() {
@@ -104,12 +98,14 @@ public class DefaultCache<K,V> implements Cache<K,V>{
         return put(key,value,0);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public V get(K key) {
         Element ele = CACHE_MANAGER.getCache(name).get(key);
         return ele == null ? null : (V) ele.getObjectValue();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public V remove(K key) {
         return (V) CACHE_MANAGER.getCache(name).removeAndReturnElement(key).getObjectValue();
@@ -134,7 +130,4 @@ public class DefaultCache<K,V> implements Cache<K,V>{
     public Map<K, V> getItems(int n) {
         return null;
     }
-
-
-
 }

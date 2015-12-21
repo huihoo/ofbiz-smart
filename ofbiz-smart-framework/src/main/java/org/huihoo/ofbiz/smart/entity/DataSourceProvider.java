@@ -6,6 +6,6 @@ import java.util.Properties;
 
 public interface DataSourceProvider {
 
-   DataSource datasource(Properties prop,String datasourceName);
+  DataSource datasource(Properties prop, String datasourceName);
 
 }

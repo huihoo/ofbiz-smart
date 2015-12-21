@@ -2,6 +2,7 @@ package org.huihoo.ofbiz.smart.entity;
 
 
 import org.huihoo.ofbiz.smart.base.C;
+import org.huihoo.ofbiz.smart.base.cache.SimpleCacheManager;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.junit.Assert;
@@ -15,11 +16,12 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 
-public class DelegatorTest extends BaseTestCase{
+public class DelegatorTest extends BaseTestCase {
   private final static String TAG = DelegatorTest.class.getName();
 
   @Test
   public void testAllInOne() throws GenericEntityException, ParseException, SQLException {
+    Log.i("start testing.........", TAG);
     Customer customer = new Customer();
     customer.setLastName("Peter");
     customer.setGender("Male");
@@ -48,135 +50,140 @@ public class DelegatorTest extends BaseTestCase{
     customer002.setSalary(new BigDecimal("8000"));
     delegator.save(customer002);
 
-    Assert.assertEquals("Peter",customer.getLastName());
+    Assert.assertEquals("Peter", customer.getLastName());
     Assert.assertNotNull(customer.getAddress());
 
-    Customer newestCustomer = (Customer) delegator.findById(Customer.class,customer.getId());
+    Customer newestCustomer = (Customer) delegator.findById(Customer.class, customer.getId());
     Assert.assertNotNull(newestCustomer);
 
-    newestCustomer = (Customer) delegator.findById(Customer.class,customer.getId(),true);
+    newestCustomer = (Customer) delegator.findById(Customer.class, customer.getId(), true);
     Assert.assertNotNull(newestCustomer);
 
-    newestCustomer = (Customer) delegator.findById(Customer.class,customer.getId(),true);
+    newestCustomer = (Customer) delegator.findById(Customer.class, customer.getId(), true);
     Assert.assertNotNull(newestCustomer);
-    Assert.assertEquals(1,delegator.getCache().getHitCount());
+    Assert.assertEquals(1, SimpleCacheManager.getCache("EntityCache").getHitCount());
 
-    newestCustomer = (Customer) delegator.findUniqueByAnd(Customer.class, CommUtil.toMap("lastName","Peter"));
+    newestCustomer = (Customer) delegator.findUniqueByAnd(Customer.class, CommUtil.toMap("lastName", "Peter"));
     Assert.assertNotNull(newestCustomer);
 
-    newestCustomer = (Customer) delegator.findUniqueByAnd(Customer.class, CommUtil.toMap("lastName","PeterNotFound"));
+    newestCustomer = (Customer) delegator.findUniqueByAnd(Customer.class, CommUtil.toMap("lastName", "PeterNotFound"));
     Assert.assertNull(newestCustomer);
 
     Set<String> selectToFields = new LinkedHashSet<>();
     selectToFields.add("lastName");
-    newestCustomer = (Customer) delegator.findUniqueByAnd(Customer.class, CommUtil.toMap("lastName","Peter"),selectToFields,true);
+    newestCustomer =
+        (Customer) delegator.findUniqueByAnd(Customer.class, CommUtil.toMap("lastName", "Peter"), selectToFields, true);
     Assert.assertNotNull(newestCustomer.getLastName());
 
-    newestCustomer = (Customer) delegator.findUniqueByAnd(Customer.class, CommUtil.toMap("lastName","Peter"),selectToFields,true);
+    newestCustomer =
+        (Customer) delegator.findUniqueByAnd(Customer.class, CommUtil.toMap("lastName", "Peter"), selectToFields, true);
     Assert.assertNotNull(newestCustomer);
-    Assert.assertEquals(2,delegator.getCache().getHitCount());
+    Assert.assertEquals(2, SimpleCacheManager.getCache("EntityCache").getHitCount());
 
-    List<?> customerList = delegator.findList(Customer.class,"{lastName,eq,Peter}",selectToFields, Arrays.asList(new String[]{"birthday desc"}));
+    List<?> customerList = delegator.findList(Customer.class, "{lastName,eq,Peter}", selectToFields,
+        Arrays.asList(new String[] {"birthday desc"}));
     Assert.assertNotNull(customerList);
-    Assert.assertEquals(1,customerList.size());
+    Assert.assertEquals(1, customerList.size());
 
-    customerList = delegator.findList(Customer.class,"{lastName,eq,Peter,or,gender,eq,Male}",selectToFields, Arrays.asList(new String[]{"birthday desc"}));
+    customerList = delegator.findList(Customer.class, "{lastName,eq,Peter,or,gender,eq,Male}", selectToFields,
+        Arrays.asList(new String[] {"birthday desc"}));
     Assert.assertNotNull(customerList);
-    Assert.assertEquals(2,customerList.size());
+    Assert.assertEquals(2, customerList.size());
 
-    int count = delegator.countByAnd(Customer.class,CommUtil.toMap("lastName","Peter"));
-    Assert.assertEquals(1,count);
+    int count = delegator.countByAnd(Customer.class, CommUtil.toMap("lastName", "Peter"));
+    Assert.assertEquals(1, count);
 
-    count = delegator.countByAnd(Customer.class,CommUtil.toMap("lastName","Peter2"));
-    Assert.assertEquals(0,count);
+    count = delegator.countByAnd(Customer.class, CommUtil.toMap("lastName", "Peter2"));
+    Assert.assertEquals(0, count);
 
-    count = delegator.countByCond(Customer.class,"{lastName,eq,Peter}");
-    Assert.assertEquals(1,count);
+    count = delegator.countByCond(Customer.class, "{lastName,eq,Peter}");
+    Assert.assertEquals(1, count);
 
-    count = delegator.countByCond(Customer.class,"{lastName,eq,Peter2}");
-    Assert.assertEquals(0,count);
+    count = delegator.countByCond(Customer.class, "{lastName,eq,Peter2}");
+    Assert.assertEquals(0, count);
 
-    List<?> ids = delegator.findIdsByAnd(Customer.class,CommUtil.toMap("lastName","Peter"));
-    Assert.assertEquals(1,ids.size());
+    List<?> ids = delegator.findIdsByAnd(Customer.class, CommUtil.toMap("lastName", "Peter"));
+    Assert.assertEquals(1, ids.size());
 
-    ids = delegator.findIdsByCond(Customer.class,"{lastName,eq,Peter}");
-    Assert.assertEquals(1,ids.size());
+    ids = delegator.findIdsByCond(Customer.class, "{lastName,eq,Peter}");
+    Assert.assertEquals(1, ids.size());
 
-    Map<String,Object> pageResult = delegator.findPageByAnd(Customer.class,CommUtil.toMap("lastName","Peter"),1,10);
+    Map<String, Object> pageResult =
+        delegator.findPageByAnd(Customer.class, CommUtil.toMap("lastName", "Peter"), 1, 10);
     Assert.assertNotNull(pageResult);
-    Assert.assertEquals(1,pageResult.get(C.PAGE_TOTAL_ENTRY));
-    Assert.assertEquals(1,pageResult.get(C.PAGE_TOTAL_PAGE));
-    Assert.assertEquals(true,pageResult.get(C.PAGE_LIST) instanceof List<?>);
+    Assert.assertEquals(1, pageResult.get(C.PAGE_TOTAL_ENTRY));
+    Assert.assertEquals(1, pageResult.get(C.PAGE_TOTAL_PAGE));
+    Assert.assertEquals(true, pageResult.get(C.PAGE_LIST) instanceof List<?>);
 
-    pageResult = delegator.findPageByAnd(Customer.class,CommUtil.toMap("lastName","Peter"),1,10,selectToFields,null);
+    pageResult =
+        delegator.findPageByAnd(Customer.class, CommUtil.toMap("lastName", "Peter"), 1, 10, selectToFields, null);
     Assert.assertNotNull(pageResult);
-    Assert.assertEquals(1,pageResult.get(C.PAGE_TOTAL_ENTRY));
-    Assert.assertEquals(1,pageResult.get(C.PAGE_TOTAL_PAGE));
-    Assert.assertEquals(true,pageResult.get(C.PAGE_LIST) instanceof List<?>);
+    Assert.assertEquals(1, pageResult.get(C.PAGE_TOTAL_ENTRY));
+    Assert.assertEquals(1, pageResult.get(C.PAGE_TOTAL_PAGE));
+    Assert.assertEquals(true, pageResult.get(C.PAGE_LIST) instanceof List<?>);
 
-    pageResult = delegator.findPageByAnd(Customer.class,CommUtil.toMap("gender","Male"),1,10,selectToFields,null);
+    pageResult = delegator.findPageByAnd(Customer.class, CommUtil.toMap("gender", "Male"), 1, 10, selectToFields, null);
     Assert.assertNotNull(pageResult);
-    Assert.assertEquals(2,pageResult.get(C.PAGE_TOTAL_ENTRY));
-    Assert.assertEquals(1,pageResult.get(C.PAGE_TOTAL_PAGE));
-    Assert.assertEquals(true,pageResult.get(C.PAGE_LIST) instanceof List<?>);
+    Assert.assertEquals(2, pageResult.get(C.PAGE_TOTAL_ENTRY));
+    Assert.assertEquals(1, pageResult.get(C.PAGE_TOTAL_PAGE));
+    Assert.assertEquals(true, pageResult.get(C.PAGE_LIST) instanceof List<?>);
 
 
 
-
-    pageResult = delegator.findPageByAnd(Customer.class,CommUtil.toMap("gender","Male"),1,10,selectToFields,
-                                                                      Arrays.asList(new String[]{"createdAt asc"}));
+    pageResult = delegator.findPageByAnd(Customer.class, CommUtil.toMap("gender", "Male"), 1, 10, selectToFields,
+        Arrays.asList(new String[] {"createdAt asc"}));
     Assert.assertNotNull(pageResult);
-    Assert.assertEquals(2,pageResult.get(C.PAGE_TOTAL_ENTRY));
-    Assert.assertEquals(1,pageResult.get(C.PAGE_TOTAL_PAGE));
-    Assert.assertEquals(true,pageResult.get(C.PAGE_LIST) instanceof List<?>);
-    Assert.assertEquals("Peter",((Customer)((List<?>)pageResult.get(C.PAGE_LIST)).get(0)).getLastName());
+    Assert.assertEquals(2, pageResult.get(C.PAGE_TOTAL_ENTRY));
+    Assert.assertEquals(1, pageResult.get(C.PAGE_TOTAL_PAGE));
+    Assert.assertEquals(true, pageResult.get(C.PAGE_LIST) instanceof List<?>);
+    Assert.assertEquals("Peter", ((Customer) ((List<?>) pageResult.get(C.PAGE_LIST)).get(0)).getLastName());
 
 
-    pageResult = delegator.findPageByAnd(Customer.class,CommUtil.toMap("gender","Male"),1,10,selectToFields,
-                                                                     Arrays.asList(new String[]{"createdAt desc"}));
+    pageResult = delegator.findPageByAnd(Customer.class, CommUtil.toMap("gender", "Male"), 1, 10, selectToFields,
+        Arrays.asList(new String[] {"createdAt desc"}));
     Assert.assertNotNull(pageResult);
-    Assert.assertEquals(2,pageResult.get(C.PAGE_TOTAL_ENTRY));
-    Assert.assertEquals(1,pageResult.get(C.PAGE_TOTAL_PAGE));
-    Assert.assertEquals(true,pageResult.get(C.PAGE_LIST) instanceof List<?>);
-    Assert.assertEquals("Peter002",((Customer)((List<?>)pageResult.get(C.PAGE_LIST)).get(0)).getLastName());
+    Assert.assertEquals(2, pageResult.get(C.PAGE_TOTAL_ENTRY));
+    Assert.assertEquals(1, pageResult.get(C.PAGE_TOTAL_PAGE));
+    Assert.assertEquals(true, pageResult.get(C.PAGE_LIST) instanceof List<?>);
+    Assert.assertEquals("Peter002", ((Customer) ((List<?>) pageResult.get(C.PAGE_LIST)).get(0)).getLastName());
 
 
-    pageResult = delegator.findPageByAnd(Customer.class,CommUtil.toMap("gender","Male"),1,10,selectToFields,
-                                                    Arrays.asList(new String[]{"createdAt desc","birthday desc"}),true);
+    pageResult = delegator.findPageByAnd(Customer.class, CommUtil.toMap("gender", "Male"), 1, 10, selectToFields,
+        Arrays.asList(new String[] {"createdAt desc", "birthday desc"}), true);
     Assert.assertNotNull(pageResult);
-    Assert.assertEquals(2,pageResult.get(C.PAGE_TOTAL_ENTRY));
-    Assert.assertEquals(1,pageResult.get(C.PAGE_TOTAL_PAGE));
-    Assert.assertEquals(true,pageResult.get(C.PAGE_LIST) instanceof List<?>);
-    Assert.assertEquals("Peter002",((Customer)((List<?>)pageResult.get(C.PAGE_LIST)).get(0)).getLastName());
+    Assert.assertEquals(2, pageResult.get(C.PAGE_TOTAL_ENTRY));
+    Assert.assertEquals(1, pageResult.get(C.PAGE_TOTAL_PAGE));
+    Assert.assertEquals(true, pageResult.get(C.PAGE_LIST) instanceof List<?>);
+    Assert.assertEquals("Peter002", ((Customer) ((List<?>) pageResult.get(C.PAGE_LIST)).get(0)).getLastName());
 
 
-    pageResult = delegator.findPageByAnd(Customer.class,CommUtil.toMap("gender","Male"),1,10,selectToFields,
-                                                    Arrays.asList(new String[]{"createdAt desc","birthday desc"}),true);
+    pageResult = delegator.findPageByAnd(Customer.class, CommUtil.toMap("gender", "Male"), 1, 10, selectToFields,
+        Arrays.asList(new String[] {"createdAt desc", "birthday desc"}), true);
     Assert.assertNotNull(pageResult);
 
 
 
-    pageResult = delegator.findPageByCond(Customer.class,"{gender,eq,Male}",1,10,selectToFields,
-                                                                Arrays.asList(new String[]{"createdAt asc"}));
+    pageResult = delegator.findPageByCond(Customer.class, "{gender,eq,Male}", 1, 10, selectToFields,
+        Arrays.asList(new String[] {"createdAt asc"}));
     Assert.assertNotNull(pageResult);
-    Assert.assertEquals(2,pageResult.get(C.PAGE_TOTAL_ENTRY));
-    Assert.assertEquals(1,pageResult.get(C.PAGE_TOTAL_PAGE));
-    Assert.assertEquals(true,pageResult.get(C.PAGE_LIST) instanceof List<?>);
-    Assert.assertEquals("Peter",((Customer)((List<?>)pageResult.get(C.PAGE_LIST)).get(0)).getLastName());
+    Assert.assertEquals(2, pageResult.get(C.PAGE_TOTAL_ENTRY));
+    Assert.assertEquals(1, pageResult.get(C.PAGE_TOTAL_PAGE));
+    Assert.assertEquals(true, pageResult.get(C.PAGE_LIST) instanceof List<?>);
+    Assert.assertEquals("Peter", ((Customer) ((List<?>) pageResult.get(C.PAGE_LIST)).get(0)).getLastName());
 
     pageResult = delegator.findPageByCond(Customer.class,
-            "{gender,eq,Male}" +
-            "{level,between,1#5}{salary,between,5000#8000}" +
-            "{id,in,1#2#3}" + "{lastName,isNotNull,any}{firstName,isNull,any}{level,ge,1}{level,gt,0}{level,le,10}{level,lt,10}" +
-            "{id,notIn,8#9#10}{id,ge,1,or,id,le,100}", 1,10,selectToFields,Arrays.asList(new String[]{"createdAt asc"}));
+        "{gender,eq,Male}" + "{level,between,1#5}{salary,between,5000#8000}" + "{id,in,1#2#3}"
+            + "{lastName,isNotNull,any}{firstName,isNull,any}{level,ge,1}{level,gt,0}{level,le,10}{level,lt,10}"
+            + "{id,notIn,8#9#10}{id,ge,1,or,id,le,100}",
+        1, 10, selectToFields, Arrays.asList(new String[] {"createdAt asc"}));
     Assert.assertNotNull(pageResult);
-    Assert.assertEquals(2,pageResult.get(C.PAGE_TOTAL_ENTRY));
-    Assert.assertEquals(1,pageResult.get(C.PAGE_TOTAL_PAGE));
-    Assert.assertEquals(true,pageResult.get(C.PAGE_LIST) instanceof List<?>);
-    Assert.assertEquals("Peter",((Customer)((List<?>)pageResult.get(C.PAGE_LIST)).get(0)).getLastName());
+    Assert.assertEquals(2, pageResult.get(C.PAGE_TOTAL_ENTRY));
+    Assert.assertEquals(1, pageResult.get(C.PAGE_TOTAL_PAGE));
+    Assert.assertEquals(true, pageResult.get(C.PAGE_LIST) instanceof List<?>);
+    Assert.assertEquals("Peter", ((Customer) ((List<?>) pageResult.get(C.PAGE_LIST)).get(0)).getLastName());
 
     Connection con = delegator.getConnection();
     Assert.assertNotNull("raw connection ---> " + con);
     con.close();
   }
-}   
+}
