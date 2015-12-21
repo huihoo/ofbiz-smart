@@ -11,7 +11,7 @@ public class ServiceModel implements Serializable {
   public String location;
   public String invoke;
   public String engineName;
-  public String engityName;
+  public String entityName;
   public String description;
   public boolean requireAuth = false;
   public boolean export = false;

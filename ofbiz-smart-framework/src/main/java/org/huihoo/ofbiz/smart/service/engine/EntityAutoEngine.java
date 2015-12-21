@@ -56,13 +56,13 @@ public class EntityAutoEngine extends GenericAsyncEngine {
       throw new GenericServiceException("Service [" + serviceName + "] required to set Delegator.");
     }
 
-    Class<?> entityClazz = ENGITY_CLAZZ_MAP.get(serviceModel.engityName);
+    Class<?> entityClazz = ENGITY_CLAZZ_MAP.get(serviceModel.entityName);
     if (entityClazz == null) {
       try {
-        entityClazz = Thread.currentThread().getContextClassLoader().loadClass(serviceModel.engityName);
-        ENGITY_CLAZZ_MAP.put(serviceModel.engityName, entityClazz);
+        entityClazz = Thread.currentThread().getContextClassLoader().loadClass(serviceModel.entityName);
+        ENGITY_CLAZZ_MAP.put(serviceModel.entityName, entityClazz);
       } catch (ClassNotFoundException e) {
-        throw new GenericServiceException("EngityClass [" + serviceModel.engityName + "] not found.");
+        throw new GenericServiceException("EngityClass [" + serviceModel.entityName + "] not found.");
       }
     }
     try {

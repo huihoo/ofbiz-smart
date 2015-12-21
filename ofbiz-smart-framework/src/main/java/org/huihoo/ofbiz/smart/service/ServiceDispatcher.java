@@ -5,6 +5,7 @@ import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.location.FlexibleLocation;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
+import org.huihoo.ofbiz.smart.base.util.ServiceUtil;
 import org.huihoo.ofbiz.smart.entity.Delegator;
 import org.huihoo.ofbiz.smart.service.annotation.Service;
 import org.huihoo.ofbiz.smart.service.annotation.ServiceDefinition;
@@ -71,6 +72,8 @@ public class ServiceDispatcher {
 
 
   public Map<String, Object> runSync(String serviceName, Map<String, Object> ctx) {
+    boolean transaction = false;
+    boolean persist = false;
     try {
       if (!C.PROFILE_PRODUCTION.equals(profile)) {
         // In test,develop profile, always load it.
@@ -78,13 +81,38 @@ public class ServiceDispatcher {
       }
       ServiceModel serviceModel = SERVICE_CONTEXT_MAP.get(serviceName);
       if (serviceModel == null) {
-
+        String msg = "Unable to locate service[" + serviceName + "]";
+        Log.w(msg, TAG);
+        return ServiceUtil.returnProplem("SERVICE_NOT_FOUND", msg);
       }
-      return null;
+      
+      GenericEngine engine = ENGINE_MAP.get(serviceModel.engineName);
+      if (engine == null) {
+        Log.w("Unsupported ServiceEngine [%s]", TAG, serviceModel.engineName);
+        return ServiceUtil.returnProplem("UNSUPPORTED_SERVICE_ENGINE", "Unsupported service ["+ serviceName + "]");
+      }
+      
+      transaction = serviceModel.transaction;
+      persist = serviceModel.persist;
+      
+      if (persist && delegator == null) {
+        Log.w("Service [%s] require persist context.", TAG, serviceName);
+        return ServiceUtil.returnProplem("UNSUPPORTED_SERVICE_ENGINE", "Unsupported service ["+ serviceName + "]");
+      }
+      if (persist && transaction) {
+        delegator.beginTransaction();
+      }
+      return engine.runSync(serviceName, ctx);
     } catch (Exception e) {
-      return null;
+      if (persist && transaction && delegator != null) {
+        delegator.rollback();
+      }
+      Log.e(e, e.getMessage(), TAG);
+      return ServiceUtil.returnProplem("SERVICE_CALL_EXCEPTION", "Calling service["+serviceName+"] has an exception.");
     } finally {
-
+      if (persist && transaction && delegator != null) {
+        delegator.endTransaction();
+      }
     }
   }
 
@@ -134,6 +162,14 @@ public class ServiceDispatcher {
       Log.e(e, "Unable to register serviceCallback[" + serviceCallbackClazzName + "]", TAG);
     }
   }
+  
+  
+  public void registerService(ServiceModel sm) {
+    if (CommUtil.isEmpty(sm) || CommUtil.isEmpty(sm.name)) {
+      return;
+    }
+    SERVICE_CONTEXT_MAP.put(sm.name, sm);
+  }
 
   public Map<String, ServiceModel> getServiceContextMap() {
     return SERVICE_CONTEXT_MAP;
@@ -164,7 +200,7 @@ public class ServiceDispatcher {
         }
         ServiceModel sm = new ServiceModel();
         sm.engineName = sd.type();
-        sm.engityName = sd.entityName();
+        sm.entityName = sd.entityName();
         sm.location = sClazz.getName();
         sm.invoke = method.getName();
         sm.name = sd.name();
@@ -189,7 +225,7 @@ public class ServiceDispatcher {
       }
     }
   }
-
+  
   private Set<Class<?>> scanServiceClazz(String file, boolean recursive) {
     Set<Class<?>> serviceClazzSet = new LinkedHashSet<>();
     if (file.endsWith(".jar")) {
