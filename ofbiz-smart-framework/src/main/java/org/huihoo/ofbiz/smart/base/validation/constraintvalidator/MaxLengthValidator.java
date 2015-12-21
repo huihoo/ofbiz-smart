@@ -2,11 +2,7 @@ package org.huihoo.ofbiz.smart.base.validation.constraintvalidator;
 
 
 import org.huihoo.ofbiz.smart.base.validation.ConstraintValidator;
-import org.huihoo.ofbiz.smart.base.validation.Max;
 import org.huihoo.ofbiz.smart.base.validation.MaxLength;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 public class MaxLengthValidator implements ConstraintValidator<MaxLength,CharSequence>{
 

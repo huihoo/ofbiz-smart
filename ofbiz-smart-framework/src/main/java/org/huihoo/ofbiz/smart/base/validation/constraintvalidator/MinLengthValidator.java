@@ -2,7 +2,6 @@ package org.huihoo.ofbiz.smart.base.validation.constraintvalidator;
 
 
 import org.huihoo.ofbiz.smart.base.validation.ConstraintValidator;
-import org.huihoo.ofbiz.smart.base.validation.MaxLength;
 import org.huihoo.ofbiz.smart.base.validation.MinLength;
 
 public class MinLengthValidator implements ConstraintValidator<MinLength,CharSequence>{

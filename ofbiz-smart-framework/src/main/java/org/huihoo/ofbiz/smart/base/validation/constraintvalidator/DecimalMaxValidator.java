@@ -4,10 +4,8 @@ package org.huihoo.ofbiz.smart.base.validation.constraintvalidator;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.validation.ConstraintValidator;
 import org.huihoo.ofbiz.smart.base.validation.DecimalMax;
-import org.huihoo.ofbiz.smart.base.validation.Max;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 
 public class DecimalMaxValidator implements ConstraintValidator<DecimalMax,CharSequence>{
 

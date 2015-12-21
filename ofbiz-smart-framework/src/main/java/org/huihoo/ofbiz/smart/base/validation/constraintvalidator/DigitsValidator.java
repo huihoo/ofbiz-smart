@@ -3,7 +3,6 @@ package org.huihoo.ofbiz.smart.base.validation.constraintvalidator;
 
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.validation.ConstraintValidator;
-import org.huihoo.ofbiz.smart.base.validation.DecimalMax;
 import org.huihoo.ofbiz.smart.base.validation.Digits;
 
 import java.math.BigDecimal;

@@ -4,7 +4,6 @@ package org.huihoo.ofbiz.smart.base.validation.constraintvalidator;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.validation.ConstraintValidator;
 import org.huihoo.ofbiz.smart.base.validation.Email;
-import org.huihoo.ofbiz.smart.base.validation.Null;
 
 public class EmailValidator implements ConstraintValidator<Email,CharSequence>{
 

@@ -3,7 +3,6 @@ package org.huihoo.ofbiz.smart.base.validation.constraintvalidator;
 
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.validation.ConstraintValidator;
-import org.huihoo.ofbiz.smart.base.validation.Email;
 import org.huihoo.ofbiz.smart.base.validation.Url;
 
 public class UrlValidator implements ConstraintValidator<Url,CharSequence>{
@@ -23,7 +22,8 @@ public class UrlValidator implements ConstraintValidator<Url,CharSequence>{
                     + "[0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}"
                     + "|[1-9][0-9]|[0-9]))");
 
-    public static final java.util.regex.Pattern DOMAIN_NAME = java.util.regex.Pattern.compile("(" + HOST_NAME + "|" + IP_ADDRESS + ")");
+    public static final java.util.regex.Pattern DOMAIN_NAME = 
+                                                  java.util.regex.Pattern.compile("(" + HOST_NAME + "|" + IP_ADDRESS + ")");
 
 
 
