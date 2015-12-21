@@ -189,6 +189,10 @@ public class I18NUtil {
 
   public static class XmlResourceBundle extends ResourceBundle implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected Properties properties = null;
     protected Locale locale = null;
     protected int hashCode = hashCode();

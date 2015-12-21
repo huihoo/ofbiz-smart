@@ -182,6 +182,28 @@ public class DelegatorTest extends BaseTestCase {
     Assert.assertEquals(true, pageResult.get(C.PAGE_LIST) instanceof List<?>);
     Assert.assertEquals("Peter", ((Customer) ((List<?>) pageResult.get(C.PAGE_LIST)).get(0)).getLastName());
 
+    String exprCond = Expr.create().eq("gender", "Male")
+                                   .between("level", 1,5)
+                                   .between("salary", 5000, 8000)
+                                   .in("id", Arrays.asList(new Object[]{1,2,3}))
+                                   .notIn("id", Arrays.asList(new Object[]{8,9,10}))
+                                   .isNotNull("lastName")
+                                   .isNull("firstName")
+                                   .ge("level", 1)
+                                   .gt("level", 0)
+                                   .le("level", 10)
+                                   .lt("level", 10)
+                                   .or("id,ge,1", "id,le,100")
+                                   .build();
+    
+    Log.d("exprCond -> " + exprCond, TAG);
+    pageResult = delegator.findPageByCond(Customer.class,exprCond,1, 10, selectToFields, Arrays.asList(new String[] {"createdAt asc"}));
+    Assert.assertNotNull(pageResult);
+    Assert.assertEquals(2, pageResult.get(C.PAGE_TOTAL_ENTRY));
+    Assert.assertEquals(1, pageResult.get(C.PAGE_TOTAL_PAGE));
+    Assert.assertEquals(true, pageResult.get(C.PAGE_LIST) instanceof List<?>);
+    Assert.assertEquals("Peter", ((Customer) ((List<?>) pageResult.get(C.PAGE_LIST)).get(0)).getLastName());
+    
     Connection con = delegator.getConnection();
     Assert.assertNotNull("raw connection ---> " + con);
     con.close();

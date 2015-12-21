@@ -30,8 +30,10 @@ public class ServiceDispatcher {
 
   private final static Map<String, ServiceModel> SERVICE_CONTEXT_MAP = new ConcurrentHashMap<>();
 
-  private final static String[] INTENAL_ENGINES = {"org.huihoo.ofbiz.smart.service.engine.EntityAutoEngine",
-      "org.huihoo.ofbiz.smart.service.engine.StandardJavaEngine"};
+  private final static String[] INTENAL_ENGINES = {
+                                    "org.huihoo.ofbiz.smart.service.engine.EntityAutoEngine",
+                                    "org.huihoo.ofbiz.smart.service.engine.StandardJavaEngine"
+  };
 
   private volatile String profile;
 
@@ -51,14 +53,13 @@ public class ServiceDispatcher {
     profile = applicationProps.getProperty(C.PROFILE_NAME);
 
     if (CommUtil.isEmpty(scanResNames)) {
-      throw new GenericServiceException("You must be assign both delegator and scanResNames.");
+      throw new GenericServiceException("Config[service.scanning.names] is empty.");
     }
 
     if (delegator == null) {
-      if (delegator == null) {
-        Log.w("[ServiceDispatcher.init]:Could not find Delegator instance", TAG);
-      }
+      Log.w("[ServiceDispatcher.init]:Could not find Delegator instance", TAG);
     }
+    
     this.delegator = delegator;
 
     for (String engineClazzName : INTENAL_ENGINES) {
