@@ -1,32 +1,40 @@
 package org.huihoo.ofbiz.smart.base.util;
 
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.InvalidPropertiesFormatException;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.ResourceBundle;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.huihoo.ofbiz.smart.base.cache.Cache;
-import org.huihoo.ofbiz.smart.base.cache.DefaultCache;
+import org.huihoo.ofbiz.smart.base.cache.SimpleCacheManager;
 import org.huihoo.ofbiz.smart.base.location.FlexibleLocation;
 import org.jetbrains.annotations.NotNull;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.net.URL;
-import java.util.*;
-
+@SuppressWarnings("unchecked")
 public class I18NUtil {
 
   private final static String TAG = I18NUtil.class.getName();
 
-  private final static Cache<String, ResourceBundle> RESOURCE_BUNDLE_CACHE = new DefaultCache<>();
+  private final static Cache<String, ResourceBundle> RESOURCE_BUNDLE_CACHE;
 
   static {
-    RESOURCE_BUNDLE_CACHE.start("i18n-resources-cache");
+    RESOURCE_BUNDLE_CACHE = (Cache<String, ResourceBundle>)
+                                     SimpleCacheManager.createCache("I18N-resources-cache");
   }
 
   public static ResourceBundle getResourceBundle(String resourceName, Locale locale) {
