@@ -112,17 +112,24 @@ public interface Delegator {
 
   List<Object> findIdsByCond(Class<?> entityClazz, String cond) throws GenericEntityException;
 
+  List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap)throws GenericEntityException;
+  
+  List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap, List<String> orderBy)throws GenericEntityException;
+  
+  List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap, Set<String> fieldsToSelect,List<String> orderBy,boolean useCache) 
+          throws GenericEntityException;
+  
   Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException;
 
   Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap, Set<String> fieldsToSelect, boolean useCache)
       throws GenericEntityException;
 
-  List<?> findList(Class<?> entityClazz, String cond) throws GenericEntityException;
+  List<?> findListByCond(Class<?> entityClazz, String cond) throws GenericEntityException;
 
-  List<?> findList(Class<?> entityClazz, String cond, Set<String> fieldsToSelect, List<String> orderBy)
+  List<?> findListByCond(Class<?> entityClazz, String cond, Set<String> fieldsToSelect, List<String> orderBy)
       throws GenericEntityException;
 
-  List<?> findList(Class<?> entityClazz, String cond, Set<String> fieldsToSelect, List<String> orderBy,
+  List<?> findListByCond(Class<?> entityClazz, String cond, Set<String> fieldsToSelect, List<String> orderBy,
       boolean useCache) throws GenericEntityException;
 
   Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, int pageNo, int pageSize)

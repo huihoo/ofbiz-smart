@@ -317,27 +317,67 @@ public class EbeanDelegator implements Delegator {
       throw new GenericEntityException(e);
     }
   }
+  
 
   @Override
-  public List<?> findList(Class<?> entityClazz, String cond) throws GenericEntityException {
-    return findList(entityClazz, cond, new HashSet<String>(), new ArrayList<String>(), false);
+  public List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap)
+          throws GenericEntityException {
+    return findListByAnd(entityClazz, andMap, new HashSet<String>(),new ArrayList<String>(), false);
+  }
+  
+  @Override
+  public List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap,List<String> orderBy)
+          throws GenericEntityException {
+    return findListByAnd(entityClazz, andMap, new HashSet<String>(),new ArrayList<String>(), false);
   }
 
   @Override
-  public List<?> findList(Class<?> entityClazz, String cond, Set<String> fieldsToSelect, List<String> orderBy)
+  public List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap,
+          Set<String> fieldsToSelect, List<String> orderBy,boolean useCache) throws GenericEntityException {
+    String cacheKey =  "findListByAnd#" + andMap + "#" + fieldsToSelect;
+    if (useCache) {
+      List<?> cachedObj = (List<?>) CACHE.get(cacheKey);
+      if (cachedObj != null) {
+        Log.d("findListByAnd[" + cacheKey + "]from cache.", TAG);
+        return cachedObj;
+      }
+    }
+
+    
+    Query<?> query = currentServerMap.get(CURRENT_SERVER_NAME).find(entityClazz);
+    buildSelectFields(query, fieldsToSelect);
+    ExpressionList<?> expList = query.where();
+    buildExprOrderBy(expList, orderBy);
+    if (CommUtil.isNotEmpty(andMap)) {
+      expList.allEq(andMap);
+    }
+    List<?> result = expList.findList();
+    if (useCache && result != null) {
+      CACHE.put(cacheKey, result);
+    }
+    return result;
+  }
+
+  @Override
+  public List<?> findListByCond(Class<?> entityClazz, String cond) throws GenericEntityException {
+    return findListByCond(entityClazz, cond, new HashSet<String>(), new ArrayList<String>(), false);
+  }
+
+  @Override
+  public List<?> findListByCond(Class<?> entityClazz, String cond, Set<String> fieldsToSelect, List<String> orderBy)
       throws GenericEntityException {
-    return findList(entityClazz, cond, fieldsToSelect, orderBy, false);
+    return findListByCond(entityClazz, cond, fieldsToSelect, orderBy, false);
   }
 
   @Override
-  public List<?> findList(Class<?> entityClazz, String cond, Set<String> fieldsToSelect, List<String> orderBy,
+  public List<?> findListByCond(Class<?> entityClazz, String cond, Set<String> fieldsToSelect, List<String> orderBy,
       boolean useCache) throws GenericEntityException {
     try {
       String cacheKey = entityClazz + "#" + cond + "#" + fieldsToSelect + "#" + orderBy;
       if (useCache) {
         List<?> cachedList = (List<?>) CACHE.get(cacheKey);
         if (cachedList != null) {
-          Log.d("findList[" + cacheKey + "]from cache.", TAG);
+          Log.d("findListByCond[" + cacheKey + "]from cache.", TAG);
           return cachedList;
         }
       }
@@ -959,4 +999,5 @@ public class EbeanDelegator implements Delegator {
       pathProperties.apply(query);
     }
   }
+
 }

@@ -31,12 +31,27 @@ public final class C {
   // ========================================================================================
   // Service Config Flag
   // ========================================================================================
+  public static final String ENTITY_ID_NAME = "id";
+  public static final String ENTITY_MODEL_NAME = "model";
+  public static final String ENTITY_RETURN_NAME = "returnName";
+  public static final String ENTITY_REMOVED_NAME = "removed";
+  public static final String ENTITY_MODEL_LIST  = "list";
+  public static final String ENTITY_USE_CACHE = "useCache";
+  
+  public static final String ENTITY_CONDTION = "condition";
+  public static final String ENTITY_ANDMAP = "andMap";
+  public static final String ENTITY_FIELDS_TO_SELECT = "fieldsToSelect";
+  public static final String ENTITY_ORDERBY = "orderBy";
+  public static final String ENTITY_ORDERBY_DEFAULT_FIELD = "updatedAt desc";
+  public static final String ENTITY_UPDATED_AT = "updatedAt";
+  
   public static final String SERVICE_ENGITYAUTO_CREATE = "create";
   public static final String SERVICE_ENGITYAUTO_UPDATE = "update";
   public static final String SERVICE_ENGITYAUTO_REMOVE = "remove";
   public static final String SERVICE_ENGITYAUTO_FINDBYID = "findById";
-  public static final String SERVICE_ENGITYAUTO_FINDBYAND = "findByAnd";
-  public static final String SERVICE_ENGITYAUTO_FINDLIST = "findList";
+  public static final String SERVICE_ENGITYAUTO_FINDUNIQUEBYAND= "findUniqueByAnd";
+  public static final String SERVICE_ENGITYAUTO_FINDLISTBYAND = "findListByAnd";
+  public static final String SERVICE_ENGITYAUTO_FINDLISTBYCOND = "findListByCond";
   public static final String SERVICE_ENGITYAUTO_FINDPAGEBYAND = "findPageByAnd";
   public static final String SERVICE_ENGITYAUTO_FINDPAGEBYCOND = "findPageByCondition";
   

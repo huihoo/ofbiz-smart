@@ -80,12 +80,12 @@ public class DelegatorTest extends BaseTestCase {
     Assert.assertNotNull(newestCustomer);
     Assert.assertEquals(2, SimpleCacheManager.getCache("EntityCache").getHitCount());
 
-    List<?> customerList = delegator.findList(Customer.class, "{lastName,eq,Peter}", selectToFields,
+    List<?> customerList = delegator.findListByCond(Customer.class, "{lastName,eq,Peter}", selectToFields,
         Arrays.asList(new String[] {"birthday desc"}));
     Assert.assertNotNull(customerList);
     Assert.assertEquals(1, customerList.size());
 
-    customerList = delegator.findList(Customer.class, "{lastName,eq,Peter,or,gender,eq,Male}", selectToFields,
+    customerList = delegator.findListByCond(Customer.class, "{lastName,eq,Peter,or,gender,eq,Male}", selectToFields,
         Arrays.asList(new String[] {"birthday desc"}));
     Assert.assertNotNull(customerList);
     Assert.assertEquals(2, customerList.size());
