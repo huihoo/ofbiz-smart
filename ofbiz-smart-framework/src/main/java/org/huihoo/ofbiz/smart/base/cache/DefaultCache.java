@@ -4,7 +4,6 @@ package org.huihoo.ofbiz.smart.base.cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
-import net.sf.ehcache.config.PersistenceConfiguration;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 
@@ -55,9 +54,7 @@ public class DefaultCache<K,V> implements Cache<K,V>{
                 new CacheConfiguration(name, maxEntries == 0 ? DEFAULT_MAX_ENTRIES : maxEntries)
             .memoryStoreEvictionPolicy(mep)
             .eternal(false)
-            .timeToLiveSeconds(timeToLiveSeconds == 0 ? DEFAULT_TIME_TO_LIVE_SECONDS : timeToLiveSeconds)
-            .diskExpiryThreadIntervalSeconds(0)
-            .persistence(new PersistenceConfiguration().strategy(PersistenceConfiguration.Strategy.LOCALTEMPSWAP)));
+            .timeToLiveSeconds(timeToLiveSeconds == 0 ? DEFAULT_TIME_TO_LIVE_SECONDS : timeToLiveSeconds));
 
         CACHE_MANAGER.addCache(cache);
     }
