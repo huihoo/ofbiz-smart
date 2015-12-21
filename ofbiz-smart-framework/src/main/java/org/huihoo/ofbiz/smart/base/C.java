@@ -6,6 +6,13 @@ public final class C {
   public static final String PROFILE_NAME = "profile";
   public static final String PROFILE_PRODUCTION = "production";
   // ========================================================================================
+  // Context Related Flag
+  // ========================================================================================
+  public static final String CTX_DELETAGOR = "_ctx_deletagor_"; 
+  public static final String CTX_SERVICE_DISPATCHER = "_ctx_service_dispatcher_"; 
+  public static final String CTX_WEB_HTTP_SERVLET_REQUEST = "_ctx_httpservletrequest_"; 
+  public static final String CTX_WEB_HTTP_SERVLET_RESPONSE = "_ctx_httpservletresponse_"; 
+  // ========================================================================================
   // Cache Related Flag
   // ========================================================================================
   public static final String CACHE_PROVIDER_NAME = "cache.provider";
@@ -24,6 +31,15 @@ public final class C {
   // ========================================================================================
   // Service Config Flag
   // ========================================================================================
+  public static final String SERVICE_ENGITYAUTO_CREATE = "create";
+  public static final String SERVICE_ENGITYAUTO_UPDATE = "update";
+  public static final String SERVICE_ENGITYAUTO_REMOVE = "remove";
+  public static final String SERVICE_ENGITYAUTO_FINDBYID = "findById";
+  public static final String SERVICE_ENGITYAUTO_FINDBYAND = "findByAnd";
+  public static final String SERVICE_ENGITYAUTO_FINDLIST = "findList";
+  public static final String SERVICE_ENGITYAUTO_FINDPAGEBYAND = "findPageByAnd";
+  public static final String SERVICE_ENGITYAUTO_FINDPAGEBYCOND = "findPageByCondition";
+  
   public static final String SERVICE_SCANNING_NAMES = "service.scanning.names";
 
   // ========================================================================================

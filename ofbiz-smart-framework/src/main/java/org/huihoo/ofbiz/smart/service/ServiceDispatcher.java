@@ -196,7 +196,7 @@ public class ServiceDispatcher {
           }
         }
       } catch (IOException e) {
-        Log.w("Could find resource [" + pkgDirName + "]", TAG);
+        Log.w("Could not find resource [" + pkgDirName + "]", TAG);
       }
     }
     return serviceClazzSet;
@@ -225,7 +225,7 @@ public class ServiceDispatcher {
         try {
           classes.add(Thread.currentThread().getContextClassLoader().loadClass(pkg + "." + clazzName));
         } catch (ClassNotFoundException e) {
-          Log.w("class[" + pkg + clazzName + "] not found.", TAG);
+          Log.w("Class[" + pkg + clazzName + "] not found.", TAG);
         }
       }
     }

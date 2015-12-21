@@ -4,11 +4,21 @@ package org.huihoo.ofbiz.smart.base.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.huihoo.ofbiz.smart.base.C;
+import org.huihoo.ofbiz.smart.entity.Delegator;
+
 public class ServiceUtil {
   public static final String RESPONSE_MESSAGE = "message";
   public static final String RESPOND_SUCCESS = "success";
   public static final String RESPOND_ERROR = "error";
 
+  public static Delegator getDelegator(Map<String, Object> ctx) {
+    if (ctx == null) {
+      return null;
+    }
+    return (Delegator) ctx.get(C.CTX_DELETAGOR);
+  }
+  
   public static boolean isSuccess(Map<String, Object> result) {
     if (result == null || result.containsKey(RESPOND_ERROR)) {
       return false;

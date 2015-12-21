@@ -18,6 +18,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.avaje.agentloader.AgentLoader;
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.cache.Cache;
 import org.huihoo.ofbiz.smart.base.cache.SimpleCacheManager;
@@ -58,7 +59,17 @@ public class EbeanDelegator implements Delegator {
     } catch (IOException e) {
       throw new GenericEntityException("Unable to load external properties");
     }
-
+    
+    String profile = applicationProps.getProperty("profile");
+    if (!C.PROFILE_PRODUCTION.equals(profile)) {
+      //NOTICE 仅在非生产环境下通过这种方式动态增强实体特性
+      String entityPackages = applicationProps.getProperty("entity.scanning.packages");
+      if (!AgentLoader.loadAgentFromClasspath("avaje-ebeanorm-agent","debug=1;packages="+entityPackages)) {
+          Log.i("avaje-ebeanorm-agent not found in classpath - not dynamically loaded",TAG);
+      }
+    }
+    
+    
     CACHE = (Cache<String, Object>) SimpleCacheManager.createCache("EntityCache");
 
     defaultDataSourceName = applicationProps.getProperty(C.CONFIG_DATASOURCE_DEFAULT);
