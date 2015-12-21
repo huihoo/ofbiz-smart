@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceModel implements Serializable {
-
+  private static final long serialVersionUID = 1L;
   public String name;
   public String location;
   public String invoke;
@@ -17,7 +17,7 @@ public class ServiceModel implements Serializable {
   public boolean export = false;
   public boolean persist = true;
   public boolean transaction = false;
-
+  public Class<ServiceCallback>[] callback;
   public List<Parameter> parameters = new ArrayList<>();
 
   static class Parameter {

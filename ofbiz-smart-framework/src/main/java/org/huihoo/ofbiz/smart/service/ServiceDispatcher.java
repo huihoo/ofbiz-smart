@@ -172,8 +172,19 @@ public class ServiceDispatcher {
         sm.transaction = sd.transaction();
         sm.export = sd.export();
         sm.persist = sd.persist();
+        sm.callback = sd.callback();
         sm.requireAuth = sd.requireAuth();
-
+        if (sm.callback != null && sm.callback.length > 0) {
+          for (Class<?> clz : sm.callback) {
+            try {
+              Constructor<ServiceCallback> cn = CommUtil.cast(clz.getConstructor());
+              ServiceCallback serviceCallback = cn.newInstance();
+              SERVICE_CALLBACK_MAP.put(clz.getName(), serviceCallback);
+            } catch(Exception e) {
+              Log.w("Unable to load class [%s]", TAG, clz);
+            }
+          }
+        }
         SERVICE_CONTEXT_MAP.put(sm.name, sm);
       }
     }

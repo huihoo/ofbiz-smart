@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.huihoo.ofbiz.smart.service.ServiceCallback;
+
 
 
 /**
@@ -40,13 +42,14 @@ public @interface ServiceDefinition {
   /** 是否对外提供远程调用 */
   boolean export() default false;
 
+  /** 实体的名称(如果有) */
   String entityName() default "";
 
+  Class<ServiceCallback>[]callback() default {};
+
   /** 输入参数集合 */
-  InParameter[]inParameters() default @InParameter(name = "")
-  ;
+  InParameter[]inParameters() default @InParameter(name = "");
 
   /** 输出参数集合 */
-  OutParameter[]outParameters() default @OutParameter(name = "")
-  ;
+  OutParameter[]outParameters() default @OutParameter(name = "");
 }
