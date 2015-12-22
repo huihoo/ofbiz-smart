@@ -24,22 +24,29 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ServiceDispatcher {
   private final static String TAG = ServiceDispatcher.class.getName();
-
+  
+  /** 执行引擎缓存 */
   private final static Map<String, GenericEngine> ENGINE_MAP = new ConcurrentHashMap<>();
 
+  /** 服务回调接口缓存 */
   private final static Map<String, ServiceCallback> SERVICE_CALLBACK_MAP = new ConcurrentHashMap<>();
 
+  /** 所有服务定义的上下文信息缓存 */
   private final static Map<String, ServiceModel> SERVICE_CONTEXT_MAP = new ConcurrentHashMap<>();
-
+  
+  /** 内置的服务执行引擎 */
   private final static String[] INTENAL_ENGINES = {
                                     "org.huihoo.ofbiz.smart.service.engine.EntityAutoEngine",
                                     "org.huihoo.ofbiz.smart.service.engine.StandardJavaEngine"
   };
 
+  /** 当前服务执行的环境 是开发环境还是生产环境 */
   private volatile String profile;
 
+  /** 服务执行依赖的数据库访问代理对象 */
   private final Delegator delegator;
 
+  /** 要扫描的服务资源名称，可以是服务类所在包名，也可以是服务类打包的Jar包路径，多个以逗号隔开*/
   private final String scanResNames;
 
   public ServiceDispatcher(Delegator delegator) throws GenericServiceException {
@@ -181,23 +188,31 @@ public class ServiceDispatcher {
   private void loadAndFilterServiceClazz() {
     Set<Class<?>> serviceClasses = new LinkedHashSet<Class<?>>();
     String[] scanResNamesArray = scanResNames.split(",");
+    
+    //NOTICE 如果scanResName为org.huihoo.ofbiz.smart.service
+    //NOTICE 会引发StackOverFlow异常，因为执行该方法的类就在这个包下面，
+    //NOTICE 引起了递归执行，无法退出
     for (String scanResName : scanResNamesArray) {
+      if (getClass().getPackage().equals(scanResName)) {
+        Log.w("Resource name [" + getClass().getPackage() + "] ignored.", TAG);
+        continue;
+      }
       serviceClasses.addAll(scanServiceClazz(scanResName, true));
     }
-    Log.d("ServiceClazz:" + serviceClasses, TAG);
 
     for (Class<?> sClazz : serviceClasses) {
       Service serviceAnno = sClazz.getAnnotation(Service.class);
       if (serviceAnno == null) {
         continue;
       }
-
+      
       Method[] methods = sClazz.getMethods();
       for (Method method : methods) {
         ServiceDefinition sd = method.getAnnotation(ServiceDefinition.class);
         if (sd == null) {
           continue;
         }
+        Log.d("Service [%s][%s] found.", TAG,sClazz.getName(),method.getName());
         ServiceModel sm = new ServiceModel();
         sm.engineName = sd.type();
         sm.entityName = sd.entityName();
@@ -226,20 +241,20 @@ public class ServiceDispatcher {
     }
   }
   
-  private Set<Class<?>> scanServiceClazz(String file, boolean recursive) {
+  private Set<Class<?>> scanServiceClazz(String resourceName, boolean recursive) {
     Set<Class<?>> serviceClazzSet = new LinkedHashSet<>();
-    if (file.endsWith(".jar")) {
+    if (resourceName.endsWith(".jar")) {
       // TODO jar
     } else {
-      String pkgDirName = file.replaceAll("\\.", "/");
+      String pkgDirName = resourceName.replaceAll("\\.", "/");
       try {
         Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(pkgDirName);
         while (resources.hasMoreElements()) {
           URL url = resources.nextElement();
           String protocal = url.getProtocol();
-          if (file.equals(protocal)) {
+          if ("file".equals(protocal)) {
             String filePath = URLDecoder.decode(url.getFile(), C.UTF_8);
-            findAndAddServiceClazz(file, filePath, recursive, serviceClazzSet);
+            findAndAddServiceClazz(resourceName, filePath, recursive, serviceClazzSet);
           }
         }
       } catch (IOException e) {
@@ -262,7 +277,7 @@ public class ServiceDispatcher {
         return (recursive && file.isDirectory()) || (file.getName().endsWith(".class"));
       }
     });
-
+    
     for (File f : files) {
       if (f.isDirectory()) {
         findAndAddServiceClazz(pkg, pgkPath, recursive, classes);

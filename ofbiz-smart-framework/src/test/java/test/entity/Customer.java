@@ -1,4 +1,4 @@
-package org.huihoo.ofbiz.smart.entity;
+package test.entity;
 
 
 import com.avaje.ebean.Model;

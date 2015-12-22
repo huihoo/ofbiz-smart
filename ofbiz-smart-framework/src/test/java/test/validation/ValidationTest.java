@@ -1,4 +1,4 @@
-package org.huihoo.ofbiz.smart.validation;
+package test.validation;
 
 
 

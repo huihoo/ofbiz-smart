@@ -1,6 +1,9 @@
-package org.huihoo.ofbiz.smart.entity;
+package test.entity;
 
 
+import org.huihoo.ofbiz.smart.entity.Delegator;
+import org.huihoo.ofbiz.smart.entity.EbeanDelegator;
+import org.huihoo.ofbiz.smart.entity.GenericEntityException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

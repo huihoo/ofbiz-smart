@@ -1,4 +1,4 @@
-package org.huihoo.ofbiz.smart.util;
+package test.util;
 
 
 import org.huihoo.ofbiz.smart.base.util.I18NUtil;

@@ -1,4 +1,4 @@
-package org.huihoo.ofbiz.smart.service;
+package test.service;
 
 import java.util.Map;
 
@@ -6,10 +6,14 @@ import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.base.util.ServiceUtil;
-import org.huihoo.ofbiz.smart.entity.BaseTestCase;
-import org.huihoo.ofbiz.smart.entity.Customer;
+import org.huihoo.ofbiz.smart.service.GenericServiceException;
+import org.huihoo.ofbiz.smart.service.ServiceDispatcher;
+import org.huihoo.ofbiz.smart.service.ServiceModel;
 import org.junit.Assert;
 import org.junit.Test;
+
+import test.entity.BaseTestCase;
+import test.entity.Customer;
 
 
 
@@ -47,5 +51,8 @@ public class ServiceDispatcherTest extends BaseTestCase {
     Log.d("resultMap > " + resultMap, TAG);
     Assert.assertEquals(true, ServiceUtil.isSuccess(resultMap));
     Assert.assertEquals(true, resultMap.containsKey(C.ENTITY_MODEL_NAME));
+    
+    resultMap = serviceDispatcher.runSync("createOrder", ctx);
+    Assert.assertEquals(true, ServiceUtil.isSuccess(resultMap));
   }
 }

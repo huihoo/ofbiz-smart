@@ -1,4 +1,4 @@
-package org.huihoo.ofbiz.smart.entity;
+package test.entity;
 
 import java.math.BigDecimal;
 import java.util.Date;

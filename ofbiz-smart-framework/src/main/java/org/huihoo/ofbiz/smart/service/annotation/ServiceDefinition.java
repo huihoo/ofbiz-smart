@@ -18,14 +18,14 @@ import org.huihoo.ofbiz.smart.service.ServiceCallback;
  * @since 1.0
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.METHOD})
 public @interface ServiceDefinition {
 
   /** 服务的名称 */
   String name();
 
   /** 服务的类型 */
-  String type();
+  String type() default "java";
 
   /** 服务的描述 */
   String description() default "";

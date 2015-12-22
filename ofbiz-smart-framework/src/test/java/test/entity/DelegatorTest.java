@@ -1,10 +1,12 @@
-package org.huihoo.ofbiz.smart.entity;
+package test.entity;
 
 
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.cache.SimpleCacheManager;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
+import org.huihoo.ofbiz.smart.entity.Expr;
+import org.huihoo.ofbiz.smart.entity.GenericEntityException;
 import org.junit.Assert;
 import org.junit.Test;
 

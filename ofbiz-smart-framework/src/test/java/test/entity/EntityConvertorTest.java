@@ -1,4 +1,4 @@
-package org.huihoo.ofbiz.smart.entity;
+package test.entity;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
+import org.huihoo.ofbiz.smart.entity.EntityConverter;
+import org.huihoo.ofbiz.smart.entity.GenericEntityException;
 import org.junit.Assert;
 import org.junit.Test;
 
