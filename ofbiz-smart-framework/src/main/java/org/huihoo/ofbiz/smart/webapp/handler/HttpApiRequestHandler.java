@@ -1,4 +1,4 @@
-package org.huihoo.ofbiz.smart.webapp;
+package org.huihoo.ofbiz.smart.webapp.handler;
 
 
 import javax.servlet.http.HttpServletRequest;
