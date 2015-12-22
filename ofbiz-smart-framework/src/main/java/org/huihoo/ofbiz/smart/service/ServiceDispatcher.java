@@ -25,6 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServiceDispatcher {
   private final static String TAG = ServiceDispatcher.class.getName();
   
+  private final static String SLOW_LOG_TAG = "ServiceCallSlowLog";
+  
   /** 执行引擎缓存 */
   private final static Map<String, GenericEngine> ENGINE_MAP = new ConcurrentHashMap<>();
 
@@ -42,6 +44,11 @@ public class ServiceDispatcher {
 
   /** 当前服务执行的环境 是开发环境还是生产环境 */
   private volatile String profile;
+  
+  private volatile int slowTimeInMilliSeconds;
+  
+  /** 当前属性配置 */
+  private volatile Properties applicationConfig;
 
   /** 服务执行依赖的数据库访问代理对象 */
   private final Delegator delegator;
@@ -50,16 +57,16 @@ public class ServiceDispatcher {
   private final String scanResNames;
 
   public ServiceDispatcher(Delegator delegator) throws GenericServiceException {
-    Properties applicationProps = new Properties();
+    applicationConfig = new Properties();
     try {
-      applicationProps.load(FlexibleLocation.resolveLocation(C.APPLICATION_CONFIG_NAME).openStream());
+      applicationConfig.load(FlexibleLocation.resolveLocation(C.APPLICATION_CONFIG_NAME).openStream());
     } catch (IOException e) {
       throw new GenericServiceException("Unable to load external properties");
     }
 
-    scanResNames = applicationProps.getProperty(C.SERVICE_SCANNING_NAMES);
-    profile = applicationProps.getProperty(C.PROFILE_NAME);
-
+    scanResNames = applicationConfig.getProperty(C.SERVICE_SCANNING_NAMES);
+    profile = applicationConfig.getProperty(C.PROFILE_NAME);
+    slowTimeInMilliSeconds = Integer.valueOf(applicationConfig.getProperty(C.SERVICE_SLOWTIME_MILLISECONDS, "30000"));
     if (CommUtil.isEmpty(scanResNames)) {
       throw new GenericServiceException("Config[service.scanning.names] is empty.");
     }
@@ -79,8 +86,11 @@ public class ServiceDispatcher {
 
 
   public Map<String, Object> runSync(String serviceName, Map<String, Object> ctx) {
+    long beginTime = System.currentTimeMillis();
     boolean transaction = false;
     boolean persist = false;
+    boolean exception = false;
+   
     try {
       if (!C.PROFILE_PRODUCTION.equals(profile)) {
         // In test,develop profile, always load it.
@@ -106,19 +116,35 @@ public class ServiceDispatcher {
         Log.w("Service [%s] require persist context.", TAG, serviceName);
         return ServiceUtil.returnProplem("UNSUPPORTED_SERVICE_ENGINE", "Unsupported service ["+ serviceName + "]");
       }
+      
+      ctx.put(C.APPLICATION_CONFIG_PROP_KEY, applicationConfig);
+      
       if (persist && transaction) {
         delegator.beginTransaction();
       }
-      return engine.runSync(serviceName, ctx);
+      
+      Map<String,Object> result = engine.runSync(serviceName, ctx);
+      return result;
     } catch (Exception e) {
       if (persist && transaction && delegator != null) {
         delegator.rollback();
       }
       Log.e(e, e.getMessage(), TAG);
+      exception = true;
       return ServiceUtil.returnProplem("SERVICE_CALL_EXCEPTION", "Calling service["+serviceName+"] has an exception.");
     } finally {
       if (persist && transaction && delegator != null) {
         delegator.endTransaction();
+      }
+      long costTime = (System.currentTimeMillis() - beginTime);
+      if (exception) {
+        Log.i("Service[%s] cost %s ms. But exception happend.", TAG, serviceName,costTime);
+      } else {
+        Log.i("Service[%s] cost %s ms.", TAG, serviceName,costTime);
+      }
+      
+      if (costTime > slowTimeInMilliSeconds) {
+        Log.w("Service[%s] cost %s ms. It has been exceed a threshold value[%s]", SLOW_LOG_TAG, serviceName,costTime,slowTimeInMilliSeconds);
       }
     }
   }

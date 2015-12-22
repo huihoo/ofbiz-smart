@@ -5,9 +5,11 @@ public final class C {
   public static final String UTF_8 = "UTF-8";
   public static final String PROFILE_NAME = "profile";
   public static final String PROFILE_PRODUCTION = "production";
+  
   // ========================================================================================
   // Context Related Flag
   // ========================================================================================
+  public static final String APPLICATION_CONFIG_PROP_KEY = "_application_config_properties_";
   public static final String CTX_DELETAGOR = "_ctx_deletagor_"; 
   public static final String CTX_SERVICE_DISPATCHER = "_ctx_service_dispatcher_"; 
   public static final String CTX_WEB_HTTP_SERVLET_REQUEST = "_ctx_httpservletrequest_"; 
@@ -55,6 +57,7 @@ public final class C {
   public static final String SERVICE_ENGITYAUTO_FINDLISTBYCOND = "findListByCond";
   public static final String SERVICE_ENGITYAUTO_FINDPAGEBYAND = "findPageByAnd";
   public static final String SERVICE_ENGITYAUTO_FINDPAGEBYCOND = "findPageByCondition";
+  public static final String SERVICE_SLOWTIME_MILLISECONDS = "service.slowtime.milliseconds";
   
   public static final String SERVICE_SCANNING_NAMES = "service.scanning.resource.names";
   public static final String ENTITY_SCANNING_PACKAGES = "entity.scanning.packages";
