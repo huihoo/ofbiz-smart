@@ -56,8 +56,9 @@ public final class C {
   public static final String SERVICE_ENGITYAUTO_FINDPAGEBYAND = "findPageByAnd";
   public static final String SERVICE_ENGITYAUTO_FINDPAGEBYCOND = "findPageByCondition";
   
-  public static final String SERVICE_SCANNING_NAMES = "service.scanning.names";
-
+  public static final String SERVICE_SCANNING_NAMES = "service.scanning.resource.names";
+  public static final String ENTITY_SCANNING_PACKAGES = "entity.scanning.packages";
+  
   // ========================================================================================
   // Datasource Config Flag
   // ========================================================================================

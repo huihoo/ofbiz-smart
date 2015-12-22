@@ -28,5 +28,6 @@ public @interface OutParameter {
   /** 参数的默认值 */
   String defaultValue() default "";
 
-  // TODO 参数类型
+  /** 参数类型 */
+  Class<?> type() default String.class;
 }

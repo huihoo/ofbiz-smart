@@ -52,4 +52,10 @@ public @interface ServiceDefinition {
 
   /** 输出参数集合 */
   OutParameter[]outParameters() default @OutParameter(name = "");
+  
+  /** JSON格式的返回示例 */
+  String responseJsonExample() default "";
+  
+  /** XML格式的返回示例 */
+  String responseXmlExample() default "";
 }
