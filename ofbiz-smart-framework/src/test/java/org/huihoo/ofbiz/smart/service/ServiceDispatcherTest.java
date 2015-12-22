@@ -35,5 +35,17 @@ public class ServiceDispatcherTest extends BaseTestCase {
     resultMap = serviceDispatcher.runSync(sm.name, ctx);
     Log.d("resultMap > " + resultMap, TAG);
     Assert.assertEquals(true, ServiceUtil.isError(resultMap));
+    Assert.assertEquals(true, resultMap.containsKey(C.RESPOND_VALIDATION_ERRORS));
+    
+    ctx.put("firstName", "huang");
+    ctx.put("lastName", "baihua");
+    ctx.put("status", "ACTIVE");
+    ctx.put("gender", "Male");
+    ctx.put("level", 2);
+    ctx.put("birthday", "1986-05-18");
+    resultMap = serviceDispatcher.runSync(sm.name, ctx);
+    Log.d("resultMap > " + resultMap, TAG);
+    Assert.assertEquals(true, ServiceUtil.isSuccess(resultMap));
+    Assert.assertEquals(true, resultMap.containsKey(C.ENTITY_MODEL_NAME));
   }
 }

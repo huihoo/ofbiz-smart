@@ -217,7 +217,7 @@ public class ServiceDispatcher {
               ServiceCallback serviceCallback = cn.newInstance();
               SERVICE_CALLBACK_MAP.put(clz.getName(), serviceCallback);
             } catch(Exception e) {
-              Log.w("Unable to load class [%s]", TAG, clz);
+              Log.w("Unable to load service callback class [%s]", TAG, clz);
             }
           }
         }

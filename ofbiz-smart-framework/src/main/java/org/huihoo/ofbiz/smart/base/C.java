@@ -45,6 +45,7 @@ public final class C {
   public static final String ENTITY_ORDERBY_DEFAULT_FIELD = "updatedAt desc";
   public static final String ENTITY_UPDATED_AT = "updatedAt";
   
+  public static final String RESPOND_VALIDATION_ERRORS = "validation_errors";
   public static final String SERVICE_ENGITYAUTO_CREATE = "create";
   public static final String SERVICE_ENGITYAUTO_UPDATE = "update";
   public static final String SERVICE_ENGITYAUTO_REMOVE = "remove";

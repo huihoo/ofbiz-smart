@@ -114,15 +114,11 @@ public class EntityConverter {
         }
         
       } else if( (toType == Long.class || toType == long.class) ) {
-        if (CommUtil.isEmpty(value)) {
-          result = Long.valueOf(0);
-        } else {
+        if (CommUtil.isNotEmpty(value)) {
           result = Long.valueOf("" + value);
         }
       } else if( (toType == Integer.class || toType == int.class) ) {
-        if (CommUtil.isEmpty(value)) {
-          result = Integer.valueOf(0);
-        } else {
+        if (CommUtil.isNotEmpty(value)) {
           result = Integer.valueOf("" + value);
         }
       } 

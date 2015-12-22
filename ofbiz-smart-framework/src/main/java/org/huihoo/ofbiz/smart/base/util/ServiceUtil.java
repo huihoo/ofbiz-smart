@@ -14,7 +14,6 @@ public class ServiceUtil {
   public static final String RESPONSE_MESSAGE = "message";
   public static final String RESPOND_SUCCESS = "success";
   public static final String RESPOND_ERROR = "error";
-  public static final String RESPOND_VALIDATION_ERRORS = "validation_errors";
 
   public static Delegator getDelegator(Map<String, Object> ctx) {
     if (ctx == null) {
@@ -52,7 +51,7 @@ public class ServiceUtil {
       result.put(RESPONSE_MESSAGE, message);
     }
     if (CommUtil.isNotEmpty(constraintViolations)) {
-      result.put(RESPOND_VALIDATION_ERRORS, constraintViolations);
+      result.put(C.RESPOND_VALIDATION_ERRORS, constraintViolations);
     }
     return result;
   }
