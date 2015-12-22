@@ -63,7 +63,7 @@ public class EbeanDelegator implements Delegator {
     String profile = applicationProps.getProperty("profile");
     if (!C.PROFILE_PRODUCTION.equals(profile)) {
       //NOTICE 仅在非生产环境下通过这种方式动态增强实体特性
-      String entityPackages = applicationProps.getProperty("entity.scanning.packages");
+      String entityPackages = applicationProps.getProperty("service.scanning.resource.names");
       if (!AgentLoader.loadAgentFromClasspath("avaje-ebeanorm-agent","debug=1;packages="+entityPackages)) {
           Log.i("avaje-ebeanorm-agent not found in classpath - not dynamically loaded",TAG);
       }
