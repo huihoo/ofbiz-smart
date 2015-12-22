@@ -45,6 +45,7 @@ public class ServiceDispatcher {
   /** 当前服务执行的环境 是开发环境还是生产环境 */
   private volatile String profile;
   
+  /** 服务执行过慢的毫秒 */
   private volatile int slowTimeInMilliSeconds;
   
   /** 当前属性配置 */
@@ -122,8 +123,17 @@ public class ServiceDispatcher {
       if (persist && transaction) {
         delegator.beginTransaction();
       }
+      //TODO 输入参数的验证
+      
+      //TODO 服务的认证
       
       Map<String,Object> result = engine.runSync(serviceName, ctx);
+      
+      //TODO 输出参数的验证
+      
+      
+      //TODO 服务回调的执行
+      
       return result;
     } catch (Exception e) {
       if (persist && transaction && delegator != null) {
