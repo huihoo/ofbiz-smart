@@ -7,13 +7,33 @@ import java.util.Set;
 public class ActionModel implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  public String uri;
+  public String description;
+  
+  public Set<Action> actionSet = new LinkedHashSet<>();
+  
+  public static class Action implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
+    public String uri;
 
-  public String method;
+    public String method;
 
-  public String processType;
+    public String processType;
+    
+    public boolean auth;
+    
+    public String pageTitle;
+    
+    public String moreCss;
+    
+    public String moreJavascripts;
 
-  public Set<ServiceCall> serviceCallSet = new LinkedHashSet<>();
+    public Set<ServiceCall> serviceCallSet = new LinkedHashSet<>();
+    
+    public Response response;
+  }
+  
+  
 
   public static class Response implements Serializable {
     private static final long serialVersionUID = 1L;
