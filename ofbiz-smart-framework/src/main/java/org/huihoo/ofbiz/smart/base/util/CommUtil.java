@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -79,7 +80,7 @@ public class CommUtil {
     }
     if (data.length % 2 == 1) {
       IllegalArgumentException e = new IllegalArgumentException(
-              "You must pass an even sized array to the toMap method (size = " + data.length + ")");
+          "You must pass an even sized array to the toMap method (size = " + data.length + ")");
       Log.e(e, "data size is illegal.", tag);
       throw e;
     }
@@ -103,7 +104,7 @@ public class CommUtil {
     return theBuf.toString();
   }
 
-  
+
   private static <C extends Collection<?>> C checkCollectionCast(Object object, Class<C> clz) {
     return clz.cast(object);
   }
@@ -127,12 +128,11 @@ public class CommUtil {
       int i = 0;
       for (Map.Entry<?, ?> entry : map.entrySet()) {
         if (entry.getKey() != null && !keyType.isInstance(entry.getKey())) {
-          throw new IllegalArgumentException(
-                  "Key(" + i + "), with value(" + entry.getKey() + ") is not a " + keyType);
+          throw new IllegalArgumentException("Key(" + i + "), with value(" + entry.getKey() + ") is not a " + keyType);
         }
         if (entry.getValue() != null && !valueType.isInstance(entry.getValue())) {
           throw new IllegalArgumentException(
-                  "Value(" + i + "), with value(" + entry.getValue() + ") is not a " + valueType);
+              "Value(" + i + "), with value(" + entry.getValue() + ") is not a " + valueType);
         }
         i++;
       }
@@ -182,19 +182,8 @@ public class CommUtil {
 
 
 
-  /**
-   * <p>
-   * 将骆驼命名形式的字符串转换成下划线形式字符串
-   * </p>
-   * <p>
-   * 比如： OrderHeader 转换后为: order_header
-   * </p>
-   * 
-   * @param camelString 要转换的骆驼命名形式的字符串
-   * @return 转换过后的字符串
-   */
   public static String underscore(String camelString) {
-    // 1.首先找到字符串中所有大写字母的索引位置并保存
+
     List<Integer> upperIdx = new ArrayList<Integer>();
     byte[] bytes = camelString.getBytes();
     for (int i = 0; i < bytes.length; i++) {
@@ -203,7 +192,7 @@ public class CommUtil {
         upperIdx.add(i);
       }
     }
-    // 2.在大写字母之前插入下划线
+
     StringBuilder b = new StringBuilder(camelString);
     for (int i = upperIdx.size() - 1; i >= 0; i--) {
       Integer index = upperIdx.get(i);
@@ -211,9 +200,65 @@ public class CommUtil {
         b.insert(index, "_");
       }
     }
-    // 3.转换成小写并返回
+
     return b.toString().toLowerCase();
   }
 
 
+  // ================================================================================
+  // Copy from org.springframework.util
+  // ================================================================================
+  public static String[] tokenizeToStringArray(String str, String delimiters) {
+    return tokenizeToStringArray(str, delimiters, true, true);
+  }
+
+
+  public static String[] tokenizeToStringArray(String str, String delimiters, boolean trimTokens,
+      boolean ignoreEmptyTokens) {
+
+    if (str == null) {
+      return null;
+    }
+    StringTokenizer st = new StringTokenizer(str, delimiters);
+    List<String> tokens = new ArrayList<String>();
+    while (st.hasMoreTokens()) {
+      String token = st.nextToken();
+      if (trimTokens) {
+        token = token.trim();
+      }
+      if (!ignoreEmptyTokens || token.length() > 0) {
+        tokens.add(token);
+      }
+    }
+    return toStringArray(tokens);
+  }
+
+
+  public static String[] toStringArray(Collection<String> collection) {
+    if (collection == null) {
+      return null;
+    }
+    return collection.toArray(new String[collection.size()]);
+  }
+
+  public static boolean hasLength(CharSequence str) {
+    return (str != null && str.length() > 0);
+  }
+
+  public static boolean hasLength(String str) {
+    return hasLength((CharSequence) str);
+  }
+
+  public static boolean hasText(CharSequence str) {
+    if (!hasLength(str)) {
+      return false;
+    }
+    int strLen = str.length();
+    for (int i = 0; i < strLen; i++) {
+      if (!Character.isWhitespace(str.charAt(i))) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
