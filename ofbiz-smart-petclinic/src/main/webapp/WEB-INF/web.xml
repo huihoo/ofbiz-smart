@@ -12,8 +12,21 @@
 		</init-param>
 		<init-param>
 			<param-name>uri-suffix</param-name>
-			<param-value>do</param-value>
+			<param-value>.do</param-value>
 		</init-param>
+		<init-param>
+			<param-name>http-api-uri-base</param-name>
+			<param-value>/api</param-value>
+		</init-param>
+		<init-param>
+			<param-name>rest-api-uri-base</param-name>
+			<param-value>/rest</param-value>
+		</init-param>
+		<init-param>
+			<param-name>api-doc-uri-base</param-name>
+			<param-value>/doc</param-value>
+		</init-param>
+		
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
