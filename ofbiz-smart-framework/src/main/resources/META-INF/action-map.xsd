@@ -1,23 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
--->
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+	license agreements. See the NOTICE file distributed with this work for additional 
+	information regarding copyright ownership. The ASF licenses this file to 
+	you under the Apache License, Version 2.0 (the "License"); you may not use 
+	this file except in compliance with the License. You may obtain a copy of 
+	the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+	by applicable law or agreed to in writing, software distributed under the 
+	License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+	OF ANY KIND, either express or implied. See the License for the specific 
+	language governing permissions and limitations under the License. -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified">
 	<!-- ====================== Root Element ======================= -->
@@ -42,8 +33,7 @@
 					<xs:complexType>
 						<xs:sequence>
 
-							<xs:element maxOccurs="unbounded" name="page-title"
-								type="xs:string">
+							<xs:element maxOccurs="1" name="page-title" type="xs:string">
 								<xs:annotation>
 									<xs:documentation>
 										<![CDATA[
@@ -53,8 +43,8 @@
 								</xs:annotation>
 							</xs:element>
 
-							<xs:element maxOccurs="unbounded" name="more-css"
-								type="xs:string">
+
+							<xs:element maxOccurs="1" name="more-css" type="xs:string">
 								<xs:annotation>
 									<xs:documentation>
 										<![CDATA[
@@ -64,7 +54,7 @@
 								</xs:annotation>
 							</xs:element>
 
-							<xs:element maxOccurs="unbounded" name="more-javascripts"
+							<xs:element maxOccurs="1" name="more-javascripts"
 								type="xs:string">
 								<xs:annotation>
 									<xs:documentation>
@@ -74,56 +64,29 @@
 									</xs:documentation>
 								</xs:annotation>
 							</xs:element>
-							
-							<xs:element name="action-interceptor" maxOccurs="unbounded">
-								<xs:annotation>
-									<xs:documentation>
-										<![CDATA[
-											指定当前action的拦截处理。
-										]]>
-									</xs:documentation>
-								</xs:annotation>
-								<xs:complexType>
-									<xs:attributeGroup ref="attlist.interceptor"></xs:attributeGroup>
-								</xs:complexType>
-							</xs:element>
-							
-							<xs:element name="service-event-action" maxOccurs="unbounded">
-								<xs:annotation>
-									<xs:documentation>
-										<![CDATA[
-											指定当前action中调用的服务由哪个 服务事件处理实现类来处理 。
-										]]>
-									</xs:documentation>
-								</xs:annotation>
-								<xs:complexType>
-									<xs:attributeGroup ref="attlist.sea"></xs:attributeGroup>
-								</xs:complexType>
-							</xs:element>
-							
+
 							
 
-							<xs:element name="event" maxOccurs="unbounded">
+							<xs:element name="service-call" maxOccurs="unbounded">
 								<xs:annotation>
 									<xs:documentation>
 										<![CDATA[
-											指定当前action由哪种事件处理类，来完成当次的处理。它支持的类型有: "java",普通的Java类处理;
-											"service",服务引擎处理(服务是什么类型就调用什么服务);"simple",服务引擎处理(但它只调用服务类型为简单的服务);
-											"auto",自动处理;"api",API服务处理;"none",不进行任何处理。
+											服务调用
 										]]>
 									</xs:documentation>
 								</xs:annotation>
 								<xs:complexType>
-									<xs:attributeGroup ref="attlist.event"></xs:attributeGroup>
+									<xs:attributeGroup ref="attlist.service"></xs:attributeGroup>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="response" maxOccurs="unbounded">
+
+
+
+							<xs:element name="response" maxOccurs="1">
 								<xs:annotation>
 									<xs:documentation>
 										<![CDATA[
-											指定当前action以何种方式生成响应(Response)，可以是页面，也可以是文件或是其它文本内容。它支持的类型有："include-view",
-											表示是生成的页面，是服务器内部指定的页面，在这里表示是JSP页面;"redirect",表示是一个重定向;"json",表示是标准的JSON字符串;
-											"html",表示的是HTML文本内容;"none",表示无响应
+											指定输出响应内容
 										]]>
 									</xs:documentation>
 								</xs:annotation>
@@ -131,6 +94,7 @@
 									<xs:attributeGroup ref="attlist.response"></xs:attributeGroup>
 								</xs:complexType>
 							</xs:element>
+
 						</xs:sequence>
 						<xs:attributeGroup ref="attlist.action" />
 					</xs:complexType>
@@ -151,7 +115,7 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="allow-method" default="all">
+		<xs:attribute name="method" default="all">
 			<xs:annotation>
 				<xs:documentation>
 					<![CDATA[
@@ -167,7 +131,7 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-		
+
 		<xs:attribute name="auth" default="false">
 			<xs:annotation>
 				<xs:documentation>
@@ -187,59 +151,25 @@
 	</xs:attributeGroup>
 
 
-	<xs:attributeGroup name="attlist.event">
-		<xs:attribute name="type" use="required">
+	<xs:attributeGroup name="attlist.service">
+
+
+		<xs:attribute name="service-name">
 			<xs:annotation>
 				<xs:documentation>
 					<![CDATA[
-						事件处理类型
+						服务的名称
 					]]>
 				</xs:documentation>
 			</xs:annotation>
-			<xs:simpleType>
-				<xs:restriction base="xs:token">
-					<xs:enumeration value="none"></xs:enumeration>
-					<xs:enumeration value="java"></xs:enumeration>
-					<xs:enumeration value="service"></xs:enumeration>
-					<xs:enumeration value="auto"></xs:enumeration>
-					<xs:enumeration value="simple"></xs:enumeration>
-					<xs:enumeration value="api"></xs:enumeration>
-				</xs:restriction>
-			</xs:simpleType>
 		</xs:attribute>
 
-		<xs:attribute name="sname">
+
+		<xs:attribute name="entity-name">
 			<xs:annotation>
 				<xs:documentation>
 					<![CDATA[
-						服务名称,仅在type为service时指定
-					]]>
-				</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="path">
-			<xs:annotation>
-				<xs:documentation>
-					<![CDATA[
-						事件处理类的路径，仅在type为java时指定
-					]]>
-				</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="invoke">
-			<xs:annotation>
-				<xs:documentation>
-					<![CDATA[
-						事件处理类所调用的方法，仅在type为java或simple时指定
-					]]>
-				</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="default-entity-name">
-			<xs:annotation>
-				<xs:documentation>
-					<![CDATA[
-						事件处理类指定的默认业务实体名称，仅在type为java或simple时指定
+						实体的全路径名称
 					]]>
 				</xs:documentation>
 			</xs:annotation>
@@ -253,28 +183,39 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+
+		<xs:attribute name="param-pairs">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						参数对
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+
+		<xs:attribute name="order-by">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						排序串
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+
 	</xs:attributeGroup>
 
 
 	<xs:attributeGroup name="attlist.response">
-		<xs:attribute name="type" use="required">
+		<xs:attribute name="view-name" default="none">
 			<xs:annotation>
 				<xs:documentation>
 					<![CDATA[
-						事件响应类型
+						响应对应的界面名称
 					]]>
 				</xs:documentation>
 			</xs:annotation>
-			<xs:simpleType>
-				<xs:restriction base="xs:token">
-					<xs:enumeration value="redirect"></xs:enumeration>
-					<xs:enumeration value="include-view"></xs:enumeration>
-					<xs:enumeration value="json"></xs:enumeration>
-					<xs:enumeration value="html"></xs:enumeration>
-					<xs:enumeration value="none"></xs:enumeration>
-					<xs:enumeration value="file"></xs:enumeration>
-				</xs:restriction>
-			</xs:simpleType>
 		</xs:attribute>
 
 		<xs:attribute name="layout" default="none">
@@ -286,78 +227,6 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-
-		<xs:attribute name="value">
-			<xs:annotation>
-				<xs:documentation>
-					<![CDATA[
-						事件响应指定值，可以是具体的JSP页面，也可以是一个请求路径。该值表示的含义依赖于相应的类型。
-					]]>
-				</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
 	</xs:attributeGroup>
 
-
-
-
-	<xs:attributeGroup name="attlist.interceptor">
-		<xs:attribute name="name" use="required">
-			<xs:annotation>
-				<xs:documentation>
-					<![CDATA[
-						Action的拦截器实现类的全路径名称。
-					]]>
-				</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-
-		<xs:attribute name="trigger-at" use="required">
-			<xs:annotation>
-				<xs:documentation>
-					<![CDATA[
-						定义在什么时候拦截: before在服务调用前拦截；success在服务调用成功后拦截；all 调用前，成功后都拦截
-					]]>
-				</xs:documentation>
-			</xs:annotation>
-			<xs:simpleType>
-				<xs:restriction base="xs:token">
-					<xs:enumeration value="all"></xs:enumeration>
-					<xs:enumeration value="before"></xs:enumeration>
-					<xs:enumeration value="success"></xs:enumeration>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
-	</xs:attributeGroup>
-
-
-
-	<xs:attributeGroup name="attlist.sea">
-		<xs:attribute name="name" use="required">
-			<xs:annotation>
-				<xs:documentation>
-					<![CDATA[
-						服务处理事件实现类的全路径名称。
-					]]>
-				</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-
-		<xs:attribute name="trigger-at" use="required">
-			<xs:annotation>
-				<xs:documentation>
-					<![CDATA[
-						定义在什么时候触发: before在服务调用前触发；success在服务调用成功后触发；all 调用前，成功后都触发
-					]]>
-				</xs:documentation>
-			</xs:annotation>
-			<xs:simpleType>
-				<xs:restriction base="xs:token">
-					<xs:enumeration value="all"></xs:enumeration>
-					<xs:enumeration value="before"></xs:enumeration>
-					<xs:enumeration value="success"></xs:enumeration>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
-	</xs:attributeGroup>
 </xs:schema>

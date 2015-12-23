@@ -26,12 +26,12 @@ public class JspView implements View {
     setModelAsRequestAttributies(model,request);
     
     String uri = request.getRequestURI();
-    
+    uri = "/WEB-INF/views/owners/findOwners.jsp";
     RequestDispatcher rd = request.getRequestDispatcher(uri);
     if (rd == null) {
       throw new ViewException("Could not get RequestDispatcher for [" + uri + "]");
     }
-    
+    request.setAttribute("name", "黄柏华");
     boolean isIncludeRequest = request.getAttribute(C.INCLUDE_REQUEST_URI_ATTRIBUTE) != null || response.isCommitted();
     try {
       if (isIncludeRequest) {
