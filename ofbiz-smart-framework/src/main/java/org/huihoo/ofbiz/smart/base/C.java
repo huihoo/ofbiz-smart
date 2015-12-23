@@ -7,6 +7,13 @@ public final class C {
   public static final String PROFILE_PRODUCTION = "production";
   
   // ========================================================================================
+  // Servlet spec related attributies
+  // ========================================================================================
+  public static final String DEFAULT_CONTENT_TYPE = "text/html;charset=utf-8";
+  public static final String TEMP_DIR_CONTEXT_ATTRIBUTE = "javax.servlet.context.tempdir";
+  public static final String INCLUDE_REQUEST_URI_ATTRIBUTE = "javax.servlet.include.request_uri";
+  
+  // ========================================================================================
   // Context Related Flag
   // ========================================================================================
   public static final String APPLICATION_CONFIG_PROP_KEY = "_application_config_properties_";

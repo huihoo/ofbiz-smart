@@ -13,9 +13,9 @@ public class XmlView implements View {
   }
 
   @Override
-  public void render(Map<String, ?> model, HttpServletRequest request,
+  public void render(Map<String, Object> model, HttpServletRequest request,
           HttpServletResponse response) {
-
+    //TODO
   }
 
 }

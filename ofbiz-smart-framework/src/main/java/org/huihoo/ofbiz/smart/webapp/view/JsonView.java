@@ -9,13 +9,13 @@ public class JsonView implements View {
 
   @Override
   public String getContentType() {
-    return null;
+    return "application/json;charset=utf-8";
   }
 
   @Override
-  public void render(Map<String, ?> model, HttpServletRequest request,
+  public void render(Map<String, Object> model, HttpServletRequest request,
           HttpServletResponse response) {
-
+    //TODO
   }
 
 }

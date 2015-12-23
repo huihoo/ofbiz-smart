@@ -9,6 +9,6 @@ public interface View {
   
   String getContentType();
   
-  void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response);
+  void render(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws ViewException;
   
 }
