@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-map xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../../../../../ofbiz-smart-framework/src/main/resources/META-INF/action-map.xsd">
+	<action uri="/owners/findOwners" process-type="uriAuto">
+	</action>
+
+	<action uri="/owners/findOwners_with_layout" process-type="uriAuto">
+		<page-title>findOwners_with_layout</page-title>
+		<more-css>/css/abc/1.css,/css/abc/2.css</more-css>
+		<more-javascripts>/js/2.js,/js/3.js</more-javascripts>
+		<response layout="/layout/layout.jsp"/>
+	</action>
+</action-map>
