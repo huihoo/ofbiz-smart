@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<action-map xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/META-INF/action-map.xsd">
-  <action uri="">
-    <page-title>page-title</page-title>
-    <more-css>more-css</more-css>
-    <more-javascripts>more-javascripts</more-javascripts>
-    <service-call/>
-    <response/>
-  </action>
+<action-map xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../../../main/resources/META-INF/action-map.xsd">
+
+	<action uri="/order/create" process-type="byConfig">
+		<service-call service-name="createOrder" />
+		<response view-type="json" />
+	</action>
+
+
+	<action uri="/product/detail" process-type="byConfig">
+		<page-title>page-title</page-title>
+		<more-css>more-css</more-css>
+		<more-javascripts>more-javascripts</more-javascripts>
+		<service-call />
+		<response view-type="json" />
+	</action>
+	
+	<action uri="/news/**" process-type="entityAuto">
+		<response view-type="auto" />
+	</action>
+	
+	<action uri="/customer/detail" process-type="urlAuto">
+		<response view-type="auto" />
+	</action>
+
 </action-map>

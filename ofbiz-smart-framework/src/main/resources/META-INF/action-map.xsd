@@ -170,8 +170,7 @@
 
 
 	<xs:attributeGroup name="attlist.service">
-
-
+	
 		<xs:attribute name="service-name">
 			<xs:annotation>
 				<xs:documentation>
@@ -182,7 +181,6 @@
 			</xs:annotation>
 		</xs:attribute>
 
-
 		<xs:attribute name="entity-name">
 			<xs:annotation>
 				<xs:documentation>
@@ -192,6 +190,7 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		
 		<xs:attribute name="condition">
 			<xs:annotation>
 				<xs:documentation>

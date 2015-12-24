@@ -1,15 +1,13 @@
 package org.huihoo.ofbiz.smart.webapp;
 
 import java.io.Serializable;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ActionModel implements Serializable {
   private static final long serialVersionUID = 1L;
-
-  public String description;
   
-  public Set<Action> actionSet = new LinkedHashSet<>();
+  public List<Action> actionList = new ArrayList<>();
   
   public static class Action implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -28,9 +26,34 @@ public class ActionModel implements Serializable {
     
     public String moreJavascripts;
 
-    public Set<ServiceCall> serviceCallSet = new LinkedHashSet<>();
+    public List<ServiceCall> serviceCallList= new ArrayList<>();
     
     public Response response;
+
+    @Override
+    public String toString() {
+      StringBuilder builder = new StringBuilder();
+      builder.append("Action [uri=");
+      builder.append(uri);
+      builder.append(", method=");
+      builder.append(method);
+      builder.append(", processType=");
+      builder.append(processType);
+      builder.append(", requireAuth=");
+      builder.append(requireAuth);
+      builder.append(", pageTitle=");
+      builder.append(pageTitle);
+      builder.append(", moreCss=");
+      builder.append(moreCss);
+      builder.append(", moreJavascripts=");
+      builder.append(moreJavascripts);
+      builder.append(", serviceCallList=");
+      builder.append(serviceCallList);
+      builder.append(", response=");
+      builder.append(response);
+      builder.append("]");
+      return builder.toString();
+    }
   }
   
   
@@ -43,6 +66,19 @@ public class ActionModel implements Serializable {
     public String viewName;
     
     public String layout;
+
+    @Override
+    public String toString() {
+      StringBuilder builder = new StringBuilder();
+      builder.append("Response [viewType=");
+      builder.append(viewType);
+      builder.append(", viewName=");
+      builder.append(viewName);
+      builder.append(", layout=");
+      builder.append(layout);
+      builder.append("]");
+      return builder.toString();
+    }
     
   }
 
@@ -53,5 +89,32 @@ public class ActionModel implements Serializable {
     public String paramPairs; 
     public String condition;
     public String orderBy;
+    @Override
+    public String toString() {
+      StringBuilder builder = new StringBuilder();
+      builder.append("ServiceCall [serviceName=");
+      builder.append(serviceName);
+      builder.append(", entityName=");
+      builder.append(entityName);
+      builder.append(", paramPairs=");
+      builder.append(paramPairs);
+      builder.append(", condition=");
+      builder.append(condition);
+      builder.append(", orderBy=");
+      builder.append(orderBy);
+      builder.append("]");
+      return builder.toString();
+    }
   }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("ActionModel [actionList=");
+    builder.append(actionList);
+    builder.append("]");
+    return builder.toString();
+  }
+
+  
 }

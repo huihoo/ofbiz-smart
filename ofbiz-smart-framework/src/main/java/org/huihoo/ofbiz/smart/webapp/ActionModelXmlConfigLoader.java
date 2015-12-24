@@ -79,7 +79,7 @@ public class ActionModelXmlConfigLoader {
     private ActionModel actionModel;
     
     public SaxHandler(ActionModel actionModel) {
-      this.actionModel = new ActionModel();
+      this.actionModel = actionModel;
     }
 
     @Override
@@ -100,7 +100,7 @@ public class ActionModelXmlConfigLoader {
           serviceCall.paramPairs = attributes.getValue("param-pairs");
           serviceCall.orderBy = attributes.getValue("order-by");
           
-          action.serviceCallSet.add(serviceCall);
+          action.serviceCallList.add(serviceCall);
           break;
         case "response":
           Response response = new Response();
@@ -116,7 +116,7 @@ public class ActionModelXmlConfigLoader {
     public void endElement(String uri, String localName, String qName) throws SAXException {
       switch (qName) {
         case "action":
-          actionModel.actionSet.add(action);
+          actionModel.actionList.add(action);
           break;
         case "page-title":
           action.pageTitle = content;
@@ -126,9 +126,6 @@ public class ActionModelXmlConfigLoader {
           break;
         case "more-javascripts":
           action.moreJavascripts = content;
-          break;
-        case "description":
-          actionModel.description = content;
           break;
       }
     }
