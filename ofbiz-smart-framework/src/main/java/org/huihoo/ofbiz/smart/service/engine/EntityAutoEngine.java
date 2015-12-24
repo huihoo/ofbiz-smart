@@ -2,6 +2,7 @@ package org.huihoo.ofbiz.smart.service.engine;
 
 
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -166,7 +167,7 @@ public class EntityAutoEngine extends GenericAsyncEngine {
           andMap = (Map<String, Object>) ctx.get(C.ENTITY_ANDMAP);
           fieldsToSelect = (Set<String>) ctx.get(C.ENTITY_FIELDS_TO_SELECT);
           orderBy = (List<String>) ctx.get(C.ENTITY_ORDERBY);
-          if (orderBy == null && entityClazz.getDeclaredField(C.ENTITY_UPDATED_AT) != null) {
+          if (orderBy == null && hasUpdatedAtField(entityClazz)) {
             orderBy = Arrays.asList(new String[]{C.ENTITY_ORDERBY_DEFAULT_FIELD});
           }
           Integer pageNo = Integer.valueOf((ctx.get(C.PAGE_PAGE_NO) == null ? 1 : ctx.get(C.PAGE_PAGE_NO)) + "");
@@ -205,5 +206,35 @@ public class EntityAutoEngine extends GenericAsyncEngine {
   //=============================================================
   // Private Method
   //=============================================================
+  
+  
+  private static boolean hasUpdatedAtField(Class<?> entityClazz) {
+    if (entityClazz == null) {
+      return false;
+    }
+    boolean flag = true;
+    try {
+      entityClazz.getDeclaredField(C.ENTITY_UPDATED_AT);
+    } catch (NoSuchFieldException e) {
+      flag = false;
+    } catch (SecurityException e) {
+      flag = false;
+    }
+    
+    if (flag) {
+      return true;
+    } else {
+      Class<?> superClazz = null;
+      if (!flag) {
+        superClazz = entityClazz.getSuperclass();
+        flag = hasUpdatedAtField(superClazz);
+      }
+      
+      if (!flag && superClazz != null) {
+        flag = hasUpdatedAtField(superClazz.getSuperclass());
+      }
+    }
+    return flag;
+  }
   
 }
