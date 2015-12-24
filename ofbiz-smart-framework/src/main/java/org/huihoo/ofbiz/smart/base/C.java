@@ -5,6 +5,7 @@ public final class C {
   public static final String UTF_8 = "UTF-8";
   public static final String PROFILE_NAME = "profile";
   public static final String PROFILE_PRODUCTION = "production";
+  public static final String ACTION_CONFIG_BASEPATH_KEY = "action.config.basepath";
   
   // ========================================================================================
   // Servlet spec related attributies
@@ -16,11 +17,14 @@ public final class C {
   // ========================================================================================
   // Context Related Flag
   // ========================================================================================
-  public static final String APPLICATION_CONFIG_PROP_KEY = "_application_config_properties_";
+  public static final String APPLICATION_CONFIG_PROP_KEY = "_ctx_application_config_properties_";
   public static final String CTX_DELETAGOR = "_ctx_deletagor_"; 
   public static final String CTX_SERVICE_DISPATCHER = "_ctx_service_dispatcher_"; 
   public static final String CTX_WEB_HTTP_SERVLET_REQUEST = "_ctx_httpservletrequest_"; 
   public static final String CTX_WEB_HTTP_SERVLET_RESPONSE = "_ctx_httpservletresponse_"; 
+  public static final String CTX_ACTION_MODEL = "_ctx_action_model_";
+  public static final String CTX_URI_SUFFIX = "_ctx_uri_suffix_";
+  public static final String CTX_JSP_VIEW_BASEPATH = "_ctx_jsp_view_basepath_";
   // ========================================================================================
   // Cache Related Flag
   // ========================================================================================

@@ -4,8 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -24,13 +23,21 @@ import org.xml.sax.helpers.DefaultHandler;
 public class ActionModelXmlConfigLoader {
   private final static String TAG = ActionModelXmlConfigLoader.class.getName();
   
-  private final static Set<ActionModel> ACTION_MODEL_SET = new LinkedHashSet<>();
+  private final static ActionModelXmlConfigLoader ME = new ActionModelXmlConfigLoader();
   
-  public static Set<ActionModel> getAllActionModel() {
-    return ACTION_MODEL_SET;
+  
+  private ActionModelXmlConfigLoader() {
+    
   }
   
-  public static void loadXml(String path) {
+  
+  
+  public static ActionModelXmlConfigLoader me() {
+    return ME;
+  }
+  
+  
+  public void loadXml(String path,List<ActionModel> actionModels) {
     File f = new File(path);
     
     File[] configFiles = f.listFiles(new FileFilter() {
@@ -50,7 +57,7 @@ public class ActionModelXmlConfigLoader {
     
     for (File ff : configFiles) {
       if (ff.isDirectory()) {
-        loadXml(ff.getPath());
+        loadXml(ff.getPath(),actionModels);
       } else {
         SAXParserFactory factory = SAXParserFactory.newInstance();
         SAXParser parser;
@@ -60,7 +67,8 @@ public class ActionModelXmlConfigLoader {
           //NOTICE: 如果以文件进行解析，有可能会报Content is not allowed in prolog的诡异异常
           //parser.parse(ff, new SaxHandler(actionModel));
           parser.parse(new FileInputStream(ff), new SaxHandler(actionModel));
-          ACTION_MODEL_SET.add(actionModel);
+          Log.d("Loaded action config [" + ff.getPath() + "]", TAG);
+          actionModels.add(actionModel);
         } catch (ParserConfigurationException e) {
           Log.e(e, "Unable to load action config file [" + ff.getPath() + "]", TAG);
         } catch (SAXException e) {

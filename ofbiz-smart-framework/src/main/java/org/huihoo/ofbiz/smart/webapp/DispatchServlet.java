@@ -2,6 +2,8 @@ package org.huihoo.ofbiz.smart.webapp;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.servlet.ServletConfig;
@@ -66,6 +68,15 @@ public class DispatchServlet extends HttpServlet {
     long startTime = System.currentTimeMillis();
     Throwable failureCause = null;
     try {
+      Properties applicationConfig = (Properties) getServletContext().getAttribute(C.APPLICATION_CONFIG_PROP_KEY);
+      if (!C.PROFILE_PRODUCTION.equals(applicationConfig.getProperty(C.PROFILE_NAME))) {
+        //非生产环境，总是重新加载
+        try {
+          loadAppConfig(getServletContext());
+        } catch (GenericServiceException e) {
+          Log.w("Unable to load app config : " + e.getMessage(), TAG);
+        }
+      }
       RequestHandler requestHandler = null;
       if (targetUri.startsWith(restApiUrlBase)) {
         requestHandler = HANDLER_CACHE.get("Rest");
@@ -93,6 +104,9 @@ public class DispatchServlet extends HttpServlet {
           HANDLER_CACHE.put("Default", requestHandler);
         }
       }
+      
+      request.setAttribute("uriSuffix", uriSuffix);
+      request.setAttribute("ctxPath", request.getContextPath());
       
       requestHandler.handleRequest(request, response);
 
@@ -141,7 +155,11 @@ public class DispatchServlet extends HttpServlet {
       httpApiUrlBase = "/rest";
     }
 
-    initWebContext(config.getServletContext());
+    ServletContext sc = config.getServletContext();
+    sc.setAttribute(C.CTX_JSP_VIEW_BASEPATH, jspViewBathPath);
+    sc.setAttribute(C.CTX_URI_SUFFIX, uriSuffix);
+    
+    initWebContext(sc);
 
     HANDLER_CACHE =
             (Cache<String, RequestHandler>) SimpleCacheManager.createCache("RequestHandler-Cache");
@@ -151,13 +169,8 @@ public class DispatchServlet extends HttpServlet {
   protected void initWebContext(ServletContext servletContext) throws ServletException {
     try {
       Delegator delegator = new EbeanDelegator();
-      ServiceDispatcher serviceDispatcher = new ServiceDispatcher(delegator);
-      Properties applicationConfig = new Properties();
-      applicationConfig
-              .load(FlexibleLocation.resolveLocation(C.APPLICATION_CONFIG_NAME).openStream());
       servletContext.setAttribute(C.CTX_DELETAGOR, delegator);
-      servletContext.setAttribute(C.CTX_SERVICE_DISPATCHER, serviceDispatcher);
-      servletContext.setAttribute(C.APPLICATION_CONFIG_PROP_KEY, applicationConfig);
+      loadAppConfig(servletContext);
     } catch (GenericEntityException e) {
       throw new ServletException("Unable to initialize Delegator.");
     } catch (GenericServiceException e) {
@@ -168,5 +181,17 @@ public class DispatchServlet extends HttpServlet {
       throw new ServletException("Unable to load gobal config file : " + C.APPLICATION_CONFIG_NAME);
     }
   }
-
+  
+  protected void loadAppConfig(ServletContext servletContext) throws MalformedURLException, IOException, GenericServiceException {
+    //NOTICE 以下对象可以重新加载,除了Delegator
+    ServiceDispatcher serviceDispatcher = new ServiceDispatcher((Delegator)servletContext.getAttribute(C.CTX_DELETAGOR));
+    Properties applicationConfig = new Properties();
+    applicationConfig.load(FlexibleLocation.resolveLocation(C.APPLICATION_CONFIG_NAME).openStream());
+    servletContext.setAttribute(C.CTX_SERVICE_DISPATCHER, serviceDispatcher);
+    servletContext.setAttribute(C.APPLICATION_CONFIG_PROP_KEY, applicationConfig);
+    String actionConfigBasePath = applicationConfig.getProperty(C.ACTION_CONFIG_BASEPATH_KEY, "./");
+    List<ActionModel> actionModels = new ArrayList<>();
+    ActionModelXmlConfigLoader.me().loadXml(FlexibleLocation.resolveLocation(actionConfigBasePath).getPath(),actionModels);
+    servletContext.setAttribute(C.CTX_ACTION_MODEL,actionModels);
+  }
 }

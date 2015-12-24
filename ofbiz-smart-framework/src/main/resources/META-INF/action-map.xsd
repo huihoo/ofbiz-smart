@@ -160,7 +160,7 @@
 			<xs:simpleType>
 				<xs:restriction base="xs:token">
 					<xs:enumeration value="byConfig" />
-					<xs:enumeration value="urlAuto" />
+					<xs:enumeration value="uriAuto" />
 					<xs:enumeration value="entityAuto" />
 				</xs:restriction>
 			</xs:simpleType>

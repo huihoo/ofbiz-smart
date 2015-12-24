@@ -1,4 +1,4 @@
-package org.huihoo.ofbiz.smart.webapp.view;
+ package org.huihoo.ofbiz.smart.webapp.view;
 
 import java.util.Map;
 

@@ -25,21 +25,20 @@ public class JspView implements View {
     
     setModelAsRequestAttributies(model,request);
     
-    String uri = request.getRequestURI();
-    uri = "/WEB-INF/views/owners/findOwners.jsp";
-    RequestDispatcher rd = request.getRequestDispatcher(uri);
+    String viewName = (String) request.getAttribute("viewName");
+    RequestDispatcher rd = request.getRequestDispatcher(viewName); 
     if (rd == null) {
-      throw new ViewException("Could not get RequestDispatcher for [" + uri + "]");
+      throw new ViewException("Could not get RequestDispatcher for [" + viewName + "]");
     }
-    request.setAttribute("name", "黄柏华");
+    
     boolean isIncludeRequest = request.getAttribute(C.INCLUDE_REQUEST_URI_ATTRIBUTE) != null || response.isCommitted();
     try {
       if (isIncludeRequest) {
-        Log.d("Including resource [" + uri + "] in JspView.", TAG);
+        Log.d("Including resource [" + viewName + "] in JspView.", TAG);
         response.setContentType(getContentType());
         rd.include(request, response);
       } else {
-        Log.d("Forwarding to resource [" + uri + "] in JspView.", TAG);
+        Log.d("Forwarding to resource [" + viewName + "] in JspView.", TAG);
         rd.forward(request, response);
       }
     } catch (IOException e) {

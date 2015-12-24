@@ -1,6 +1,7 @@
 package test.webapp;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,8 +24,8 @@ public class WebAppTest {
     
     String path = FlexibleLocation.resolveLocation("./").getPath();
     Log.d("Path >" + path, TAG);
-    ActionModelXmlConfigLoader.loadXml(path);
-    Set<ActionModel> actionModels = ActionModelXmlConfigLoader.getAllActionModel();
+    List<ActionModel> actionModels = new ArrayList<>(); 
+    ActionModelXmlConfigLoader.me().loadXml(path,actionModels);
     Log.d("actionModels > " +actionModels, TAG);
     Assert.assertEquals(true, actionModels.size() > 0);
     
@@ -47,7 +48,7 @@ public class WebAppTest {
   }
   
   
-  private Action shouldHasAction(String actionUri,Set<ActionModel> actionModels) {
+  private Action shouldHasAction(String actionUri,List<ActionModel> actionModels) {
     for (ActionModel actionModel : actionModels) {
       List<Action> actions = actionModel.actionList;
       for (Action action : actions) {
