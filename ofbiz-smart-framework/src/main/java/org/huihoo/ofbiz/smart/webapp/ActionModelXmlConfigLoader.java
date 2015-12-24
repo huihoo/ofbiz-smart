@@ -2,6 +2,7 @@ package org.huihoo.ofbiz.smart.webapp;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -25,6 +26,10 @@ public class ActionModelXmlConfigLoader {
   
   private final static Set<ActionModel> ACTION_MODEL_SET = new LinkedHashSet<>();
   
+  public static Set<ActionModel> getAllActionModel() {
+    return ACTION_MODEL_SET;
+  }
+  
   public static void loadXml(String path) {
     File f = new File(path);
     
@@ -39,6 +44,10 @@ public class ActionModelXmlConfigLoader {
       }
     });
     
+    if (configFiles == null) {
+      throw new IllegalArgumentException("Path [" + path + "] has nothing.");
+    }
+    
     for (File ff : configFiles) {
       if (ff.isDirectory()) {
         loadXml(ff.getPath());
@@ -48,7 +57,9 @@ public class ActionModelXmlConfigLoader {
         try {
           parser = factory.newSAXParser();
           ActionModel actionModel = new ActionModel();
-          parser.parse(f, new SaxHandler(actionModel));
+          //NOTICE: 如果以文件进行解析，有可能会报Content is not allowed in prolog的诡异异常
+          //parser.parse(ff, new SaxHandler(actionModel));
+          parser.parse(new FileInputStream(ff), new SaxHandler(actionModel));
           ACTION_MODEL_SET.add(actionModel);
         } catch (ParserConfigurationException e) {
           Log.e(e, "Unable to load action config file [" + ff.getPath() + "]", TAG);
@@ -77,8 +88,9 @@ public class ActionModelXmlConfigLoader {
         case "action":
           action = new Action();
           action.uri = attributes.getValue("uri");
-          action.method = attributes.getValue("method");
-          action.auth = Boolean.valueOf(attributes.getValue("auth") == null ? "false" : attributes.getValue("auth"));
+          action.method = attributes.getValue("method") == null ? "all" : attributes.getValue("method");
+          action.requireAuth = Boolean.valueOf(attributes.getValue("require-auth") == null ? "false" : attributes.getValue("auth"));
+          action.processType = attributes.getValue("process-type") == null ? "byConfig" : attributes.getValue("process-type");
           break;
         case "service-call":
           ServiceCall serviceCall = new ServiceCall();
@@ -94,6 +106,7 @@ public class ActionModelXmlConfigLoader {
           Response response = new Response();
           response.viewName = attributes.getValue("view-name");
           response.layout = attributes.getValue("layout");
+          response.viewType = attributes.getValue("view-type");
           action.response = response;
           break;
       }

@@ -20,7 +20,7 @@ public class ActionModel implements Serializable {
 
     public String processType;
     
-    public boolean auth;
+    public boolean requireAuth;
     
     public String pageTitle;
     
@@ -37,6 +37,8 @@ public class ActionModel implements Serializable {
 
   public static class Response implements Serializable {
     private static final long serialVersionUID = 1L;
+    
+    public String viewType;
     
     public String viewName;
     

@@ -132,7 +132,7 @@
 			</xs:simpleType>
 		</xs:attribute>
 
-		<xs:attribute name="auth" default="false">
+		<xs:attribute name="require-auth" default="false">
 			<xs:annotation>
 				<xs:documentation>
 					<![CDATA[
@@ -144,6 +144,24 @@
 				<xs:restriction base="xs:token">
 					<xs:enumeration value="true" />
 					<xs:enumeration value="false" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		
+		
+		<xs:attribute name="process-type" default="byConfig">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						请求处理类型。
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:token">
+					<xs:enumeration value="byConfig" />
+					<xs:enumeration value="urlAuto" />
+					<xs:enumeration value="entityAuto" />
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
@@ -208,11 +226,31 @@
 
 
 	<xs:attributeGroup name="attlist.response">
+		<xs:attribute name="view-type" default="jsp">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						界面类型。
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:token">
+					<xs:enumeration value="auto" />
+					<xs:enumeration value="jsp" />
+					<xs:enumeration value="json" />
+					<xs:enumeration value="xml" />
+					<xs:enumeration value="html" />
+					<xs:enumeration value="redirect" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		
 		<xs:attribute name="view-name" default="none">
 			<xs:annotation>
 				<xs:documentation>
 					<![CDATA[
-						响应对应的界面名称
+						界面名称
 					]]>
 				</xs:documentation>
 			</xs:annotation>
@@ -222,7 +260,7 @@
 			<xs:annotation>
 				<xs:documentation>
 					<![CDATA[
-						事件响应指定的布局文件，默认是none，表示无应用的布局文件。
+						布局(如果界面需要应用布局)
 					]]>
 				</xs:documentation>
 			</xs:annotation>

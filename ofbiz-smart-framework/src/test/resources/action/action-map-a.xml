@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<action-map xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/META-INF/action-map.xsd">
+  <action uri="">
+    <page-title>page-title</page-title>
+    <more-css>more-css</more-css>
+    <more-javascripts>more-javascripts</more-javascripts>
+    <service-call/>
+    <response/>
+  </action>
+</action-map>
