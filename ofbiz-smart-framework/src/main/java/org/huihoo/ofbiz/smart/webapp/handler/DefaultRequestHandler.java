@@ -247,7 +247,7 @@ public class DefaultRequestHandler implements RequestHandler {
         } catch (OgnlException e) {
           throw new ViewException("Unable to get id");
         }
-        req.setAttribute("targetUri", req.getServletContext() + "/" + firstUriString + "/view" + uriSuffix + "?id=" + idValue);
+        req.setAttribute("targetUri", req.getContextPath() + "/" + firstUriString + "/view" + uriSuffix + "?id=" + idValue);
         redirectView.render(modelMap, req, resp);
       } else {
         req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + layout);

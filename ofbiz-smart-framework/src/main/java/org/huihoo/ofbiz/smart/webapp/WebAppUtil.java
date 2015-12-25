@@ -88,9 +88,17 @@ public class WebAppUtil {
     for (int i = 0; i < len; i++) {
       String t = pToken[i];
       if (t.startsWith("requestScope.")) {
-        sb.append(req.getParameter(t.substring("requestScope.".length())));
+        String val = req.getParameter(t.substring("requestScope.".length()));
+        if (val == null) {
+          val = "";
+        }
+        sb.append(val);
       } else if (t.startsWith("sessionScope.")){
-        sb.append(req.getSession().getAttribute(t.substring("requestScope.".length())));
+        Object val = req.getSession().getAttribute(t.substring("requestScope.".length()));
+        if (val == null) {
+          val = "";
+        }
+        sb.append(val);
       } else {
         sb.append(t);
       }
