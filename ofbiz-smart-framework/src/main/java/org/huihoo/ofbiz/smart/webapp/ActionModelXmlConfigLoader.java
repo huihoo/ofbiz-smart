@@ -96,6 +96,7 @@ public class ActionModelXmlConfigLoader {
         case "action":
           action = new Action();
           action.uri = attributes.getValue("uri");
+          action.navTag = attributes.getValue("nav-tag");
           action.method = attributes.getValue("method") == null ? "all" : attributes.getValue("method");
           action.requireAuth = Boolean.valueOf(attributes.getValue("require-auth") == null ? "false" : attributes.getValue("auth"));
           action.processType = attributes.getValue("process-type") == null ? "byConfig" : attributes.getValue("process-type");

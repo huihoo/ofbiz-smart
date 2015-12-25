@@ -105,6 +105,8 @@ public class DispatchServlet extends HttpServlet {
         }
       }
       
+      
+      request.setAttribute("uri", targetUri);
       request.setAttribute("uriSuffix", uriSuffix);
       request.setAttribute("ctxPath", request.getContextPath());
       

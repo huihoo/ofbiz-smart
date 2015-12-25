@@ -29,6 +29,8 @@ public class ActionModel implements Serializable {
     public List<ServiceCall> serviceCallList= new ArrayList<>();
     
     public Response response;
+    
+    public String navTag;
 
     @Override
     public String toString() {

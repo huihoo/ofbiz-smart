@@ -17,8 +17,8 @@ public class RedirectView implements View {
   @Override
   public void render(Map<String, Object> model, HttpServletRequest request,
           HttpServletResponse response) {
-    String targetUrl = "";
-    String encodedRedirectURL = response.encodeRedirectURL(targetUrl);
+    String targetUri = "";
+    String encodedRedirectURL = response.encodeRedirectURL(targetUri);
     response.setStatus(303);//http://tools.ietf.org/html/rfc7231#section-6.4.4
     response.setHeader("Location", encodedRedirectURL);
   }

@@ -165,6 +165,16 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+		
+		<xs:attribute type="xs:string" name="nav-tag">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						导航标签，用于标识导航名称
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 
 	</xs:attributeGroup>
 

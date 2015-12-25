@@ -24,6 +24,7 @@ import org.huihoo.ofbiz.smart.entity.Delegator;
 import org.huihoo.ofbiz.smart.service.ServiceDispatcher;
 import org.huihoo.ofbiz.smart.service.ServiceModel;
 import org.huihoo.ofbiz.smart.webapp.ActionModel;
+import org.huihoo.ofbiz.smart.webapp.ProcessType;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.Action;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.ServiceCall;
 import org.huihoo.ofbiz.smart.webapp.WebAppUtil;
@@ -34,17 +35,20 @@ import org.huihoo.ofbiz.smart.webapp.view.View;
 import org.huihoo.ofbiz.smart.webapp.view.ViewException;
 import org.huihoo.ofbiz.smart.webapp.view.XmlView;
 
-import test.entity.Customer;
-
 
 
 
 public class DefaultRequestHandler implements RequestHandler {
   private final static String TAG = DefaultRequestHandler.class.getName();
   
+  @SuppressWarnings("unchecked")
   private final static Cache<String,String> ENTITY_CLAZZ_NAME_CACHE = 
                    (Cache<String,String>) SimpleCacheManager.createCache("Request-Handler-EntityClazz-Cache");
-
+  
+  @SuppressWarnings("unchecked")
+  private final static Cache<String,View> VIEW_CACHE = 
+                            (Cache<String,View>) SimpleCacheManager.createCache("Request-Handler-View-Cache");
+  
   @SuppressWarnings("unchecked")
   @Override
   public void handleRequest(HttpServletRequest req, HttpServletResponse resp)
@@ -69,9 +73,6 @@ public class DefaultRequestHandler implements RequestHandler {
     Action reqAction = matchAction(actionModels, targetUri);
     Log.d("Action : " + reqAction, TAG);
     if (reqAction != null) {
-
-
-
       Map<String, Object> modelMap = new LinkedHashMap<>();
       Map<String, Object> ctx = WebAppUtil.buildWebCtx(req);
 
@@ -100,50 +101,53 @@ public class DefaultRequestHandler implements RequestHandler {
         viewType = "jsp";
       }
 
-      View view = null;
-
-      switch (viewType) {
-        case "jsp":
-          view = new JspView();
-          break;
-        case "json":
-          view = new JsonView();
-          break;
-        case "xml":
-          view = new XmlView();
-          break;
-        case "redirect":
-          view = new RedirectView();
-          break;
-        case "auto":
-          view = new JspView();
-          break;
-        default:
-          view = new JspView();
-          break;
+      View view = VIEW_CACHE.get(viewType);
+      if (view == null) {
+        switch (viewType) {
+          case "jsp":
+            view = new JspView();
+            break;
+          case "json":
+            view = new JsonView();
+            break;
+          case "xml":
+            view = new XmlView();
+            break;
+          case "redirect":
+            view = new RedirectView();
+            break;
+          case "auto":
+            view = new JspView();
+            break;
+          default:
+            view = new JspView();
+            break;
+        }
+        VIEW_CACHE.put(viewType, view);
       }
+      
 
-      if ("uriAuto".equals(reqAction.processType)) {
+      if (ProcessType.URI_AUTO.value().equals(reqAction.processType)) {
         String viewName = null;
         if (layout != null) {
           viewName = jspViewBasePath + layout;
-          req.setAttribute("layoutContentView", jspViewBasePath + targetUri + ".jsp");
+          req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, jspViewBasePath + targetUri + ".jsp");
         } else {
           viewName = jspViewBasePath + targetUri + ".jsp";
         }
-        req.setAttribute("viewName", viewName);
-      } else if ("entityAuto".equals(reqAction.processType)) {
+        req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, viewName);
+      } else if (ProcessType.ENTITY_AUTO.value().equals(reqAction.processType)) {
 
         try {
-          doEntityAutoAction(serviceDispatcher, req, resp,applicationConfig, targetUri, jspViewBasePath,ctx);
+          doEntityAutoAction(serviceDispatcher, req, resp,applicationConfig, targetUri, jspViewBasePath,ctx,layout);
         } catch (ViewException e) {
           throw new ServletException(e);
         }
         //自动处理时，忽略后面的处理
         return ;
 
-      } else if ("byConfig".equals(reqAction.processType)) {
-        req.setAttribute("viewName", jspViewBasePath + targetUri + ".jsp");
+      } else if (ProcessType.BY_CONFIG.value().equals(reqAction.processType)) {
+        req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + targetUri + ".jsp");
       }
 
       try {
@@ -154,8 +158,14 @@ public class DefaultRequestHandler implements RequestHandler {
     }
   }
 
-  private void doEntityAutoAction(ServiceDispatcher serviceDispatcher, HttpServletRequest req,HttpServletResponse resp,
-          Properties applicationConfig, String targetUri, String jspViewBasePath,Map<String,Object> ctx) throws ViewException {
+  private void doEntityAutoAction(ServiceDispatcher serviceDispatcher, 
+                                  HttpServletRequest req,
+                                  HttpServletResponse resp,
+                                  Properties applicationConfig,
+                                  String targetUri, 
+                                  String jspViewBasePath,
+                                  Map<String,Object> ctx,
+                                  String layout) throws ViewException {
     
     String[] spiltUri = targetUri.split("/");
     String firstUriString = spiltUri[1];
@@ -197,9 +207,13 @@ public class DefaultRequestHandler implements RequestHandler {
       viewName = jspViewBasePath + "/" +firstUriString + "/list.jsp";
     } else if (targetUri.endsWith("/create") || targetUri.endsWith("/add")) {
       viewName = jspViewBasePath + "/" + firstUriString + "/form.jsp";
-    } else if (targetUri.endsWith("/save") || targetUri.endsWith("new")) {
+    } else if (targetUri.endsWith("/save") || targetUri.endsWith("/new")) {
       sm.name = sm.engineName + "#" + C.SERVICE_ENGITYAUTO_CREATE;
       sm.invoke = C.SERVICE_ENGITYAUTO_CREATE;
+      viewName = jspViewBasePath + "/" +firstUriString + "/view.jsp";
+    } else if (targetUri.endsWith("/update") || targetUri.endsWith("/modify")) {
+      sm.name = sm.engineName + "#" + C.SERVICE_ENGITYAUTO_UPDATE;
+      sm.invoke = C.SERVICE_ENGITYAUTO_UPDATE;
       viewName = jspViewBasePath + "/" +firstUriString + "/view.jsp";
     }
     
@@ -209,10 +223,10 @@ public class DefaultRequestHandler implements RequestHandler {
       result = serviceDispatcher.runSync(sm.name, ctx);
     }
     
-    req.setAttribute("viewName", viewName);
-    
-    View view = new JspView();
-    view.render(result, req, resp);
+    req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + layout);
+    req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, viewName);
+    Log.d("layoutContentView : " + viewName, TAG);
+    VIEW_CACHE.get("auto").render(result, req, resp);
   }
 
   private Action matchAction(List<ActionModel> actionModels, String uri) {
@@ -229,6 +243,7 @@ public class DefaultRequestHandler implements RequestHandler {
 
   private void setPageAttributies(HttpServletRequest req, Action reqAction) {
     String ctxPath = req.getContextPath();
+    req.setAttribute("navTag", reqAction.navTag);
     req.setAttribute("pageTitle", reqAction.pageTitle);
     String moreCss = reqAction.moreCss;
     if (CommUtil.isNotEmpty(moreCss)) {
