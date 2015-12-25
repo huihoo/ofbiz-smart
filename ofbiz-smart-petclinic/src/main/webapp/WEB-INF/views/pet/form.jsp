@@ -5,7 +5,7 @@
 	<div class="col-lg-12" >
 		<ol class="breadcrumb">
 		  <li><a href="${ctxPath }/">首页</a></li>
-		  <li><a href="${ctxPath }/list${uriSuffix}">宠物</a></li>
+		  <li><a href="${ctxPath }/pet/list${uriSuffix}">宠物</a></li>
 		  <li class="active">
 		  	<c:choose>
 		  		<c:when test="${not empty(model) }">${model.name }</c:when>
@@ -16,14 +16,18 @@
 		
 		<c:choose>
 	  		<c:when test="${not empty(model) }">
-	  			<c:set var="action" value="${ctxPath }/owner/update${uriSuffix}"></c:set>
+	  			<c:set var="action" value="${ctxPath }/pet/update${uriSuffix}"></c:set>
 	  		</c:when>
 	  		<c:otherwise>
-	  			<c:set var="action" value="${ctxPath }/owner/save${uriSuffix}"></c:set>
+	  			<c:set var="action" value="${ctxPath }/pet/save${uriSuffix}"></c:set>
 	  		</c:otherwise>
 	  	</c:choose>
 		  	
 		<form action="${action}" method="post">
+		  <input type="hidden" value="${model.id }" name="id"/>
+		  <c:if test="${empty(model) }">
+		  	<input type="hidden" value="${ownerId }" name="owner.id"/>
+		  </c:if>
 		  <div class="form-group">
 		    <label for="firstName">主人</label>
 		    <p>${owner.firstName }${owner.lastName }</p>
