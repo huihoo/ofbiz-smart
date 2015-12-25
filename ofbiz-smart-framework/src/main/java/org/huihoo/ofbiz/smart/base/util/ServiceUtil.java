@@ -2,6 +2,7 @@ package org.huihoo.ofbiz.smart.base.util;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +71,26 @@ public class ServiceUtil {
       result.put(RESPONSE_MESSAGE, message);
     }
     return result;
+  }
+  
+  
+  public static Map<String,Object> covertParamPairToMap(String paramPair) {
+    Map<String,Object> paramMap = null;
+    if (CommUtil.isNotEmpty(paramPair)) {
+      String[] paramPairToken = paramPair.split(",");
+      //if last param value is null or empty, polish it to ensure the length is even.
+      if (paramPair.endsWith(",")) {
+        paramPair += "";
+        String[] newParamPairToken = Arrays.copyOf(paramPairToken, paramPairToken.length + 1); 
+        newParamPairToken[newParamPairToken.length -1] = "";
+        paramPairToken = newParamPairToken;
+      }
+      if (paramPairToken.length % 2 != 0) {
+        throw new IllegalArgumentException("The param pairs length must be even.");
+      }
+      paramMap = CommUtil.toMap((Object[])paramPairToken);
+    }
+    return paramMap;
   }
   
 }

@@ -230,6 +230,16 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		
+		<xs:attribute name="result-name">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						给返回的结果集Map定义一个名字
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 
 	</xs:attributeGroup>
 

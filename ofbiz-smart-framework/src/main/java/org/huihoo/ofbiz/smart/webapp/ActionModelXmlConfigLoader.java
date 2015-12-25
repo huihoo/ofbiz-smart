@@ -108,6 +108,7 @@ public class ActionModelXmlConfigLoader {
           serviceCall.condition = attributes.getValue("condition");
           serviceCall.paramPairs = attributes.getValue("param-pairs");
           serviceCall.orderBy = attributes.getValue("order-by");
+          serviceCall.resultName = attributes.getValue("result-name");
           
           action.serviceCallList.add(serviceCall);
           break;

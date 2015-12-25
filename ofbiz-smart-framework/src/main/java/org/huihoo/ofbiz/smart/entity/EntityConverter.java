@@ -21,6 +21,9 @@ import ognl.Ognl;
 import ognl.OgnlException;
 
 public class EntityConverter {
+  
+  private static final String[] INGORE_INCLUDED_NAME = {"_ctx","ebean","action.config."};
+  
   private static final String TAG = EntityConverter.class.getName();
   
   private static final SimpleDateFormat FULL_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -36,6 +39,9 @@ public class EntityConverter {
       while (iter.hasNext()) {
         Entry<String, Object> entry = iter.next();
         String name = entry.getKey();
+        if (isIngore(name)) {
+          continue;
+        }
         Object value = entry.getValue();
         try {
           if (name.indexOf(".") >= 0) {
@@ -71,6 +77,15 @@ public class EntityConverter {
       return null;
     }
     
+  }
+  
+  private static boolean isIngore(String name) {
+    for (String s : INGORE_INCLUDED_NAME) {
+      if (name.indexOf(s) >= 0) {
+        return true;
+      }
+    }
+    return false;
   }
   
   @SuppressWarnings("rawtypes")

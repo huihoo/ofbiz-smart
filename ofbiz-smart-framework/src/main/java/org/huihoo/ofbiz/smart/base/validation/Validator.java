@@ -1,16 +1,37 @@
 package org.huihoo.ofbiz.smart.base.validation;
 
 
-import javassist.*;
-import ognl.Ognl;
-import ognl.OgnlException;
-import org.huihoo.ofbiz.smart.base.util.Log;
-import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.*;
-
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.huihoo.ofbiz.smart.base.util.Log;
+import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.AlphanumValidator;
+import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.DecimalMaxValidator;
+import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.DecimalMinValidator;
+import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.DecimalRangeValidator;
+import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.DigitsValidator;
+import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.EmailValidator;
+import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.MaxLengthValidator;
+import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.MaxValidator;
+import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.MinLengthValidator;
+import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.MinValidator;
+import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.NotNullValidator;
+import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.NullValidator;
+import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.PatternValidator;
+import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.RequiredValidator;
+import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.UrlValidator;
+
+import javassist.CtField;
+import javassist.NotFoundException;
+import ognl.Ognl;
+import ognl.OgnlException;
 
 public class Validator {
   private final static String TAG = Validator.class.getName();
@@ -52,11 +73,10 @@ public class Validator {
     if (target == null) {
       return constraintViolations;
     }
-    ClassPool classPool = ClassPool.getDefault();
+   
     try {
-      CtClass ctClass = classPool.get(target.getClass().getName());
-      CtField[] fields = ctClass.getDeclaredFields();
-      for (CtField f : fields) {
+      Field[] fields = target.getClass().getDeclaredFields();
+      for (Field f : fields) {
         String fieldName = f.getName();
 
         boolean exclude = false;
@@ -82,7 +102,8 @@ public class Validator {
 
         validateField(constraintViolations, profile, f, value);
       }
-    } catch (NotFoundException e) {
+    } catch (Exception e) {
+      e.printStackTrace();
       Log.w("Unable to validate for object[%s] : %s", TAG, target, e.getMessage());
     }
 
@@ -91,7 +112,7 @@ public class Validator {
 
 
   @SuppressWarnings({"unchecked", "rawtypes"})
-  private static void validateField(List<ConstraintViolation> constraintViolations, ValidateProfile profile, CtField f,
+  private static void validateField(List<ConstraintViolation> constraintViolations, ValidateProfile profile, Field f,
       Object value) {
     Object[] annos = null;
     try {
@@ -185,8 +206,6 @@ public class Validator {
         }
       }
 
-    } catch (ClassNotFoundException e) {
-      Log.w("Unable to validate for field[%s] : %s", TAG, f, e.getMessage());
     } catch (InstantiationException e) {
       Log.w("Unable to validate for field[%s] : %s", TAG, f, e.getMessage());
     } catch (IllegalAccessException e) {

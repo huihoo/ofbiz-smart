@@ -91,6 +91,7 @@ public class ActionModel implements Serializable {
     public String paramPairs; 
     public String condition;
     public String orderBy;
+    public String resultName;
     @Override
     public String toString() {
       StringBuilder builder = new StringBuilder();

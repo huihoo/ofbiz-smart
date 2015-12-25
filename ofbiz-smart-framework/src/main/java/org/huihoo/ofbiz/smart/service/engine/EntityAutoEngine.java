@@ -2,7 +2,7 @@ package org.huihoo.ofbiz.smart.service.engine;
 
 
 
-import java.lang.reflect.Field;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -67,8 +67,12 @@ public class EntityAutoEngine extends GenericAsyncEngine {
       }
     }
     try {
+      Boolean useCache = (Boolean) ctx.get(C.ENTITY_USE_CACHE);
+      if (useCache == null) {
+        useCache = Boolean.FALSE;
+      }
       Map<String,Object> successResult = ServiceUtil.returnSuccess();
-      String returnName = (String) ctx.get(C.ENTITY_RETURN_NAME);
+      String resultName = (String) ctx.get(C.SERVICE_RESULT_NAME_ATTRIBUTE);
       switch (serviceModel.invoke) {
         case C.SERVICE_ENGITYAUTO_CREATE:
           Object modelObj = EntityConverter.convertFrom(entityClazz, ctx, delegator);
@@ -78,8 +82,8 @@ public class EntityAutoEngine extends GenericAsyncEngine {
                                                                                             constraintViolations);
           }
           delegator.save(modelObj);  
-          if (returnName != null) {
-            successResult.put(returnName, modelObj);
+          if (resultName != null) {
+            successResult.put(resultName, modelObj);
           } else {
             successResult.put(C.ENTITY_MODEL_NAME, modelObj);
           }
@@ -94,8 +98,8 @@ public class EntityAutoEngine extends GenericAsyncEngine {
             modelObj = EntityConverter.convertFrom(obj.getClass(), ctx, delegator);
             delegator.save(modelObj); 
 
-            if (returnName != null) {
-              successResult.put(returnName, modelObj);
+            if (resultName != null) {
+              successResult.put(resultName, modelObj);
             } else {
               successResult.put(C.ENTITY_MODEL_NAME, modelObj);
             }
@@ -120,29 +124,24 @@ public class EntityAutoEngine extends GenericAsyncEngine {
           }
           break;
         case C.SERVICE_ENGITYAUTO_FINDBYID:
-          Boolean useCache = (Boolean) ctx.get(C.ENTITY_USE_CACHE);
-          if (useCache == null) {
-            useCache = Boolean.FALSE;
-          }
           id = ctx.get(C.ENTITY_ID_NAME);
           if (CommUtil.isEmpty(id)) {
             return ServiceUtil.returnProplem("ENTITY_ID_REQUIRED","The entity id required.");
           }
           obj = delegator.findById(entityClazz, id,useCache);
-          if (returnName != null) {
-            successResult.put(returnName, obj);
+          if (resultName != null) {
+            successResult.put(resultName, obj);
           } else {
             successResult.put(C.ENTITY_MODEL_NAME, obj);
           }
           break;
         case C.SERVICE_ENGITYAUTO_FINDLISTBYAND:
         case C.SERVICE_ENGITYAUTO_FINDLISTBYCOND:
-          useCache = (Boolean) ctx.get(C.ENTITY_USE_CACHE);
           String condition = (String) ctx.get(C.ENTITY_CONDTION);
           Map<String, Object> andMap = (Map<String, Object>) ctx.get(C.ENTITY_ANDMAP);
           Set<String> fieldsToSelect = (Set<String>) ctx.get(C.ENTITY_FIELDS_TO_SELECT);
           List<String> orderBy = (List<String>) ctx.get(C.ENTITY_ORDERBY);
-          if (orderBy == null && entityClazz.getDeclaredField(C.ENTITY_UPDATED_AT) != null) {
+          if (orderBy == null && hasUpdatedAtField(entityClazz)) {
             orderBy = Arrays.asList(new String[]{C.ENTITY_ORDERBY_DEFAULT_FIELD});
           }
           List<?> pList = null;
@@ -151,18 +150,14 @@ public class EntityAutoEngine extends GenericAsyncEngine {
           } else {
             pList = delegator.findListByAnd(entityClazz, andMap, fieldsToSelect, orderBy, useCache);
           }
-          if (returnName != null) {
-            successResult.put(returnName, pList);
+          if (resultName != null) {
+            successResult.put(resultName, pList);
           } else {
             successResult.put(C.ENTITY_MODEL_LIST, pList);
           }
           break;
         case C.SERVICE_ENGITYAUTO_FINDPAGEBYAND:
         case C.SERVICE_ENGITYAUTO_FINDPAGEBYCOND:
-          useCache = (Boolean) ctx.get(C.ENTITY_USE_CACHE);
-          if (useCache == null) {
-            useCache = Boolean.FALSE;
-          }
           condition = (String) ctx.get(C.ENTITY_CONDTION);
           andMap = (Map<String, Object>) ctx.get(C.ENTITY_ANDMAP);
           fieldsToSelect = (Set<String>) ctx.get(C.ENTITY_FIELDS_TO_SELECT);
@@ -179,8 +174,8 @@ public class EntityAutoEngine extends GenericAsyncEngine {
           } else {
             pMap = delegator.findPageByAnd(entityClazz, andMap, pageNo, pageSize, fieldsToSelect, orderBy, useCache);
           }
-          if (CommUtil.isNotEmpty(returnName)) {
-            successResult.put(returnName, pMap);
+          if (CommUtil.isNotEmpty(resultName)) {
+            successResult.put(resultName, pMap);
           } else {
             successResult.putAll(pMap);
           }

@@ -7,6 +7,8 @@ public final class C {
   public static final String PROFILE_PRODUCTION = "production";
   public static final String ACTION_CONFIG_BASEPATH_KEY = "action.config.basepath";
   
+  public static final String SEED_DATA_SQL_FILE_ATTRIBUTE = "seed.data.sql.file";
+  
   public static final String JSP_VIEW_NAME_ATTRIBUTE = "viewName";
   public static final String JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE = "layoutContentView";
   
@@ -28,6 +30,7 @@ public final class C {
   public static final String CTX_ACTION_MODEL = "_ctx_action_model_";
   public static final String CTX_URI_SUFFIX = "_ctx_uri_suffix_";
   public static final String CTX_JSP_VIEW_BASEPATH = "_ctx_jsp_view_basepath_";
+  public static final String CTX_SUPPORTED_VIEW_ATTRIBUTE = "_ctx_supported_view_";
   // ========================================================================================
   // Cache Related Flag
   // ========================================================================================
@@ -49,7 +52,6 @@ public final class C {
   // ========================================================================================
   public static final String ENTITY_ID_NAME = "id";
   public static final String ENTITY_MODEL_NAME = "model";
-  public static final String ENTITY_RETURN_NAME = "returnName";
   public static final String ENTITY_REMOVED_NAME = "removed";
   public static final String ENTITY_MODEL_LIST  = "list";
   public static final String ENTITY_USE_CACHE = "useCache";
@@ -72,7 +74,8 @@ public final class C {
   public static final String SERVICE_ENGITYAUTO_FINDPAGEBYAND = "findPageByAnd";
   public static final String SERVICE_ENGITYAUTO_FINDPAGEBYCOND = "findPageByCondition";
   public static final String SERVICE_SLOWTIME_MILLISECONDS = "service.slowtime.milliseconds";
-  
+
+  public static final String SERVICE_RESULT_NAME_ATTRIBUTE = "resultName";
   public static final String SERVICE_SCANNING_NAMES = "service.scanning.resource.names";
   public static final String ENTITY_SCANNING_PACKAGES = "entity.scanning.packages";
   

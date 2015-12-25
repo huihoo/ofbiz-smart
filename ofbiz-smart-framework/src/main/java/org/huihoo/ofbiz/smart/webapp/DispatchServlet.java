@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.cache.Cache;
 import org.huihoo.ofbiz.smart.base.cache.SimpleCacheManager;
@@ -29,6 +30,7 @@ import org.huihoo.ofbiz.smart.webapp.handler.DefaultRequestHandler;
 import org.huihoo.ofbiz.smart.webapp.handler.HttpApiRequestHandler;
 import org.huihoo.ofbiz.smart.webapp.handler.RequestHandler;
 import org.huihoo.ofbiz.smart.webapp.handler.RestfulRequestHandler;
+import org.huihoo.ofbiz.smart.webapp.view.View;
 
 
 public class DispatchServlet extends HttpServlet {
@@ -38,6 +40,10 @@ public class DispatchServlet extends HttpServlet {
 
   private static volatile Cache<String, RequestHandler> HANDLER_CACHE;
 
+  @SuppressWarnings("unchecked")
+  private final static Cache<String,View> VIEW_CACHE = 
+                            (Cache<String,View>) SimpleCacheManager.createCache("Request-View-Cache");
+  
   /** JSP界面所在跟目录 */
   private volatile String jspViewBathPath;
   /** 请求uri后缀 */
@@ -49,6 +55,13 @@ public class DispatchServlet extends HttpServlet {
   /** api 文档请求uri根 */
   private volatile String apiDocUriBase;
   
+  private static final String[] BUILTIN_VIEWS = {
+                     "json#org.huihoo.ofbiz.smart.webapp.view.JsonView",
+                     "jsp#org.huihoo.ofbiz.smart.webapp.view.JspView",
+                     "redirect#org.huihoo.ofbiz.smart.webapp.view.RedirectView",
+                     "xml#org.huihoo.ofbiz.smart.webapp.view.XmlView",
+                     "doc#org.huihoo.ofbiz.smart.webapp.view.HttpApiDocView",
+  };
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -165,6 +178,8 @@ public class DispatchServlet extends HttpServlet {
 
     HANDLER_CACHE =
             (Cache<String, RequestHandler>) SimpleCacheManager.createCache("RequestHandler-Cache");
+    
+    loadSeedData(sc);
 
   }
 
@@ -195,5 +210,60 @@ public class DispatchServlet extends HttpServlet {
     List<ActionModel> actionModels = new ArrayList<>();
     ActionModelXmlConfigLoader.me().loadXml(FlexibleLocation.resolveLocation(actionConfigBasePath).getPath(),actionModels);
     servletContext.setAttribute(C.CTX_ACTION_MODEL,actionModels);
+    
+    String[] customSupportedView = null;
+    String supportedViews = applicationConfig.getProperty("webapp.supported.views");
+    if (CommUtil.isNotEmpty(supportedViews)) {
+      customSupportedView = supportedViews.split(",");
+    }
+    
+    String[] allSupportedViews = null;
+    if (CommUtil.isNotEmpty(customSupportedView)) {
+      allSupportedViews = new String[BUILTIN_VIEWS.length + customSupportedView.length];
+      System.arraycopy(BUILTIN_VIEWS, 0, allSupportedViews, 0, BUILTIN_VIEWS.length);
+      System.arraycopy(customSupportedView, BUILTIN_VIEWS.length - 1, customSupportedView, 0, customSupportedView.length);
+    } else {
+      allSupportedViews = BUILTIN_VIEWS;
+    }
+    
+    for (String view : allSupportedViews) {
+      String[] viewToken = view.split("#");
+      String viewType = viewToken[0];
+      String viewName = viewToken[1];
+      try {
+        VIEW_CACHE.put(viewType, (View) Class.forName(viewName).newInstance());
+        Log.d("Loaded view [%s] [%s]", TAG,viewType,viewName);
+      } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+        Log.e(e, "Unable to load supported view [" + viewType+ "] [" + viewName +"]", TAG);
+      }
+    }
+    servletContext.setAttribute(C.CTX_SUPPORTED_VIEW_ATTRIBUTE,VIEW_CACHE);   
+  }
+  
+  protected void loadSeedData(ServletContext servletContext){
+    //Load seed data
+    Properties applicationConfig = (Properties) servletContext.getAttribute(C.APPLICATION_CONFIG_PROP_KEY);
+    String seedDataSqlFile = applicationConfig.getProperty(C.SEED_DATA_SQL_FILE_ATTRIBUTE);
+    if (CommUtil.isNotEmpty(seedDataSqlFile)) {
+      Delegator delegator = (Delegator) servletContext.getAttribute(C.CTX_DELETAGOR);
+      String[] sqlFileArray = seedDataSqlFile.split(",");
+      for (String sqlFile : sqlFileArray) {
+        List<String> sqlLine;
+        try {
+          sqlLine = IOUtils.readLines(FlexibleLocation.resolveLocation(sqlFile).openStream());
+          for (String sql : sqlLine) {
+            try {
+              delegator.executeByRawSql(sql);
+            } catch (GenericEntityException e) {
+              Log.w("Unable to execute sql : " + sql, TAG);
+            }
+          }
+        } catch (MalformedURLException e1) {
+          Log.w("Unable to load sql file : " + sqlFile, TAG);
+        } catch (IOException e1) {
+          Log.w("Unable to load sql file : " + sqlFile, TAG);
+        }
+      }
+    }
   }
 }

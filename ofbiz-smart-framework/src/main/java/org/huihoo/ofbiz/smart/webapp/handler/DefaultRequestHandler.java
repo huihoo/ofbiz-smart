@@ -2,7 +2,6 @@ package org.huihoo.ofbiz.smart.webapp.handler;
 
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -28,12 +27,11 @@ import org.huihoo.ofbiz.smart.webapp.ProcessType;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.Action;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.ServiceCall;
 import org.huihoo.ofbiz.smart.webapp.WebAppUtil;
-import org.huihoo.ofbiz.smart.webapp.view.JsonView;
-import org.huihoo.ofbiz.smart.webapp.view.JspView;
-import org.huihoo.ofbiz.smart.webapp.view.RedirectView;
 import org.huihoo.ofbiz.smart.webapp.view.View;
 import org.huihoo.ofbiz.smart.webapp.view.ViewException;
-import org.huihoo.ofbiz.smart.webapp.view.XmlView;
+
+import ognl.Ognl;
+import ognl.OgnlException;
 
 
 
@@ -45,20 +43,19 @@ public class DefaultRequestHandler implements RequestHandler {
   private final static Cache<String,String> ENTITY_CLAZZ_NAME_CACHE = 
                    (Cache<String,String>) SimpleCacheManager.createCache("Request-Handler-EntityClazz-Cache");
   
-  @SuppressWarnings("unchecked")
-  private final static Cache<String,View> VIEW_CACHE = 
-                            (Cache<String,View>) SimpleCacheManager.createCache("Request-Handler-View-Cache");
+  
   
   @SuppressWarnings("unchecked")
   @Override
   public void handleRequest(HttpServletRequest req, HttpServletResponse resp)
           throws ServletException, IOException {
     ServletContext sc = req.getServletContext();
+    
     Delegator delegator = (Delegator) sc.getAttribute(C.CTX_DELETAGOR);
-    ServiceDispatcher serviceDispatcher =
-            (ServiceDispatcher) sc.getAttribute(C.CTX_SERVICE_DISPATCHER);
+    ServiceDispatcher serviceDispatcher = (ServiceDispatcher) sc.getAttribute(C.CTX_SERVICE_DISPATCHER);
     Properties applicationConfig = (Properties) sc.getAttribute(C.APPLICATION_CONFIG_PROP_KEY);
     List<ActionModel> actionModels = (List<ActionModel>) sc.getAttribute(C.CTX_ACTION_MODEL);
+    Cache<String,View> viewCache = (Cache<String,View>) sc.getAttribute(C.CTX_SUPPORTED_VIEW_ATTRIBUTE);
     String jspViewBasePath = (String) sc.getAttribute(C.CTX_JSP_VIEW_BASEPATH);
     String uriSuffix = (String) sc.getAttribute(C.CTX_URI_SUFFIX);
 
@@ -73,7 +70,7 @@ public class DefaultRequestHandler implements RequestHandler {
     Action reqAction = matchAction(actionModels, targetUri);
     Log.d("Action : " + reqAction, TAG);
     if (reqAction != null) {
-      Map<String, Object> modelMap = new LinkedHashMap<>();
+      Map<String, Object> modelMap = ServiceUtil.returnSuccess();
       Map<String, Object> ctx = WebAppUtil.buildWebCtx(req);
 
       // TODO request convert to map
@@ -81,7 +78,28 @@ public class DefaultRequestHandler implements RequestHandler {
       List<ServiceCall> serviceCalls = reqAction.serviceCallList;
       if (CommUtil.isNotEmpty(serviceCalls)) {
         for (ServiceCall serviceCall : serviceCalls) {
-          Map<String, Object> sResult = serviceDispatcher.runSync(serviceCall.serviceName, ctx);
+          ctx.put(C.SERVICE_RESULT_NAME_ATTRIBUTE, serviceCall.resultName);
+          
+          ServiceModel sm = new ServiceModel();
+          if (CommUtil.isNotEmpty(serviceCall.paramPairs)) {
+            String p = WebAppUtil.analyzeParamPairString(serviceCall.paramPairs, req);
+            ctx.putAll(ServiceUtil.covertParamPairToMap(p));
+          }
+          
+          if (serviceCall.serviceName.startsWith("entityAuto#")) {
+            sm.name = serviceCall.serviceName;
+            sm.engineName = "entityAuto";
+            sm.entityName = serviceCall.entityName;
+            sm.invoke = serviceCall.serviceName.substring("entityAuto#".length());
+          } else {
+            sm.name = serviceCall.serviceName;
+            sm.engineName = "java";
+          }
+          
+          serviceDispatcher.registerService(sm);
+          
+          Map<String, Object> sResult = serviceDispatcher.runSync(sm.name, ctx);
+          
           if (ServiceUtil.isSuccess(sResult)) {
             modelMap.putAll(sResult);
           }
@@ -101,32 +119,8 @@ public class DefaultRequestHandler implements RequestHandler {
         viewType = "jsp";
       }
 
-      View view = VIEW_CACHE.get(viewType);
-      if (view == null) {
-        switch (viewType) {
-          case "jsp":
-            view = new JspView();
-            break;
-          case "json":
-            view = new JsonView();
-            break;
-          case "xml":
-            view = new XmlView();
-            break;
-          case "redirect":
-            view = new RedirectView();
-            break;
-          case "auto":
-            view = new JspView();
-            break;
-          default:
-            view = new JspView();
-            break;
-        }
-        VIEW_CACHE.put(viewType, view);
-      }
+      View view = viewCache.get(viewType);
       
-
       if (ProcessType.URI_AUTO.value().equals(reqAction.processType)) {
         String viewName = null;
         if (layout != null) {
@@ -139,7 +133,9 @@ public class DefaultRequestHandler implements RequestHandler {
       } else if (ProcessType.ENTITY_AUTO.value().equals(reqAction.processType)) {
 
         try {
-          doEntityAutoAction(serviceDispatcher, req, resp,applicationConfig, targetUri, jspViewBasePath,ctx,layout);
+          view = viewCache.get("jsp");
+          doEntityAutoAction(modelMap,serviceDispatcher, req, resp,applicationConfig, targetUri, 
+                                                          jspViewBasePath,uriSuffix,viewCache,view,ctx,layout);
         } catch (ViewException e) {
           throw new ServletException(e);
         }
@@ -153,17 +149,21 @@ public class DefaultRequestHandler implements RequestHandler {
       try {
         view.render(modelMap, req, resp);
       } catch (ViewException e) {
-        e.printStackTrace();
+        throw new ServletException(e);
       }
     }
   }
 
-  private void doEntityAutoAction(ServiceDispatcher serviceDispatcher, 
+  private void doEntityAutoAction(Map<String,Object> modelMap,
+                                  ServiceDispatcher serviceDispatcher, 
                                   HttpServletRequest req,
                                   HttpServletResponse resp,
                                   Properties applicationConfig,
                                   String targetUri, 
                                   String jspViewBasePath,
+                                  String uriSuffix,
+                                  Cache<String, View> viewCache,
+                                  View view,
                                   Map<String,Object> ctx,
                                   String layout) throws ViewException {
     
@@ -194,13 +194,15 @@ public class DefaultRequestHandler implements RequestHandler {
       throw new IllegalArgumentException("Entity name [" + guessEntityName + "] related to entity class not found.");
     }
     
-    Map<String,Object> result = new LinkedHashMap<>();
+    Map<String,Object> result = ServiceUtil.returnSuccess();
     
     ServiceModel sm = new ServiceModel();
     sm.engineName = "entityAuto";
     sm.entityName = entityClazzName;
     
     String viewName = "";
+    View redirectView = null;
+    
     if (targetUri.endsWith("/list") || targetUri.endsWith("/index")) {
       sm.name = sm.engineName + "#" + C.SERVICE_ENGITYAUTO_FINDPAGEBYCOND;
       sm.invoke = C.SERVICE_ENGITYAUTO_FINDPAGEBYCOND;
@@ -211,9 +213,19 @@ public class DefaultRequestHandler implements RequestHandler {
       sm.name = sm.engineName + "#" + C.SERVICE_ENGITYAUTO_CREATE;
       sm.invoke = C.SERVICE_ENGITYAUTO_CREATE;
       viewName = jspViewBasePath + "/" +firstUriString + "/view.jsp";
+      
+      redirectView = viewCache.get("redirect");
+      
     } else if (targetUri.endsWith("/update") || targetUri.endsWith("/modify")) {
       sm.name = sm.engineName + "#" + C.SERVICE_ENGITYAUTO_UPDATE;
       sm.invoke = C.SERVICE_ENGITYAUTO_UPDATE;
+      viewName = jspViewBasePath + "/" +firstUriString + "/view.jsp";
+      
+      redirectView = viewCache.get("redirect");
+      
+    } else if (targetUri.endsWith("/view") || targetUri.endsWith("/detail")) {
+      sm.name = sm.engineName + "#" + C.SERVICE_ENGITYAUTO_FINDBYID;
+      sm.invoke = C.SERVICE_ENGITYAUTO_FINDBYID;
       viewName = jspViewBasePath + "/" +firstUriString + "/view.jsp";
     }
     
@@ -223,10 +235,29 @@ public class DefaultRequestHandler implements RequestHandler {
       result = serviceDispatcher.runSync(sm.name, ctx);
     }
     
-    req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + layout);
-    req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, viewName);
-    Log.d("layoutContentView : " + viewName, TAG);
-    VIEW_CACHE.get("auto").render(result, req, resp);
+    
+    if (ServiceUtil.isSuccess(result)) {
+      
+      modelMap.putAll(result);
+      
+      if (redirectView != null) {
+        Object idValue;
+        try {
+          idValue = Ognl.getValue("id", result.get(C.ENTITY_MODEL_NAME));
+        } catch (OgnlException e) {
+          throw new ViewException("Unable to get id");
+        }
+        req.setAttribute("targetUri", req.getServletContext() + "/" + firstUriString + "/view" + uriSuffix + "?id=" + idValue);
+        redirectView.render(modelMap, req, resp);
+      } else {
+        req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + layout);
+        req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, viewName);
+        Log.d("layoutContentView : " + viewName, TAG);
+        view.render(modelMap, req, resp);
+      }
+    } else {
+      
+    }
   }
 
   private Action matchAction(List<ActionModel> actionModels, String uri) {
