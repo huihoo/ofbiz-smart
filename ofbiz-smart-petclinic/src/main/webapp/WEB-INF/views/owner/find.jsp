@@ -1,8 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<div class="row">
+<div class="row" style="margin-top: 50px;">
 	<div class="col-lg-12">
-		<h1 >查找宠物主人</h1>
+		<ol class="breadcrumb">
+		  <li><a href="${ctxPath }/">首页</a></li>
+		  <li class="active">查找宠物主人</li>
+		</ol>
 		
 		<form class="form-horizontal well" action="${ctxPath }/owner/list${uriSuffix}">
 		   <div class="input-group">

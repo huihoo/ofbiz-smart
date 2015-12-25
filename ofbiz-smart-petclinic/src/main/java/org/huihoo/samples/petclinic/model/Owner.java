@@ -1,6 +1,9 @@
 package org.huihoo.samples.petclinic.model;
 
+import java.util.Set;
+
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -11,6 +14,9 @@ public class Owner extends Person {
   private String city;
 
   private String telephone;
+  
+  @OneToMany
+  private Set<Pet> pets;
 
   public String getAddress() {
     return address;
@@ -34,6 +40,14 @@ public class Owner extends Person {
 
   public void setTelephone(String telephone) {
     this.telephone = telephone;
+  }
+
+  public Set<Pet> getPets() {
+    return pets;
+  }
+
+  public void setPets(Set<Pet> pets) {
+    this.pets = pets;
   }
   
   

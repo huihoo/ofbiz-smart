@@ -24,6 +24,24 @@
 	</action>
 	
 	<action uri="/owner/**" process-type="entityAuto"  nav-tag="owner">
-		<response layout="/layout/layout.jsp"  view-type="auto"/>
+		<response layout="/layout/layout.jsp"/>
+	</action>
+	
+	<action uri="/pet/create" process-type="entityAuto"  nav-tag="pet">
+		
+		<service-call service-name="entityAuto#findById" 
+		              entity-name="org.huihoo.samples.petclinic.model.Owner"
+		              result-name="owner" 
+		              param-pairs="id,requestScope.ownerId"/>
+		              
+		<service-call service-name="entityAuto#findListByAnd" 
+		              entity-name="org.huihoo.samples.petclinic.model.PetType"
+		              result-name="petTypes" />
+		              
+		<response layout="/layout/layout.jsp"/>
+	</action>
+	
+	<action uri="/pet/**" process-type="entityAuto"  nav-tag="pet">
+		<response layout="/layout/layout.jsp"/>
 	</action>
 </action-map>
