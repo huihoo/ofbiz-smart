@@ -2,15 +2,15 @@
 <action-map xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="../../../../../ofbiz-smart-framework/src/main/resources/META-INF/action-map.xsd">
 	
-	<action uri="/index" process-type="uriAuto">
+	<action uri="/index" process-type="uriAuto"  nav-tag="home">
 		<response layout="/layout/layout.jsp" />
 	</action>
 	
 	
-	<action uri="/owner/findOwners" process-type="uriAuto">
+	<action uri="/owner/findOwners" process-type="uriAuto"  nav-tag="owner">
 	</action>
 
-	<action uri="/owner/findOwners_with_layout" process-type="uriAuto">
+	<action uri="/owner/findOwners_with_layout" process-type="uriAuto"  nav-tag="owner">
 		<page-title>findOwners_with_layout</page-title>
 		<more-css>/css/abc/1.css,/css/abc/2.css</more-css>
 		<more-javascripts>/js/2.js,/js/3.js</more-javascripts>
@@ -18,7 +18,12 @@
 	</action>
 	
 	
-	<action uri="/owner/**" process-type="entityAuto">
+	<action uri="/owner/find" process-type="uriAuto" nav-tag="owner">
+		<page-title>查找宠物主人</page-title>
+		<response layout="/layout/layout.jsp"/>
+	</action>
+	
+	<action uri="/owner/**" process-type="entityAuto"  nav-tag="owner">
 		<response layout="/layout/layout.jsp"  view-type="auto"/>
 	</action>
 </action-map>

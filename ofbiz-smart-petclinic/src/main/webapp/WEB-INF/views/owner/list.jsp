@@ -1,16 +1,27 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Insert title here</title>
-<link rel="stylesheet" href="/css/bootstrap.min.css">
-</head>
-<body>
-
-<h1>FIND OWNERES</h1> ${name }
-
-<script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-</body>
-</html>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<div class="row" style="margin-top: 100px; ">
+	<div class="col-lg-12 table-responsive" >
+		<table class="table table-hover table-bordered">
+	      <thead>
+	        <tr>
+	          <th>#</th>
+	          <th>姓氏</th>
+	          <th>名字</th>
+	          <th>操作</th>
+	        </tr>
+	      </thead>
+	      <tbody>
+	      	<c:forEach items="${list }" var="c">
+	      	 	<tr>
+		          <th scope="row">${c.id }</th>
+		          <td>${c.firstName }</td>
+		          <td>${c.lastName }</td>
+		          <td>@mdo</td>
+		        </tr>	
+	      	</c:forEach>
+	       
+	      </tbody>
+	    </table>
+	</div>
+</div>
