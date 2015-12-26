@@ -108,47 +108,106 @@ public interface Delegator {
 
   Object findById(Class<?> entityClazz, Object id, boolean useCache) throws GenericEntityException;
 
+  Object findById(Class<?> entityClazz, Object id, boolean useCache, 
+                                                   int liveTimeInSeconds) throws GenericEntityException;
+
   List<Object> findIdsByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException;
 
   List<Object> findIdsByCond(Class<?> entityClazz, String cond) throws GenericEntityException;
 
-  List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap)throws GenericEntityException;
-  
-  List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap, List<String> orderBy)throws GenericEntityException;
-  
-  List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap, Set<String> fieldsToSelect,List<String> orderBy,boolean useCache) 
-          throws GenericEntityException;
-  
+  List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException;
+
+  List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap, 
+                                              List<String> orderBy) throws GenericEntityException;
+
+  List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap,
+                                              Set<String> fieldsToSelect, 
+                                              List<String> orderBy, 
+                                              boolean useCache) throws GenericEntityException;
+
+  List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap,
+                                              Set<String> fieldsToSelect, 
+                                              List<String> orderBy, 
+                                              boolean useCache, 
+                                              int liveTimeInSeconds) throws GenericEntityException;
+
   Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException;
 
-  Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap, Set<String> fieldsToSelect, boolean useCache)
-      throws GenericEntityException;
+  Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap,
+                                               Set<String> fieldsToSelect, 
+                                               boolean useCache) throws GenericEntityException;
+
+  Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap,
+                                               Set<String> fieldsToSelect, 
+                                               boolean useCache, 
+                                               int liveTimeInSeconds) throws GenericEntityException;
 
   List<?> findListByCond(Class<?> entityClazz, String cond) throws GenericEntityException;
 
-  List<?> findListByCond(Class<?> entityClazz, String cond, Set<String> fieldsToSelect, List<String> orderBy)
-      throws GenericEntityException;
+  List<?> findListByCond(Class<?> entityClazz, String cond, 
+                                               Set<String> fieldsToSelect,
+                                               List<String> orderBy) throws GenericEntityException;
 
-  List<?> findListByCond(Class<?> entityClazz, String cond, Set<String> fieldsToSelect, List<String> orderBy,
-      boolean useCache) throws GenericEntityException;
+  List<?> findListByCond(Class<?> entityClazz, String cond, 
+                                               Set<String> fieldsToSelect,
+                                               List<String> orderBy, 
+                                               boolean useCache) throws GenericEntityException;
 
-  Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, int pageNo, int pageSize)
-      throws GenericEntityException;
+  List<?> findListByCond(Class<?> entityClazz, String cond, 
+                                               Set<String> fieldsToSelect,
+                                               List<String> orderBy, 
+                                               boolean useCache, 
+                                               int liveTimeInSeconds) throws GenericEntityException;
 
-  Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, int pageNo, int pageSize,
-      Set<String> fieldsToSelect, List<String> orderBy) throws GenericEntityException;
+  Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, 
+                                                          int pageNo,
+                                                          int pageSize) throws GenericEntityException;
 
-  Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, int pageNo, int pageSize,
-      Set<String> fieldsToSelect, List<String> orderBy, boolean useCache) throws GenericEntityException;
+  Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, 
+                                                          int pageNo,
+                                                          int pageSize, 
+                                                          Set<String> fieldsToSelect, 
+                                                          List<String> orderBy) throws GenericEntityException;
 
-  Map<String, Object> findPageByCond(Class<?> entityClazz, String cond, int pageNo, int pageSize)
-      throws GenericEntityException;
+  Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, 
+                                                          int pageNo,
+                                                          int pageSize, 
+                                                          Set<String> fieldsToSelect, 
+                                                          List<String> orderBy, 
+                                                          boolean useCache) throws GenericEntityException;
 
-  Map<String, Object> findPageByCond(Class<?> entityClazz, String cond, int pageNo, int pageSize,
-      Set<String> fieldsToSelect, List<String> orderBy) throws GenericEntityException;
+  Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, 
+                                                          int pageNo,
+                                                          int pageSize, 
+                                                          Set<String> fieldsToSelect, 
+                                                          List<String> orderBy, 
+                                                          boolean useCache,
+                                                          int liveTimeInSeconds) throws GenericEntityException;
 
-  Map<String, Object> findPageByCond(Class<?> entityClazz, String cond, int pageNo, int pageSize,
-      Set<String> fieldsToSelect, List<String> orderBy, boolean useCache) throws GenericEntityException;
+  Map<String, Object> findPageByCond(Class<?> entityClazz, String cond, 
+                                                           int pageNo, 
+                                                           int pageSize) throws GenericEntityException;
+
+  Map<String, Object> findPageByCond(Class<?> entityClazz, String cond, 
+                                                           int pageNo, 
+                                                           int pageSize,
+                                                           Set<String> fieldsToSelect, 
+                                                           List<String> orderBy) throws GenericEntityException;
+
+  Map<String, Object> findPageByCond(Class<?> entityClazz, String cond, 
+                                                           int pageNo, 
+                                                           int pageSize,
+                                                           Set<String> fieldsToSelect, 
+                                                           List<String> orderBy, 
+                                                           boolean useCache) throws GenericEntityException;
+
+  Map<String, Object> findPageByCond(Class<?> entityClazz, String cond, 
+                                                           int pageNo, 
+                                                           int pageSize,
+                                                           Set<String> fieldsToSelect, 
+                                                           List<String> orderBy, 
+                                                           boolean useCache, 
+                                                           int liveTimeInSeconds) throws GenericEntityException;
 
   int countByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException;
 
@@ -159,8 +218,8 @@ public interface Delegator {
   // =====================================================================================
   List<Map<String, Object>> findListByRawQuery(String query, List<?> params) throws GenericEntityException;
 
-  List<Map<String, Object>> findListByRawQuery(String query, List<?> params, boolean useCache)
-      throws GenericEntityException;
+  List<Map<String, Object>> findListByRawQuery(String query, List<?> params, 
+                                                             boolean useCache) throws GenericEntityException;
 
   int executeByRawSql(String sql) throws GenericEntityException;
 

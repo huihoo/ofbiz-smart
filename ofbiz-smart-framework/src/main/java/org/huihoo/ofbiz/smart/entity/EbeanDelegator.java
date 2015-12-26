@@ -229,6 +229,11 @@ public class EbeanDelegator implements Delegator {
 
   @Override
   public Object findById(Class<?> entityClazz, Object id, boolean useCache) throws GenericEntityException {
+    return findById(entityClazz, id, useCache, 0);
+  }
+  
+  @Override
+  public Object findById(Class<?> entityClazz, Object id, boolean useCache,int liveTimeInSeconds) throws GenericEntityException {
     try {
       if (useCache) {
         String cacheKey = entityClazz + "#" + id;
@@ -239,7 +244,7 @@ public class EbeanDelegator implements Delegator {
         }
         Object fromDbObj = currentServerMap.get(CURRENT_SERVER_NAME).find(entityClazz, id);
         if (fromDbObj != null) {
-          CACHE.put(cacheKey, fromDbObj);
+          CACHE.put(cacheKey, fromDbObj,liveTimeInSeconds);
         }
         return fromDbObj;
 
@@ -288,6 +293,13 @@ public class EbeanDelegator implements Delegator {
   @Override
   public Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap, Set<String> fieldsToSelect,
       boolean useCache) throws GenericEntityException {
+    return findUniqueByAnd(entityClazz, andMap, fieldsToSelect, useCache, 0);
+  }
+  
+  
+  @Override
+  public Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap, Set<String> fieldsToSelect,
+      boolean useCache,int liveTimeInSeconds) throws GenericEntityException {
     try {
       if (CommUtil.isEmpty(andMap)) {
         return null;
@@ -309,7 +321,7 @@ public class EbeanDelegator implements Delegator {
 
       Object fromDbObj = expList.findUnique();
       if (useCache && fromDbObj != null) {
-        CACHE.put(cacheKey, fromDbObj);
+        CACHE.put(cacheKey, fromDbObj,liveTimeInSeconds);
       }
       return fromDbObj;
     } catch (Exception e) {
@@ -334,6 +346,13 @@ public class EbeanDelegator implements Delegator {
   @Override
   public List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap,
           Set<String> fieldsToSelect, List<String> orderBy,boolean useCache) throws GenericEntityException {
+    return findListByAnd(entityClazz, andMap, fieldsToSelect, orderBy, useCache, 0);
+  }
+  
+  
+  @Override
+  public List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap,
+          Set<String> fieldsToSelect, List<String> orderBy,boolean useCache,int liveTimeInSeconds) throws GenericEntityException {
     String cacheKey =  "findListByAnd#" + andMap + "#" + fieldsToSelect;
     if (useCache) {
       List<?> cachedObj = (List<?>) CACHE.get(cacheKey);
@@ -353,7 +372,7 @@ public class EbeanDelegator implements Delegator {
     }
     List<?> result = expList.findList();
     if (useCache && result != null) {
-      CACHE.put(cacheKey, result);
+      CACHE.put(cacheKey, result,liveTimeInSeconds);
     }
     return result;
   }
@@ -372,6 +391,12 @@ public class EbeanDelegator implements Delegator {
   @Override
   public List<?> findListByCond(Class<?> entityClazz, String cond, Set<String> fieldsToSelect, List<String> orderBy,
       boolean useCache) throws GenericEntityException {
+    return findListByCond(entityClazz, cond, fieldsToSelect, orderBy, useCache, 0);
+  }
+  
+  @Override
+  public List<?> findListByCond(Class<?> entityClazz, String cond, Set<String> fieldsToSelect, List<String> orderBy,
+      boolean useCache,int liveTimeInSeconds) throws GenericEntityException {
     try {
       String cacheKey = entityClazz + "#" + cond + "#" + fieldsToSelect + "#" + orderBy;
       if (useCache) {
@@ -387,7 +412,7 @@ public class EbeanDelegator implements Delegator {
       buildExpressList(expList, cond, orderBy);
       List<?> objList = expList.findList();
       if (useCache && objList != null) {
-        CACHE.put(cacheKey, objList);
+        CACHE.put(cacheKey, objList,liveTimeInSeconds);
       }
       return objList;
     } catch (Exception e) {
@@ -411,7 +436,13 @@ public class EbeanDelegator implements Delegator {
   @Override
   public Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, int pageNo, int pageSize,
       Set<String> fieldsToSelect, List<String> orderBy, boolean useCache) throws GenericEntityException {
-    return doPagination(entityClazz, andMap, null, pageNo, pageSize, fieldsToSelect, orderBy, useCache);
+    return findPageByAnd(entityClazz, andMap, pageNo, pageSize, fieldsToSelect, orderBy, useCache, 0);
+  }
+  
+  @Override
+  public Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, int pageNo, int pageSize,
+      Set<String> fieldsToSelect, List<String> orderBy, boolean useCache,int liveTimeInSeconds) throws GenericEntityException {
+    return doPagination(entityClazz, andMap, null, pageNo, pageSize, fieldsToSelect, orderBy, useCache,liveTimeInSeconds);
   }
 
   @Override
@@ -431,7 +462,13 @@ public class EbeanDelegator implements Delegator {
   @Override
   public Map<String, Object> findPageByCond(Class<?> entityClazz, String cond, int pageNo, int pageSize,
       Set<String> fieldsToSelect, List<String> orderBy, boolean useCache) throws GenericEntityException {
-    return doPagination(entityClazz, null, cond, pageNo, pageSize, fieldsToSelect, orderBy, useCache);
+    return findPageByCond(entityClazz, cond, pageNo, pageSize, fieldsToSelect, orderBy, useCache, 0);
+  }
+  
+  @Override
+  public Map<String, Object> findPageByCond(Class<?> entityClazz, String cond, int pageNo, int pageSize,
+      Set<String> fieldsToSelect, List<String> orderBy, boolean useCache,int liveTimeInSeconds) throws GenericEntityException {
+    return doPagination(entityClazz, null, cond, pageNo, pageSize, fieldsToSelect, orderBy, useCache,liveTimeInSeconds);
   }
 
   /**
@@ -453,7 +490,7 @@ public class EbeanDelegator implements Delegator {
    */
   @SuppressWarnings("unchecked")
   private Map<String, Object> doPagination(Class<?> entityClazz, Map<String, Object> andMap, String cond, int pageNo,
-      int pageSize, Set<String> fieldsToSelect, List<String> orderBy, boolean useCache) throws GenericEntityException {
+      int pageSize, Set<String> fieldsToSelect, List<String> orderBy, boolean useCache,int liveTimeInSeconds) throws GenericEntityException {
     String findName = andMap == null ? "findPageByCond" : "findPageByAnd";
     try {
       String cacheKey = entityClazz + "#" + (andMap == null ? cond : andMap) + "#" + pageNo + "#" + pageSize + "#"
@@ -488,7 +525,7 @@ public class EbeanDelegator implements Delegator {
 
       if (totalEntry > 0 && useCache) {
         Log.d(findName + "[" + cacheKey + "]from cache.", TAG);
-        CACHE.put(cacheKey, result);
+        CACHE.put(cacheKey, result,liveTimeInSeconds);
       }
 
       return result;
