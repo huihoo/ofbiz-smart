@@ -25,8 +25,9 @@ public class EntityConvertorTest extends BaseTestCase{
                                             "birthday","1986-05-18",
                                             "tracked","1",
                                             "gender","Male"
-    ); 
-    Customer customer = (Customer)  EntityConverter.convertFrom(Customer.class, ctx,delegator);
+    );
+    Customer customer = new Customer();
+    EntityConverter.convertFrom(customer, ctx,delegator);
     Log.d("" + customer, TAG);
     Assert.assertEquals(2, customer.getLevel());
     Assert.assertEquals("hbh", customer.getFirstName());
@@ -45,7 +46,8 @@ public class EntityConvertorTest extends BaseTestCase{
                           "customer.id",customer.getId()
     );
     
-    OrderHeader orderHeader = (OrderHeader) EntityConverter.convertFrom(OrderHeader.class, ctx,delegator);
+    OrderHeader orderHeader = new OrderHeader();
+    EntityConverter.convertFrom(orderHeader, ctx,delegator);
     Log.d("" + orderHeader, TAG);
     Assert.assertEquals(300L, orderHeader.getGrandTotal().longValue());
     Assert.assertEquals(200L, orderHeader.getRemainTotal().longValue());

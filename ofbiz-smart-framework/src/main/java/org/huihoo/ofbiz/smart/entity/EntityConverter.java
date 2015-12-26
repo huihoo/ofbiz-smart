@@ -30,53 +30,46 @@ public class EntityConverter {
   
   private static final SimpleDateFormat SIMPLE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
   
-  public static Object convertFrom(Class<?> convertClazz,Map<String,Object> ctx,Delegator delegator) {
-    try {
-      Object targetObj = convertClazz.newInstance();
-      Map<?,?> onglCtx = Ognl.createDefaultContext(targetObj);    
-      Ognl.setTypeConverter(onglCtx, entityTypeConvertor);
-      Iterator<Entry<String, Object>> iter = ctx.entrySet().iterator();
-      while (iter.hasNext()) {
-        Entry<String, Object> entry = iter.next();
-        String name = entry.getKey();
-        if (isIngore(name)) {
-          continue;
-        }
-        Object value = entry.getValue();
-        try {
-          if (name.indexOf(".") >= 0) {
-            String realFieldName = name.substring(0, name.indexOf("."));
-            Field field = targetObj.getClass().getDeclaredField(realFieldName);
-            Annotation anno = field.getAnnotation(OneToOne.class);
-            if (anno == null) {
-              anno = field.getAnnotation(ManyToOne.class);
-            }
-            
-            if (anno != null) {
-              Object id = ctx.get(name);
-              Log.d("[%s] has referenced model [#%s]", TAG,convertClazz,id);
-              Object modelValue = delegator.findById(field.getType(), ctx.get(name));
-              Ognl.setValue(realFieldName, onglCtx, targetObj, modelValue);
-            }
-            
-          } else {
-            Ognl.setValue(name, onglCtx, targetObj, value);
-          }
-        } catch (OgnlException e) {
-          Log.w("Unable to get value of %s", TAG,name);
-        } catch (NoSuchFieldException e) {
-          Log.w("Unable to get value of %s", TAG,name);
-        } catch (SecurityException e) {
-          Log.w("Unable to get value of %s", TAG,name);
-        } catch (GenericEntityException e) {
-          Log.w("Unable to get value of %s", TAG,name);
-        }
+  public static void convertFrom(Object targetObj,Map<String,Object> ctx,Delegator delegator) {
+    Map<?,?> onglCtx = Ognl.createDefaultContext(targetObj);    
+    Ognl.setTypeConverter(onglCtx, entityTypeConvertor);
+    Iterator<Entry<String, Object>> iter = ctx.entrySet().iterator();
+    while (iter.hasNext()) {
+      Entry<String, Object> entry = iter.next();
+      String name = entry.getKey();
+      if (isIngore(name)) {
+        continue;
       }
-      return targetObj;
-    } catch (InstantiationException | IllegalAccessException e) {
-      return null;
+      Object value = entry.getValue();
+      try {
+        if (name.indexOf(".") >= 0) {
+          String realFieldName = name.substring(0, name.indexOf("."));
+          Field field = targetObj.getClass().getDeclaredField(realFieldName);
+          Annotation anno = field.getAnnotation(OneToOne.class);
+          if (anno == null) {
+            anno = field.getAnnotation(ManyToOne.class);
+          }
+          
+          if (anno != null) {
+            Object id = ctx.get(name);
+            Log.d("[%s] has referenced model [#%s]", TAG,targetObj.getClass(),id);
+            Object modelValue = delegator.findById(field.getType(), ctx.get(name));
+            Ognl.setValue(realFieldName, onglCtx, targetObj, modelValue);
+          }
+          
+        } else {
+          Ognl.setValue(name, onglCtx, targetObj, value);
+        }
+      } catch (OgnlException e) {
+        Log.w("Unable to get value of %s", TAG,name);
+      } catch (NoSuchFieldException e) {
+        Log.w("Unable to get value of %s", TAG,name);
+      } catch (SecurityException e) {
+        Log.w("Unable to get value of %s", TAG,name);
+      } catch (GenericEntityException e) {
+        Log.w("Unable to get value of %s", TAG,name);
+      }
     }
-    
   }
   
   private static boolean isIngore(String name) {

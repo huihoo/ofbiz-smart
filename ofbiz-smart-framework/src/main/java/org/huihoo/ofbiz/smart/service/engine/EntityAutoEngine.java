@@ -75,7 +75,8 @@ public class EntityAutoEngine extends GenericAsyncEngine {
       String resultName = (String) ctx.get(C.SERVICE_RESULT_NAME_ATTRIBUTE);
       switch (serviceModel.invoke) {
         case C.SERVICE_ENGITYAUTO_CREATE:
-          Object modelObj = EntityConverter.convertFrom(entityClazz, ctx, delegator);
+          Object modelObj = entityClazz.newInstance();
+          EntityConverter.convertFrom(modelObj, ctx, delegator);
           List<ConstraintViolation> constraintViolations =  Validator.validate(modelObj, ValidateProfile.CREATE);
           if (CommUtil.isNotEmpty(constraintViolations)) {
             return ServiceUtil.returnProplem("VALIDATION_NOT_PASSED", "Validation being unable to be passed.", 
@@ -95,13 +96,13 @@ public class EntityAutoEngine extends GenericAsyncEngine {
           }
           Object obj = delegator.findById(entityClazz, id);
           if (obj != null) {
-            modelObj = EntityConverter.convertFrom(obj.getClass(), ctx, delegator);
-            delegator.save(modelObj); 
+            EntityConverter.convertFrom(obj, ctx, delegator);
+            delegator.save(obj); 
 
             if (resultName != null) {
-              successResult.put(resultName, modelObj);
+              successResult.put(resultName, obj);
             } else {
-              successResult.put(C.ENTITY_MODEL_NAME, modelObj);
+              successResult.put(C.ENTITY_MODEL_NAME, obj);
             }
           }
           break;
