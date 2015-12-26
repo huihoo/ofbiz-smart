@@ -24,11 +24,12 @@
 	      	<c:forEach items="${list }" var="c">
 	      	 	<tr>
 		          <th scope="row">${c.id }</th>
-		          <td><a href="${ctxPath }/pet/edit${uriSuffix}?id=${c.id}">${c.name }</a></td>
+		          <td>${c.name }</td>
 		          <td>${c.type.name }</td>
-		          <td>${c.owner.firstName }${c.owner.lastName }</td>
+		          <td>${c.owner.fistName }${c.owner.lastName }</td>
 		        </tr>	
 	      	</c:forEach>
+	       
 	      </tbody>
 	    </table>
 	</div>

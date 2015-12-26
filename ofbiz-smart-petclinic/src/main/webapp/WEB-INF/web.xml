@@ -35,6 +35,14 @@
 		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
 
+	<!-- Only for debug... -->
+	<jsp-config>
+		<taglib>
+			<taglib-uri>hh</taglib-uri>
+			<taglib-location>/WEB-INF/customTags.tld</taglib-location>
+		</taglib>
+	</jsp-config>
+
 
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>

@@ -4,6 +4,7 @@ import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 @Entity
@@ -16,6 +17,7 @@ public class Owner extends Person {
   private String telephone;
   
   @OneToMany
+  @OrderBy("createdAt desc")
   private Set<Pet> pets;
 
   public String getAddress() {

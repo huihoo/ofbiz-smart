@@ -1,4 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
 <div class="row" style="margin-top: 50px; ">
 	
@@ -9,7 +11,10 @@
 		  <li class="active">${model.firstName }</li>
 		</ol>
 	
-		<table class="table table-hover table-bordered">
+		<h4>宠物主人详细信息</h4>
+		
+		<table class="table table-hover table-striped">
+		  
 	      <tbody>
 	      	<tr>
 	      		<td width="40%"><strong>姓名</strong></td>
@@ -37,5 +42,59 @@
 	      	</tr>
 	      </tbody>
 	    </table>
+	    
+	    <h4>宠物和访问记录</h4>
+		
+	    <c:forEach items="${model.pets }" var="p">
+	    	<table class="table table-striped">
+	    		<tr>
+	    			<td width="200px;">
+	    				<dl>
+				      		<dt  style="float: left;clear: left;text-align: right;text-overflow: ellipsis;"><strong>名字</strong></dt>
+				      		<dd >&nbsp;&nbsp;${p.name }</dd>
+				      		
+				      		<dt  style="float: left;clear: left;text-align: right;text-overflow: ellipsis;"><strong>生日</strong></dt>
+				      		<dd>&nbsp;&nbsp;<fmt:formatDate value="${p.birthdayDate }" pattern="yyyy-MM-dd"/></dd>
+				      		
+				      		<dt  style="float: left;clear: left;text-align: right;text-overflow: ellipsis;"><strong>类型</strong></dt>
+				      		<dd>&nbsp;&nbsp;${p.type.name }</dd>
+				      		
+				      	</dl>
+	    			</td>
+	    			<td>
+	    				<table class="table table-bordered">
+	    					<tbody>
+	    						<tr>
+	    							<th>访问日期</th>
+	    							<th>描述</th>
+	    						</tr>
+	    					</tbody>
+	    					<tbody>
+	    						<c:forEach items="${p.visits }" var="pv">
+	    							<tr>
+	    								<td><fmt:formatDate value="${pv.date }" pattern="yyyy-MM-dd"/></td>
+	    								<td>${pv.description }</td>
+	    							</tr>
+	    						</c:forEach>
+	    					</tbody>
+	    					<tfoot>
+	    						<tr>
+	    							<td>
+	    								<a href='${ctxPath }/pet/edit${uriSuffix }?id=${p.id}' class="btn btn-success">
+	    									<i class="icon-edit"></i>&nbsp;编辑宠物
+	    								</a>
+	    							</td>
+	    							<td>
+	    								<a href='${ctxPath }/visit/create${uriSuffix }?petId=${p.id}' class="btn btn-primary">
+	    									<i class="icon-plus"></i>&nbsp;增加访问
+	    								</a>
+	    							</td>
+	    						</tr>
+	    					</tfoot>
+	    				</table>
+	    			</td>
+	    		</tr>
+	    	</table>
+	    </c:forEach>
 	</div>
 </div>

@@ -6,29 +6,38 @@
 	<div class="col-lg-12 table-responsive" >
 		<ol class="breadcrumb">
 		  <li><a href="${ctxPath }/">首页</a></li>
-		  <li class="active">宠物</li>
+		  <li class="active">宠物医生</li>
 		</ol>
 		
-		<a href="${ctxPath }/pet/create${uriSuffix}"><i class="icon-plus"></i>&nbsp;新增</a>
+		
 		
 		<table class="table table-hover table-bordered">
 	      <thead>
 	        <tr>
 	          <th>#</th>
-	          <th>名称</th>
-	          <th>类型</th>
-	          <th>主人</th>
+	          <th>名字</th>
+	          <th>专业</th>
 	        </tr>
 	      </thead>
 	      <tbody>
 	      	<c:forEach items="${list }" var="c">
 	      	 	<tr>
 		          <th scope="row">${c.id }</th>
-		          <td><a href="${ctxPath }/pet/edit${uriSuffix}?id=${c.id}">${c.name }</a></td>
-		          <td>${c.type.name }</td>
-		          <td>${c.owner.firstName }${c.owner.lastName }</td>
+		          <td>${c.firstName }${c.lastName }</td>
+		          <td>
+		          	<c:choose>
+		          		<c:when test="${not empty(c.specialties) }">
+		          			<c:forEach items="${c.specialties}" var="cs">
+				          		${cs.name }&nbsp;
+				          	</c:forEach>
+		          		</c:when>
+		          		<c:otherwise>none</c:otherwise>
+		          	</c:choose>
+		          	
+		          </td>
 		        </tr>	
 	      	</c:forEach>
+	       
 	      </tbody>
 	    </table>
 	</div>

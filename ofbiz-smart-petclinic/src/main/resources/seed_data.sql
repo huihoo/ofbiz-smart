@@ -15,12 +15,12 @@ INSERT INTO vet_specialties VALUES (3, 3);
 INSERT INTO vet_specialties VALUES (4, 2);
 INSERT INTO vet_specialties VALUES (5, 1);
 
-INSERT INTO pet_types VALUES (1, 'cat','2016-01-01 00:00:00','2016-01-01 00:00:00');
-INSERT INTO pet_types VALUES (2, 'dog','2016-01-01 00:00:00','2016-01-01 00:00:00');
-INSERT INTO pet_types VALUES (3, 'lizard','2016-01-01 00:00:00','2016-01-01 00:00:00');
-INSERT INTO pet_types VALUES (4, 'snake','2016-01-01 00:00:00','2016-01-01 00:00:00');
-INSERT INTO pet_types VALUES (5, 'bird','2016-01-01 00:00:00','2016-01-01 00:00:00');
-INSERT INTO pet_types VALUES (6, 'hamster','2016-01-01 00:00:00','2016-01-01 00:00:00');
+INSERT INTO pet_types VALUES (1, '猫咪','2016-01-01 00:00:00','2016-01-01 00:00:00');
+INSERT INTO pet_types VALUES (2, '狗狗','2016-01-01 00:00:00','2016-01-01 00:00:00');
+INSERT INTO pet_types VALUES (3, '蜥蜴','2016-01-01 00:00:00','2016-01-01 00:00:00');
+INSERT INTO pet_types VALUES (4, '蛇','2016-01-01 00:00:00','2016-01-01 00:00:00');
+INSERT INTO pet_types VALUES (5, '鸟儿','2016-01-01 00:00:00','2016-01-01 00:00:00');
+INSERT INTO pet_types VALUES (6, '仓鼠','2016-01-01 00:00:00','2016-01-01 00:00:00');
 
 INSERT INTO owners VALUES (1, 'George', 'Franklin', '110 W. Liberty St.', 'Madison', '6085551023','2016-01-01 00:00:00','2016-01-01 00:00:00');
 INSERT INTO owners VALUES (2, 'Betty', 'Davis', '638 Cardinal Ave.', 'Sun Prairie', '6085551749','2016-01-01 00:00:00','2016-01-01 00:00:00');

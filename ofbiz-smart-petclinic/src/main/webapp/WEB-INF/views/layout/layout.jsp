@@ -30,8 +30,8 @@ ${moreCss }
           <ul class="nav nav-justified">
             <li <c:if test="${navTag=='home'}">class="active"</c:if>><a href="${ctxPath }/">首页</a></li>
             <li <c:if test="${navTag=='owner'}">class="active"</c:if>><a href="${ctxPath }/owner/find${uriSuffix}">宠物主人</a></li>
-            <li <c:if test="${navTag=='pet'}">class="active"</c:if>><a href="#">宠物</a></li>
-            <li><a href="#">宠物医生</a></li>
+            <li <c:if test="${navTag=='pet'}">class="active"</c:if>><a href="${ctxPath }/pet/list${uriSuffix}">宠物</a></li>
+            <li <c:if test="${navTag=='vet'}">class="active"</c:if>><a href="${ctxPath }/vet/list${uriSuffix}">宠物医生</a></li>
             <li><a href="#">关于我们</a></li>
             <li><a href="#">联系我们</a></li>
           </ul>

@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="hh" uri="http://huihoo.com/tags" %>
 
 <div class="row"  style="margin-top: 50px;">
 	<div class="col-lg-12" >
@@ -30,22 +32,32 @@
 		  </c:if>
 		  <div class="form-group">
 		    <label for="firstName">主人</label>
-		    <p>${owner.firstName }${owner.lastName }</p>
+		    <c:choose>
+		    	<c:when test="${not empty(model) }">
+		    		 <p>${model.owner.firstName }${model.owner.lastName }</p>
+		    	</c:when>
+		    	<c:otherwise>
+		    		 <p>${owner.firstName }${owner.lastName }</p>
+		    	</c:otherwise>
+		    </c:choose>
+		   
 		  </div>
 		  <div class="form-group">
 		    <label for="name">名字</label>
-		    <input type="text" class="form-control input-lg" name="name"  id="name" placeholder="请输入您名字">
+		    <input type="text" class="form-control input-lg" name="name"  id="name" placeholder="请输入名字" value="${model.name }">
 		  </div>
 		   <div class="form-group">
 		    <label for="birthday">生日</label>
-		    <input type="text" class="form-control input-lg" name="birthday"  id="birthday" placeholder="请输入您所在的城市">
+		    <input type="text" class="form-control input-lg" name="birthdayDate"  
+		                      id="birthdayDate" 
+		                      value="<fmt:formatDate value="${model.birthdayDate }" pattern="yyyy-MM-dd"/>">
 		  </div>
 		  <div class="form-group">
 		    <label for="birthday">类型</label>
 		    <select class="form-control input-lg" name="type.id">
-		    	<c:forEach items="${petTypes }" var="pt">
-		    		<option value="${pt.id }">${pt.name }</option>
-		    	</c:forEach>
+		    	<hh:options className="org.huihoo.samples.petclinic.model.PetType" 
+		    				currentId="${model.type.id }"
+		    	            liveTimeInSeconds="300"/>
 		    </select>
 		  </div>
 		  <button type="submit" class="btn btn-default btn-lg">保存</button>
