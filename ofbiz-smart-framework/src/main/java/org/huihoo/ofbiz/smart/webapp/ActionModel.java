@@ -26,7 +26,7 @@ public class ActionModel implements Serializable {
     
     public String moreJavascripts;
 
-    public List<ServiceCall> serviceCallList= new ArrayList<>();
+    public List<ServiceCall> serviceCallList = new ArrayList<>();
     
     public Response response;
     
