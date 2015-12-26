@@ -240,6 +240,17 @@
 				</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		
+		<xs:attribute name="livetime-in-seconds">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						缓存有效时间，0为一直有效
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		
 
 	</xs:attributeGroup>
 

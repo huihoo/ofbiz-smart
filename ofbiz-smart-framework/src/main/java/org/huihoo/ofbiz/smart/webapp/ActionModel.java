@@ -91,6 +91,7 @@ public class ActionModel implements Serializable {
     public String paramPairs; 
     public String condition;
     public String orderBy;
+    public int liveTimeInSeconds;
     public String resultName;
     @Override
     public String toString() {

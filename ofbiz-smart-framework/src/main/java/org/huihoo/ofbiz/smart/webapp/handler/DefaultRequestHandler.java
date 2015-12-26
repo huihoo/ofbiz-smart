@@ -50,7 +50,7 @@ public class DefaultRequestHandler implements RequestHandler {
   public void handleRequest(HttpServletRequest req, HttpServletResponse resp)
           throws ServletException, IOException {
     ServletContext sc = req.getServletContext();
-    
+    //获取保存在Web上下文中的关键对象和配置参数
     Delegator delegator = (Delegator) sc.getAttribute(C.CTX_DELETAGOR);
     ServiceDispatcher serviceDispatcher = (ServiceDispatcher) sc.getAttribute(C.CTX_SERVICE_DISPATCHER);
     Properties applicationConfig = (Properties) sc.getAttribute(C.APPLICATION_CONFIG_PROP_KEY);
@@ -58,69 +58,66 @@ public class DefaultRequestHandler implements RequestHandler {
     Cache<String,View> viewCache = (Cache<String,View>) sc.getAttribute(C.CTX_SUPPORTED_VIEW_ATTRIBUTE);
     String jspViewBasePath = (String) sc.getAttribute(C.CTX_JSP_VIEW_BASEPATH);
     String uriSuffix = (String) sc.getAttribute(C.CTX_URI_SUFFIX);
-
+    
+    //remove contextpath
     String targetUri = req.getRequestURI();
     if (targetUri.startsWith(req.getContextPath())) {
       targetUri = targetUri.substring(req.getContextPath().length());
     }
 
+    //remove uri suffix
     if (targetUri.endsWith(uriSuffix)) {
       targetUri = targetUri.substring(0, targetUri.indexOf(uriSuffix));
     }
+    
     Action reqAction = matchAction(actionModels, targetUri);
     Log.d("Action : " + reqAction, TAG);
+    
     if (reqAction != null) {
       Map<String, Object> modelMap = ServiceUtil.returnSuccess();
+      //build web ctx for service call.
       Map<String, Object> ctx = WebAppUtil.buildWebCtx(req);
-
-      // TODO request convert to map
-
+      //calling all available configured service
       List<ServiceCall> serviceCalls = reqAction.serviceCallList;
       if (CommUtil.isNotEmpty(serviceCalls)) {
         for (ServiceCall serviceCall : serviceCalls) {
-          ctx.put(C.SERVICE_RESULT_NAME_ATTRIBUTE, serviceCall.resultName);
-          
+          ctx.put(C.SERVICE_RESULT_NAME_ATTRIBUTE, serviceCall.resultName);//set service result name
           ServiceModel sm = new ServiceModel();
+          //set param pairs
           if (CommUtil.isNotEmpty(serviceCall.paramPairs)) {
             String p = WebAppUtil.analyzeParamPairString(serviceCall.paramPairs, req);
             ctx.putAll(ServiceUtil.covertParamPairToMap(p));
           }
-          
+          //entityAuto service
           if (serviceCall.serviceName.startsWith("entityAuto#")) {
             sm.name = serviceCall.serviceName;
             sm.engineName = "entityAuto";
             sm.entityName = serviceCall.entityName;
             sm.invoke = serviceCall.serviceName.substring("entityAuto#".length());
-          } else {
+          } else {//normal java service
             sm.name = serviceCall.serviceName;
             sm.engineName = "java";
           }
-          
           serviceDispatcher.registerService(sm);
-          
           Map<String, Object> sResult = serviceDispatcher.runSync(sm.name, ctx);
-          
           if (ServiceUtil.isSuccess(sResult)) {
             modelMap.putAll(sResult);
           }
         }
       }
-
+      
       setPageAttributies(req, reqAction);
-
+      
       String viewType = null;
       String layout = null;
       if (reqAction.response != null) {
         viewType = reqAction.response.viewType;
         layout = reqAction.response.layout;
       }
-
       if (viewType == null) {
         viewType = "jsp";
       }
-
-      View view = viewCache.get(viewType);
-      
+      View view = viewCache.get(viewType);      
       if (ProcessType.URI_AUTO.value().equals(reqAction.processType)) {
         String viewName = null;
         if (layout != null) {
@@ -131,21 +128,19 @@ public class DefaultRequestHandler implements RequestHandler {
         }
         req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, viewName);
       } else if (ProcessType.ENTITY_AUTO.value().equals(reqAction.processType)) {
-
         try {
           view = viewCache.get("jsp");
-          doEntityAutoAction(modelMap,serviceDispatcher, req, resp,applicationConfig, targetUri, 
-                                                          jspViewBasePath,uriSuffix,viewCache,view,ctx,layout);
+          doEntityAutoAction(modelMap,serviceDispatcher, req, resp,applicationConfig, 
+                                                                   targetUri, 
+                                                                   jspViewBasePath,uriSuffix,
+                                                                   viewCache,view,ctx,layout);
         } catch (ViewException e) {
           throw new ServletException(e);
         }
-        //自动处理时，忽略后面的处理
-        return ;
-
+        return ;//自动处理时，忽略后面的处理
       } else if (ProcessType.BY_CONFIG.value().equals(reqAction.processType)) {
         req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + targetUri + ".jsp");
       }
-
       try {
         view.render(modelMap, req, resp);
       } catch (ViewException e) {
@@ -154,6 +149,37 @@ public class DefaultRequestHandler implements RequestHandler {
     }
   }
 
+  /**
+   * 自动根据targetUri路径字符串中是否含有对应实体的名称来进行各种操作和界面渲染
+   * <p> targetUri字符串必须以如下如式的字符串结尾： /entityName/verb
+   * <p> entityName为实体的名称，命名规则为骆驼式命名法
+   * <p> verb为操作的名称 目前支持  list,index,home,create,add,save,new,update,modify,edit,view,detail
+   * <p>
+   * 实体名称的截取规则: 以/号分隔，倒数第二个为期待的实体名称，得到该值后，
+   * 尝试加载对应的实体类(应用配置entity.scanning.packages属性 + 实体名称),如果能加载
+   * 则进行下面的操作和界面渲染,否则抛出异常
+   * <ul>
+   *  <li>路径以  /list,/index,/home 结尾,进行实体查询操作和列表界面的渲染</li>
+   *  <li>路径以 /create,/add 结尾,不进行任何操作，直接渲染新增界面的渲染</li>
+   *  <li>路径以 /save,/new结尾,进行实体的保存操作，成功后跳转至实体详细信息界面,失败则返回到新增界面</li>
+   *  <li>路径以 /update,/modify结尾,进行实体的更新操作，成功后跳转至实体的详细信息界面，失败则返回到新界面</li>
+   *  <li>路径以 /edit 结尾,进行根据实体ID进行的查找操作，直接渲染编辑界面</li>
+   *  <li>路径以 /view,/detail结尾,进行根据实体ID进行的查找操作，直接渲染实体的详细信息界面</li>
+   * </ul>
+   * @param modelMap           界面<code>{@link View}</code>中要用到的值映射
+   * @param serviceDispatcher  服务调用者
+   * @param req                当前请求对象
+   * @param resp               当前响应对象
+   * @param applicationConfig  应用属性配置
+   * @param targetUri          目标路径Uri 
+   * @param jspViewBasePath    界面根路径
+   * @param uriSuffix          路径后缀
+   * @param viewCache          界面缓存
+   * @param view               当前界面对象
+   * @param ctx                当前请求上下文
+   * @param layout             布局
+   * @throws ViewException
+   */
   private void doEntityAutoAction(Map<String,Object> modelMap,
                                   ServiceDispatcher serviceDispatcher, 
                                   HttpServletRequest req,
@@ -166,15 +192,14 @@ public class DefaultRequestHandler implements RequestHandler {
                                   View view,
                                   Map<String,Object> ctx,
                                   String layout) throws ViewException {
-    
     String[] spiltUri = targetUri.split("/");
-    String firstUriString = spiltUri[1];
-    String guessEntityName =
-            firstUriString.substring(0, 1).toUpperCase() + firstUriString.substring(1);
+    if (spiltUri.length < 2) {
+      throw new IllegalArgumentException("The string array length of targeturi splited by '/' must be greater and equals to 2.");
+    }
+    String entityNameInUri = spiltUri[spiltUri.length - 2];
+    String guessEntityName = entityNameInUri.substring(0, 1).toUpperCase() + entityNameInUri.substring(1);
     Log.d("Guessed Engity Name : " + guessEntityName, TAG);
-
     String entityClazzName = ENTITY_CLAZZ_NAME_CACHE.get(guessEntityName);
-    
     if (entityClazzName == null) {
       String entityScanningPkg = applicationConfig.getProperty(C.ENTITY_SCANNING_PACKAGES);
       String[] espToken = entityScanningPkg.split(",");
@@ -195,51 +220,46 @@ public class DefaultRequestHandler implements RequestHandler {
     }
     
     Map<String,Object> result = ServiceUtil.returnSuccess();
-    
     ServiceModel sm = new ServiceModel();
     sm.engineName = "entityAuto";
     sm.entityName = entityClazzName;
     
+    
     String viewName = "";
     View redirectView = null;
-    
     if (targetUri.endsWith("/list") || targetUri.endsWith("/index")) {
       sm.name = sm.engineName + "#" + C.SERVICE_ENGITYAUTO_FINDPAGEBYCOND;
       sm.invoke = C.SERVICE_ENGITYAUTO_FINDPAGEBYCOND;
-      viewName = jspViewBasePath + "/" +firstUriString + "/list.jsp";
+      viewName = jspViewBasePath + "/" +entityNameInUri + "/list.jsp";
     } else if (targetUri.endsWith("/create") || targetUri.endsWith("/add")) {
-      viewName = jspViewBasePath + "/" + firstUriString + "/form.jsp";
+      viewName = jspViewBasePath + "/" + entityNameInUri + "/form.jsp";
     } else if (targetUri.endsWith("/save") || targetUri.endsWith("/new")) {
       sm.name = sm.engineName + "#" + C.SERVICE_ENGITYAUTO_CREATE;
       sm.invoke = C.SERVICE_ENGITYAUTO_CREATE;
-      viewName = jspViewBasePath + "/" +firstUriString + "/view.jsp";
-      
+      viewName = jspViewBasePath + "/" +entityNameInUri + "/view.jsp";      
       redirectView = viewCache.get("redirect");
-      
     } else if (targetUri.endsWith("/update") || targetUri.endsWith("/modify")) {
       sm.name = sm.engineName + "#" + C.SERVICE_ENGITYAUTO_UPDATE;
       sm.invoke = C.SERVICE_ENGITYAUTO_UPDATE;
-      viewName = jspViewBasePath + "/" +firstUriString + "/view.jsp";
-      
+      viewName = jspViewBasePath + "/" +entityNameInUri + "/view.jsp";
       redirectView = viewCache.get("redirect");
-      
     } else if (targetUri.endsWith("/view") || targetUri.endsWith("/detail")) {
       sm.name = sm.engineName + "#" + C.SERVICE_ENGITYAUTO_FINDBYID;
       sm.invoke = C.SERVICE_ENGITYAUTO_FINDBYID;
-      viewName = jspViewBasePath + "/" +firstUriString + "/view.jsp";
+      viewName = jspViewBasePath + "/" +entityNameInUri + "/view.jsp";
+    } else if (targetUri.endsWith("/edit")) {
+      sm.name = sm.engineName + "#" + C.SERVICE_ENGITYAUTO_FINDBYID;
+      sm.invoke = C.SERVICE_ENGITYAUTO_FINDBYID;
+      viewName = jspViewBasePath + "/" + entityNameInUri + "/form.jsp";
     }
     
     serviceDispatcher.registerService(sm);
-
     if (sm.invoke != null) {
       result = serviceDispatcher.runSync(sm.name, ctx);
     }
     
-    
     if (ServiceUtil.isSuccess(result)) {
-      
       modelMap.putAll(result);
-      
       if (redirectView != null) {
         Object idValue;
         try {
@@ -247,7 +267,7 @@ public class DefaultRequestHandler implements RequestHandler {
         } catch (OgnlException e) {
           throw new ViewException("Unable to get id");
         }
-        req.setAttribute("targetUri", req.getContextPath() + "/" + firstUriString + "/view" + uriSuffix + "?id=" + idValue);
+        req.setAttribute("targetUri", req.getContextPath() + "/" + entityNameInUri + "/view" + uriSuffix + "?id=" + idValue);
         redirectView.render(modelMap, req, resp);
       } else {
         req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + layout);
@@ -256,7 +276,7 @@ public class DefaultRequestHandler implements RequestHandler {
         view.render(modelMap, req, resp);
       }
     } else {
-      
+      Log.d("Result : " + result, TAG);
     }
   }
 

@@ -109,7 +109,7 @@ public class ActionModelXmlConfigLoader {
           serviceCall.paramPairs = attributes.getValue("param-pairs");
           serviceCall.orderBy = attributes.getValue("order-by");
           serviceCall.resultName = attributes.getValue("result-name");
-          
+          serviceCall.liveTimeInSeconds = attributes.getValue("livetime-in-seconds") == null ? 0 : Integer.valueOf(attributes.getValue("livetime-in-seconds"));
           action.serviceCallList.add(serviceCall);
           break;
         case "response":
