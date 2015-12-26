@@ -13,7 +13,7 @@
 	version="2.1">
 	<tlibversion>1.0</tlibversion>
 	<jspversion>2.0</jspversion>
-	<shortname>dnx</shortname>
+	<shortname>hh</shortname>
 	<info>自定义标签库</info>
 	<uri>http://huihoo.com/tags</uri>
 
@@ -103,8 +103,8 @@
 				</description>
 			<name>nextIconClass</name>
 		</attribute>
-		
-		
+
+
 		<attribute>
 			<description>
 				上一页字符串
@@ -119,4 +119,68 @@
 			<name>nextString</name>
 		</attribute>
 	</tag>
+
+
+
+
+	<tag>
+		<description>
+				Select Options Tag
+			</description>
+		<name>options</name>
+		<tagclass>org.huihoo.ofbiz.smart.webapp.taglib.SelectOptionTag</tagclass>
+		<attribute>
+			<description>
+					对象的类名
+				</description>
+			<name>className</name>
+			<rtexprvalue>true</rtexprvalue>
+			<required>true</required>
+		</attribute>
+		<attribute>
+			<description>
+					当前的ID
+				</description>
+			<name>currentId</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+		<attribute>
+			<description>
+					显示域的名称
+				</description>
+			<name>labelName</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+		<attribute>
+			<description>
+					值域的名称
+				</description>
+			<name>valueName</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+		<attribute>
+			<description>
+					额外的条件
+				</description>
+			<name>condition</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		
+		<attribute>
+			<description>
+					缓存有效时间，小于等于0，表示不缓存
+				</description>
+			<name>liveTimeInSeconds</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
 </taglib> 
