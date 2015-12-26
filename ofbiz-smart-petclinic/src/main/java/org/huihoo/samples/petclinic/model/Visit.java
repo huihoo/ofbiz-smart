@@ -9,12 +9,14 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "visits")
 public class Visit extends BaseModel {
+  @ManyToOne
+  private Pet pet;
+  
   private Date date;
 
   private String description;
 
-  @ManyToOne
-  private Pet pet;
+  
 
   public Date getDate() {
     return date;

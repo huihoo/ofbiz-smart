@@ -5,7 +5,7 @@
 	<div class="col-lg-12" >
 		<ol class="breadcrumb">
 		  <li><a href="${ctxPath }/">首页</a></li>
-		  <li><a href="${ctxPath }/list${uriSuffix}">宠物主人</a></li>
+		  <li><a href="${ctxPath }/owner/list${uriSuffix}">宠物主人</a></li>
 		  <li class="active">${model.firstName }</li>
 		</ol>
 	

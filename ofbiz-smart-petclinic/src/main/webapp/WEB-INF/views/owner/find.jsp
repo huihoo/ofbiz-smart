@@ -9,7 +9,7 @@
 		
 		<form class="form-horizontal well" action="${ctxPath }/owner/list${uriSuffix}">
 		   <div class="input-group">
-		      <input type="text" class="form-control input-lg" name="realname" placeholder="输入宠物主人的姓名">
+		      <input type="text" class="form-control input-lg" name="lastName" placeholder="输入宠物主人的姓名">
 		      <span class="input-group-btn">
 		        <button class="btn btn-default btn-lg" type="submit">查询</button>
 		      </span>
