@@ -20,6 +20,9 @@ import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.entity.Delegator;
 import org.huihoo.ofbiz.smart.service.ServiceDispatcher;
 
+import ognl.Ognl;
+import ognl.OgnlException;
+
 public class WebAppUtil {
   
   private final static String TAG = WebAppUtil.class.getName();
@@ -49,7 +52,9 @@ public class WebAppUtil {
           String name = item.getFieldName();
           InputStream stream = item.openStream();
           if (item.isFormField()) {
-            ctx.put(name, Streams.asString(stream, C.UTF_8));
+            String val = Streams.asString(stream, C.UTF_8);
+            ctx.put(name, val);
+            req.setAttribute(name, val);
           } else {
              //TODO File
           }
@@ -65,12 +70,15 @@ public class WebAppUtil {
         String value = req.getParameter(parameterName);
         if (CommUtil.isNotEmpty(value)) {
           ctx.put(parameterName, value);
+          req.setAttribute(parameterName, value);
         } else {
           String[] arrayValue = req.getParameterValues(parameterName);
           if (CommUtil.isNotEmpty(arrayValue)) {
             ctx.put(parameterName, arrayValue);
+            req.setAttribute(parameterName, arrayValue);
           } else {
             ctx.put(parameterName, value);
+            req.setAttribute(parameterName, value);
           }
         }
       }
@@ -108,6 +116,68 @@ public class WebAppUtil {
       }
     }
     return sb.toString();
+  }
+  
+  
+  public static String rebuildRequestParams(String requestParams,HttpServletRequest req,Map<String,Object> resultMap) {
+    StringBuilder sb = new StringBuilder();
+    if (CommUtil.isEmpty(requestParams)) {
+      return sb.toString();
+    }
+    String[] paramPair = requestParams.split("=");
+    if (paramPair.length % 2 != 0) {
+      throw new IllegalArgumentException("Illegal request param.");
+    }
+    for (int i = 0; i < paramPair.length; i++) {
+      String key = paramPair[i];
+      String val = paramPair[++i];
+      int leftBrace = val.indexOf("{");
+      int rightBrace = val.indexOf("}");
+      if (leftBrace >= 0 && rightBrace >= 0) {
+        String valKey = val.substring(leftBrace + 1, rightBrace);
+        
+        if (valKey.startsWith("requestScope.")) {
+          String finalVal = req.getParameter( valKey.substring("requestScope.".length()) );
+          if (finalVal == null) {
+            finalVal = "";
+          }
+          sb.append(key).append("=").append(finalVal);
+        } else if (valKey.startsWith("sessionScope.")) {
+          Object finalVal = req.getSession().getAttribute( valKey.substring("sessionScope.".length()) );
+          if (finalVal == null) {
+            finalVal = "";
+          }
+          sb.append(key).append("=").append(finalVal);
+        } else {
+          if (resultMap != null) {
+            try {
+              Object finalVal = Ognl.getValue(valKey, resultMap);
+              sb.append(key).append("=").append(finalVal);
+            } catch (OgnlException e) {
+              sb.append(key).append("=").append("unResloved");
+              Log.w("Unable to get value of [" + valKey + "]", TAG);
+            }
+          } 
+        }
+        
+      } else {
+        sb.append(key).append("=").append(val); 
+      }
+    }
+    return sb.toString();
+  }
+  
+  
+  public static void setModelAsRequestAttributies(Map<String, Object> model, HttpServletRequest request) {
+    for (Map.Entry<String, Object> entry : model.entrySet()) {
+      String modelName = entry.getKey();
+      Object modelValue = entry.getValue();
+      if (modelValue != null) {
+        request.setAttribute(modelName, modelValue);
+      } else {
+        request.removeAttribute(modelName);
+      }
+    }
   }
 
 }

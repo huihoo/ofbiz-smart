@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.util.Log;
+import org.huihoo.ofbiz.smart.webapp.WebAppUtil;
 
 public class JspView implements View {
   private final static String TAG = JspView.class.getName();
@@ -22,9 +23,7 @@ public class JspView implements View {
   @Override
   public void render(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response)
       throws ViewException {
-    
-    setModelAsRequestAttributies(model,request);
-    
+    WebAppUtil.setModelAsRequestAttributies(model, request);
     String viewName = (String) request.getAttribute("viewName");
     RequestDispatcher rd = request.getRequestDispatcher(viewName); 
     if (rd == null) {
@@ -49,16 +48,6 @@ public class JspView implements View {
   }
 
 
-  protected void setModelAsRequestAttributies(Map<String, Object> model, HttpServletRequest request) {
-    for (Map.Entry<String, Object> entry : model.entrySet()) {
-      String modelName = entry.getKey();
-      Object modelValue = entry.getValue();
-      if (modelValue != null) {
-        request.setAttribute(modelName, modelValue);
-      } else {
-        request.removeAttribute(modelName);
-      }
-    }
-  }
+  
 
 }

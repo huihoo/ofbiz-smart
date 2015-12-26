@@ -133,7 +133,8 @@ public class DefaultRequestHandler implements RequestHandler {
           doEntityAutoAction(modelMap,serviceDispatcher, req, resp,applicationConfig, 
                                                                    targetUri, 
                                                                    jspViewBasePath,uriSuffix,
-                                                                   viewCache,view,ctx,layout);
+                                                                   viewCache,view,reqAction,ctx,layout);
+          
         } catch (ViewException e) {
           throw new ServletException(e);
         }
@@ -176,6 +177,7 @@ public class DefaultRequestHandler implements RequestHandler {
    * @param uriSuffix          路径后缀
    * @param viewCache          界面缓存
    * @param view               当前界面对象
+   * @param reqAction          当前Action
    * @param ctx                当前请求上下文
    * @param layout             布局
    * @throws ViewException
@@ -190,6 +192,7 @@ public class DefaultRequestHandler implements RequestHandler {
                                   String uriSuffix,
                                   Cache<String, View> viewCache,
                                   View view,
+                                  Action reqAction,
                                   Map<String,Object> ctx,
                                   String layout) throws ViewException {
     String[] spiltUri = targetUri.split("/");
@@ -253,22 +256,43 @@ public class DefaultRequestHandler implements RequestHandler {
       viewName = jspViewBasePath + "/" + entityNameInUri + "/form.jsp";
     }
     
+    //TODO 验证输入参数
     serviceDispatcher.registerService(sm);
     if (sm.invoke != null) {
       result = serviceDispatcher.runSync(sm.name, ctx);
     }
     
     if (ServiceUtil.isSuccess(result)) {
+      
+      boolean overrideRedirectFlag = false;
+      if (reqAction.response != null && "redirect".equals(reqAction.response.viewType)) {
+        redirectView = viewCache.get("redirect");
+        viewName = reqAction.response.viewName;
+        if (CommUtil.isNotEmpty(viewName)) {
+          int sIdx = viewName.indexOf("?");
+          if (sIdx >= 0) {
+            String newParamString = WebAppUtil.rebuildRequestParams(viewName.substring(sIdx + 1), req, result);
+            viewName = viewName.substring(0, sIdx) + uriSuffix + "?" + newParamString;
+          }
+        }
+        overrideRedirectFlag = true;
+      }
+      
       modelMap.putAll(result);
       if (redirectView != null) {
-        Object idValue;
-        try {
-          idValue = Ognl.getValue("id", result.get(C.ENTITY_MODEL_NAME));
-        } catch (OgnlException e) {
-          throw new ViewException("Unable to get id");
+        if (overrideRedirectFlag) {
+          req.setAttribute("targetUri", req.getContextPath() + viewName);
+          redirectView.render(modelMap, req, resp);
+        } else {
+          Object idValue;
+          try {
+            idValue = Ognl.getValue("id", result.get(C.ENTITY_MODEL_NAME));
+          } catch (OgnlException e) {
+            throw new ViewException("Unable to get id");
+          }
+          req.setAttribute("targetUri", req.getContextPath() + "/" + entityNameInUri + "/view" + uriSuffix + "?id=" + idValue);
+          redirectView.render(modelMap, req, resp);
         }
-        req.setAttribute("targetUri", req.getContextPath() + "/" + entityNameInUri + "/view" + uriSuffix + "?id=" + idValue);
-        redirectView.render(modelMap, req, resp);
       } else {
         req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + layout);
         req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, viewName);
