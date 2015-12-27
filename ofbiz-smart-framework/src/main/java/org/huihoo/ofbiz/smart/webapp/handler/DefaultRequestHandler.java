@@ -27,8 +27,12 @@ import org.huihoo.ofbiz.smart.webapp.ProcessType;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.Action;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.ServiceCall;
 import org.huihoo.ofbiz.smart.webapp.WebAppUtil;
+import org.huihoo.ofbiz.smart.webapp.view.JsonView;
+import org.huihoo.ofbiz.smart.webapp.view.JspView;
+import org.huihoo.ofbiz.smart.webapp.view.RedirectView;
 import org.huihoo.ofbiz.smart.webapp.view.View;
 import org.huihoo.ofbiz.smart.webapp.view.ViewException;
+import org.huihoo.ofbiz.smart.webapp.view.XmlView;
 
 import ognl.Ognl;
 import ognl.OgnlException;
@@ -66,7 +70,7 @@ public class DefaultRequestHandler implements RequestHandler {
     }
 
     //remove uri suffix
-    if (targetUri.endsWith(uriSuffix)) {
+    if (CommUtil.isNotEmpty(uriSuffix) && targetUri.endsWith(uriSuffix)) {
       targetUri = targetUri.substring(0, targetUri.indexOf(uriSuffix));
     }
     
@@ -117,7 +121,19 @@ public class DefaultRequestHandler implements RequestHandler {
       if (viewType == null) {
         viewType = "jsp";
       }
-      View view = viewCache.get(viewType);      
+      View view = viewCache.get(viewType);   
+      if (view == null) {
+        if ("jsp".equals(viewType)) {
+          view = new JspView();          
+        } else if ("redirect".equals(viewType)) {
+          view = new RedirectView();
+        } else if ("json".equals(viewType)) {
+          view = new JsonView();
+        } else if ("xml".equals(viewType)) {
+          view = new XmlView();
+        }
+        viewCache.put(viewType, view);
+      }
       if (ProcessType.URI_AUTO.value().equals(reqAction.processType)) {
         String viewName = null;
         if (layout != null) {

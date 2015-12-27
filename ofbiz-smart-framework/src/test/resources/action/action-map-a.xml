@@ -23,5 +23,9 @@
 	<action uri="/customer/detail" process-type="urlAuto">
 		<response view-type="auto" />
 	</action>
+	
+	<action uri="/" process-type="uriAuto">
+		<response view-type="jsp" view-name="/index.jsp"/>
+	</action>
 
 </action-map>

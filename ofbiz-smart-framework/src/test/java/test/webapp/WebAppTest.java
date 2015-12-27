@@ -130,6 +130,7 @@ public class WebAppTest {
     when(resp.getOutputStream()).thenReturn(msos);
     when(resp.getWriter()).thenReturn(new PrintWriter(writer)); 
     
+    when(req.getAttribute("viewName")).thenReturn("/index.jsp");
     
     DispatchServlet dispatchServlet = new DispatchServlet();
     dispatchServlet.init(config);
