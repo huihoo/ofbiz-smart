@@ -12,14 +12,14 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.huihoo.ofbiz.smart.base.C;
@@ -40,6 +40,12 @@ import org.huihoo.ofbiz.smart.webapp.view.View;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockRequestDispatcher;
 
 
 
@@ -48,19 +54,21 @@ public class WebAppTest {
   
   private ServletContext context;
   private ServletConfig config;
-  private HttpServletRequest req;
-  private HttpServletResponse resp;
+  private MockHttpServletRequest req;
+  private MockHttpServletResponse resp;
+  private MockRequestDispatcher requestDispatcher;
   private HttpSession session;
   private Properties applicationConfig;
   
   @Before
   public void setUp() {
-    req = mock(HttpServletRequest.class);
-    resp = mock(HttpServletResponse.class);
+    req = mock(MockHttpServletRequest.class);
+    resp = mock(MockHttpServletResponse.class);
     session = mock(HttpSession.class);
     context = mock(ServletContext.class);
     config = mock(ServletConfig.class);
     applicationConfig = mock(Properties.class);
+    requestDispatcher = mock(MockRequestDispatcher.class);
   }
   
   @Test
@@ -76,6 +84,7 @@ public class WebAppTest {
     when(req.getContextPath()).thenReturn("");
     when(req.getSession()).thenReturn(session);
     when(req.getServletContext()).thenReturn(context);
+    
     when(applicationConfig.getProperty(C.SEED_DATA_SQL_FILE_ATTRIBUTE)).thenReturn("");
     
     DispatchServlet dispatchServlet = new DispatchServlet();
@@ -130,12 +139,16 @@ public class WebAppTest {
     when(resp.getOutputStream()).thenReturn(msos);
     when(resp.getWriter()).thenReturn(new PrintWriter(writer)); 
     
+   
+    
     when(req.getAttribute("viewName")).thenReturn("/index.jsp");
+    when(req.getRequestDispatcher("/index.jsp")).thenReturn(requestDispatcher);
     
     DispatchServlet dispatchServlet = new DispatchServlet();
     dispatchServlet.init(config);
     dispatchServlet.doGet(req, resp);
-    Log.d("Response > " + writer.toString(), TAG);
+    resp.flushBuffer();
+    Log.d("Response > " + resp.getContentLength(), TAG);
   }
   
   @Test
