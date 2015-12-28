@@ -116,14 +116,12 @@
 				<groupId>org.avaje.ebeanorm</groupId>
 				<artifactId>avaje-ebeanorm-agent</artifactId>
 				<version>${ebean.orm.agent.version}</version>
-				<scope>runtime</scope>
 			</dependency>
 
 			<dependency>
 				<groupId>org.avaje</groupId>
 				<artifactId>avaje-agentloader</artifactId>
 				<version>${ebean.agentloader.version}</version>
-				<scope>runtime</scope>
 			</dependency>
 
 			<dependency>
@@ -145,21 +143,21 @@
 				<version>${servlet.api.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>taglibs</groupId>
+				<artifactId>standard</artifactId>
+				<version>${tablib.version}</version>
+			</dependency>
+			
+			<dependency>
 				<groupId>javax.servlet.jsp</groupId>
 				<artifactId>jsp-api</artifactId>
 				<version>${jsp.api.version}</version>
-				<scope>runtime</scope>
 			</dependency>
+			
 			<dependency>
 				<groupId>javax.el</groupId>
 				<artifactId>el-api</artifactId>
 				<version>${el.api.version}</version>
-				<scope>runtime</scope>
-			</dependency>
-			<dependency>
-				<groupId>taglibs</groupId>
-				<artifactId>standard</artifactId>
-				<version>${tablib.version}</version>
 				<scope>runtime</scope>
 			</dependency>
 			<dependency>
