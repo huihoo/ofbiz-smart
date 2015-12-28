@@ -28,8 +28,7 @@ import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.PatternValidat
 import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.RequiredValidator;
 import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.UrlValidator;
 
-import javassist.CtField;
-import javassist.NotFoundException;
+
 import ognl.Ognl;
 import ognl.OgnlException;
 
