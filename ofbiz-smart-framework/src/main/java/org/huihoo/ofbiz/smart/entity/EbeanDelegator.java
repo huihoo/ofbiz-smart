@@ -1,6 +1,7 @@
 package org.huihoo.ofbiz.smart.entity;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.io.IOUtils;
 import org.avaje.agentloader.AgentLoader;
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.cache.Cache;
@@ -1037,4 +1039,28 @@ public class EbeanDelegator implements Delegator {
     }
   }
 
+  @Override
+  public void loadSeedData(String seedDataSqlCvs) throws GenericEntityException {
+    if (CommUtil.isEmpty(seedDataSqlCvs)) {
+      return ;
+    }
+    String[] sqlFileArray = seedDataSqlCvs.split(",");
+    for (String sqlFile : sqlFileArray) {
+      List<String> sqlLine;
+      try {
+        sqlLine = IOUtils.readLines(FlexibleLocation.resolveLocation(sqlFile).openStream());
+        for (String sql : sqlLine) {
+          try {
+            executeByRawSql(sql);
+          } catch (GenericEntityException e) {
+            Log.w("Unable to execute sql : " + sql, TAG);
+          }
+        }
+      } catch (MalformedURLException e1) {
+        Log.w("Unable to load sql file : " + sqlFile, TAG);
+      } catch (IOException e1) {
+        Log.w("Unable to load sql file : " + sqlFile, TAG);
+      }
+    }
+  }
 }

@@ -228,4 +228,7 @@ public interface Delegator {
   int countByRawQuery(String query, String countAlias) throws GenericEntityException;
 
   int countByRawQuery(String query, String countAlias, List<?> params) throws GenericEntityException;
+  
+  
+  void loadSeedData(String seedDataSqlCvs) throws GenericEntityException;
 }

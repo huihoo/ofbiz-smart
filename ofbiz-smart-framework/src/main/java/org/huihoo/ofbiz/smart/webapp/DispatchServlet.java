@@ -246,23 +246,10 @@ public class DispatchServlet extends HttpServlet {
     String seedDataSqlFile = applicationConfig.getProperty(C.SEED_DATA_SQL_FILE_ATTRIBUTE);
     if (CommUtil.isNotEmpty(seedDataSqlFile)) {
       Delegator delegator = (Delegator) servletContext.getAttribute(C.CTX_DELETAGOR);
-      String[] sqlFileArray = seedDataSqlFile.split(",");
-      for (String sqlFile : sqlFileArray) {
-        List<String> sqlLine;
-        try {
-          sqlLine = IOUtils.readLines(FlexibleLocation.resolveLocation(sqlFile).openStream());
-          for (String sql : sqlLine) {
-            try {
-              delegator.executeByRawSql(sql);
-            } catch (GenericEntityException e) {
-              Log.w("Unable to execute sql : " + sql, TAG);
-            }
-          }
-        } catch (MalformedURLException e1) {
-          Log.w("Unable to load sql file : " + sqlFile, TAG);
-        } catch (IOException e1) {
-          Log.w("Unable to load sql file : " + sqlFile, TAG);
-        }
+      try {
+        delegator.loadSeedData(seedDataSqlFile);
+      } catch (GenericEntityException e) {
+        Log.e(e, e.getMessage(),TAG);
       }
     }
   }
