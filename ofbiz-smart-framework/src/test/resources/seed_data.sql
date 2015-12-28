@@ -1,0 +1,4 @@
+INSERT INTO customer_type VALUES (1, '潜在客户','2016-01-01 00:00:00','2016-01-01 00:00:00');
+INSERT INTO customer_type VALUES (2, '跟踪客户','2016-01-01 00:00:00','2016-01-01 00:00:00');
+INSERT INTO customer_type VALUES (3, 'VIP客户','2016-01-01 00:00:00','2016-01-01 00:00:00');
+INSERT INTO customer_type VALUES (4, '非客户','2016-01-01 00:00:00','2016-01-01 00:00:00');
