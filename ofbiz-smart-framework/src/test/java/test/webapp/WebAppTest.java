@@ -1,21 +1,18 @@
 package test.webapp;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -40,9 +37,6 @@ import org.huihoo.ofbiz.smart.webapp.view.View;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockRequestDispatcher;
@@ -51,29 +45,36 @@ import org.springframework.mock.web.MockRequestDispatcher;
 
 public class WebAppTest {
   private final static String TAG = WebAppTest.class.getName();
-  
+
   private ServletContext context;
   private ServletConfig config;
   private MockHttpServletRequest req;
   private MockHttpServletResponse resp;
-  private MockRequestDispatcher requestDispatcher;
   private HttpSession session;
   private Properties applicationConfig;
-  
+  private DispatchServlet dispatchServlet;
+  private Cache<String, View> viewCache = null;
+  private Delegator delegator = null;
+  private ServiceDispatcher serviceDispatcher = null;
+
+  @SuppressWarnings("unchecked")
   @Before
-  public void setUp() {
+  public void setUp() throws GenericEntityException, GenericServiceException {
+    dispatchServlet = spy(new DispatchServlet());
     req = mock(MockHttpServletRequest.class);
-    resp = mock(MockHttpServletResponse.class);
+    resp = new MockHttpServletResponse();
     session = mock(HttpSession.class);
     context = mock(ServletContext.class);
     config = mock(ServletConfig.class);
     applicationConfig = mock(Properties.class);
-    requestDispatcher = mock(MockRequestDispatcher.class);
+    viewCache = (Cache<String, View>) SimpleCacheManager.createCache("mock-cache");
+    delegator = new EbeanDelegator();
+    serviceDispatcher = new ServiceDispatcher(delegator);
   }
-  
+
   @Test
   public void testDispatchServletInit() throws ServletException, IOException {
-   
+
     when(context.getAttribute(C.APPLICATION_CONFIG_PROP_KEY)).thenReturn(applicationConfig);
     when(config.getInitParameter("jsp-view-base-path")).thenReturn("");
     when(config.getInitParameter("uri-suffix")).thenReturn("");
@@ -84,104 +85,100 @@ public class WebAppTest {
     when(req.getContextPath()).thenReturn("");
     when(req.getSession()).thenReturn(session);
     when(req.getServletContext()).thenReturn(context);
-    
+
     when(applicationConfig.getProperty(C.SEED_DATA_SQL_FILE_ATTRIBUTE)).thenReturn("");
-    
+
     DispatchServlet dispatchServlet = new DispatchServlet();
     dispatchServlet.init(config);
-    
-    
-    verify(config,times(1)).getInitParameter("jsp-view-base-path");
-    verify(config,times(1)).getInitParameter("uri-suffix");
-    verify(config,times(1)).getInitParameter("http-api-uri-base");
-    verify(config,times(1)).getInitParameter("rest-api-uri-base");
-    verify(config,times(1)).getInitParameter("api-doc-uri-base");
-    
+
+
+    verify(config, times(1)).getInitParameter("jsp-view-base-path");
+    verify(config, times(1)).getInitParameter("uri-suffix");
+    verify(config, times(1)).getInitParameter("http-api-uri-base");
+    verify(config, times(1)).getInitParameter("rest-api-uri-base");
+    verify(config, times(1)).getInitParameter("api-doc-uri-base");
+
     Assert.assertNotNull(config.getInitParameter("http-api-uri-base"));
   }
-  
+
   @Test
-  public void testDoGet() throws IOException, ServletException, GenericEntityException, GenericServiceException {
-    Cache<String,View> viewCache = (Cache<String,View>) SimpleCacheManager.createCache("mock-cache");
-    Delegator delegator = new EbeanDelegator();
-    ServiceDispatcher serviceDispatcher = new ServiceDispatcher(delegator);
-    MockServletOutputStream msos = new MockServletOutputStream();
-    StringWriter writer = new StringWriter();
+  public void testDoGetSuccess() throws IOException, ServletException, GenericEntityException, GenericServiceException {
+    String viewName = "/WEB-INF/views/index.jsp";
+    initMockReq("/",viewName);
+
+    Vector<String> v = new Vector<String>();
+    v.addElement("username");
+    when(req.getParameter("username")).thenReturn("hbh");
+
+    Enumeration<String> enumeration = v.elements();
+    when(req.getParameterNames()).thenReturn(enumeration);
     
-    
-    when(context.getAttribute(C.APPLICATION_CONFIG_PROP_KEY)).thenReturn(applicationConfig);
-    when(config.getInitParameter("jsp-view-base-path")).thenReturn("");
+    dispatchServlet.init(config);
+    dispatchServlet.doGet(req, resp);
+
+    Log.d("Content:" + resp.getContentAsString(), TAG);
+
+    verify(req, times(1)).getRequestDispatcher(viewName);
+    Assert.assertEquals("text/html;charset=utf-8", resp.getContentType());
+    Assert.assertEquals("hbh", req.getParameter("username"));
+  }
+
+  @Test
+  public void testLoadActionXmlConfig() throws IOException {
+    String path = FlexibleLocation.resolveLocation("./").getPath();
+    Log.d("Path >" + path, TAG);
+    List<ActionModel> actionModels = new ArrayList<>();
+    ActionModelXmlConfigLoader.me().loadXml(path, actionModels);
+    Log.d("actionModels > " + actionModels, TAG);
+    Assert.assertEquals(true, actionModels.size() > 0);
+
+    Action action = shouldHasAction("/order/create", actionModels);
+    Assert.assertNotNull(action);
+    Assert.assertEquals(true, "byConfig".equals(action.processType));
+    Assert.assertEquals(true, action.serviceCallList.size() == 1);
+
+    Assert.assertEquals(true, action.serviceCallList.get(0).serviceName.equals("createOrder"));
+    Assert.assertEquals(true, "json".equals(action.response.viewType));
+
+    action = shouldHasAction("/product/detail", actionModels);
+    Assert.assertNotNull(action);
+
+    action = shouldHasAction("/news/**", actionModels);
+    Assert.assertNotNull(action);
+
+    action = shouldHasAction("/customer/detail", actionModels);
+    Assert.assertNotNull(action);
+  }
+
+
+  private void initMockReq(String requestUri,String viewName) throws MalformedURLException {
+    when(config.getInitParameter("jsp-view-base-path")).thenReturn("/WEB-INF/views/");
     when(config.getInitParameter("uri-suffix")).thenReturn("");
     when(config.getInitParameter("http-api-uri-base")).thenReturn("/api");
     when(config.getInitParameter("rest-api-uri-base")).thenReturn("/rest");
     when(config.getInitParameter("api-doc-uri-base")).thenReturn("/doc");
     when(config.getServletContext()).thenReturn(context);
-    
+
+    when(context.getAttribute(C.APPLICATION_CONFIG_PROP_KEY)).thenReturn(applicationConfig);
+    when(context.getAttribute(C.APPLICATION_CONFIG_PROP_KEY)).thenReturn(applicationConfig);
     when(context.getAttribute(C.CTX_DELETAGOR)).thenReturn(delegator);
     when(context.getAttribute(C.CTX_SERVICE_DISPATCHER)).thenReturn(serviceDispatcher);
     when(context.getAttribute(C.APPLICATION_CONFIG_PROP_KEY)).thenReturn(applicationConfig);
-    when(context.getAttribute(C.CTX_JSP_VIEW_BASEPATH)).thenReturn("/");
+    when(context.getAttribute(C.CTX_JSP_VIEW_BASEPATH)).thenReturn("/WEB-INF/views");
     when(context.getAttribute(C.CTX_URI_SUFFIX)).thenReturn("");
     when(context.getAttribute(C.CTX_SUPPORTED_VIEW_ATTRIBUTE)).thenReturn(viewCache);
     when(context.getAttribute(C.CTX_ACTION_MODEL)).thenReturn(getActionModels());
-    
+
     when(req.getServletContext()).thenReturn(context);
     when(req.getContextPath()).thenReturn("");
-    when(req.getRequestURI()).thenReturn("/");
+    when(req.getRequestURI()).thenReturn(requestUri);
     
-    Vector<String> v = new Vector<String>();
-    v.addElement("test");
-    when(req.getParameter("test")).thenReturn("test");
-    
-    Enumeration<String> enumeration = v.elements();
-    when(req.getParameterNames()).thenReturn(enumeration);
-    
-    when(resp.getOutputStream()).thenReturn(msos);
-    when(resp.getWriter()).thenReturn(new PrintWriter(writer)); 
-    
-   
-    
-    when(req.getAttribute("viewName")).thenReturn("/index.jsp");
-    when(req.getRequestDispatcher("/index.jsp")).thenReturn(requestDispatcher);
-    
-    DispatchServlet dispatchServlet = new DispatchServlet();
-    dispatchServlet.init(config);
-    dispatchServlet.doGet(req, resp);
-    resp.flushBuffer();
-    Log.d("Response > " + resp.getContentLength(), TAG);
+    MockRequestDispatcher requestDispatcher = new MockRequestDispatcher(viewName);
+    when(req.getAttribute("viewName")).thenReturn(viewName);
+    when(req.getRequestDispatcher(viewName)).thenReturn(requestDispatcher);
   }
-  
-  @Test
-  public void testLoadConfig() throws IOException {
-    Log.d("Start testing....", TAG);
-    
-    String path = FlexibleLocation.resolveLocation("./").getPath();
-    Log.d("Path >" + path, TAG);
-    List<ActionModel> actionModels = new ArrayList<>(); 
-    ActionModelXmlConfigLoader.me().loadXml(path,actionModels);
-    Log.d("actionModels > " +actionModels, TAG);
-    Assert.assertEquals(true, actionModels.size() > 0);
-    
-    Action action = shouldHasAction("/order/create", actionModels);
-    Assert.assertNotNull(action);
-    Assert.assertEquals(true, "byConfig".equals(action.processType));
-    Assert.assertEquals(true, action.serviceCallList.size() == 1);
-    
-    Assert.assertEquals(true, action.serviceCallList.get(0).serviceName.equals("createOrder"));
-    Assert.assertEquals(true, "json".equals(action.response.viewType));
-    
-    action = shouldHasAction("/product/detail", actionModels);
-    Assert.assertNotNull(action);
-    
-    action = shouldHasAction("/news/**", actionModels);
-    Assert.assertNotNull(action);
-    
-    action = shouldHasAction("/customer/detail", actionModels);
-    Assert.assertNotNull(action);
-  }
-  
-  
-  private Action shouldHasAction(String actionUri,List<ActionModel> actionModels) {
+
+  private Action shouldHasAction(String actionUri, List<ActionModel> actionModels) {
     for (ActionModel actionModel : actionModels) {
       List<Action> actions = actionModel.actionList;
       for (Action action : actions) {
@@ -192,7 +189,7 @@ public class WebAppTest {
     }
     return null;
   }
-  
+
   private List<ActionModel> getActionModels() throws MalformedURLException {
     List<ActionModel> actionModels = new ArrayList<ActionModel>();
     ActionModelXmlConfigLoader.me().loadXml(FlexibleLocation.resolveLocation("./").getPath(), actionModels);

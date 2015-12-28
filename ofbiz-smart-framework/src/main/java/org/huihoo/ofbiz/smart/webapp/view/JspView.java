@@ -32,9 +32,9 @@ public class JspView implements View {
     
     boolean isIncludeRequest = request.getAttribute(C.INCLUDE_REQUEST_URI_ATTRIBUTE) != null || response.isCommitted();
     try {
+      response.setContentType(getContentType());
       if (isIncludeRequest) {
         Log.d("Including resource [" + viewName + "] in JspView.", TAG);
-        response.setContentType(getContentType());
         rd.include(request, response);
       } else {
         Log.d("Forwarding to resource [" + viewName + "] in JspView.", TAG);
