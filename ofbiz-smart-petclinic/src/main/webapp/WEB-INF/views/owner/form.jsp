@@ -23,6 +23,26 @@
 	  		</c:otherwise>
 	  	</c:choose>
 		  	
+		<c:if test="${not empty(error)}">
+			<div class="alert alert-danger alert-dismissible fade in" role="alert">
+		      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+		      <h4>:(  抱歉，操作失败!</h4>
+		      <p>原因：${errorMessage }</p>
+		      <c:if test="${not empty(validationErrors) }">
+		      	<c:forEach items="${validationErrors}" var="ve">
+		      		<ul>
+		      			<li>${ve.key }
+		      				<ul>
+		      					<c:forEach items="${ve.value }" var="vee">
+		      						<li>${vee.filedMessage }</li>
+		      					</c:forEach>
+		      				</ul>
+		      			</li>
+		      		</ul>
+		      	</c:forEach>
+		      </c:if>
+		    </div>
+		</c:if>
 		
 		<form action="${action}" method="post">
 		  <input type="hidden" name="id" value="${model.id }"/>

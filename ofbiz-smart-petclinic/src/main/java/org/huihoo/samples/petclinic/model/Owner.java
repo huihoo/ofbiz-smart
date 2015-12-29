@@ -7,9 +7,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
+import org.huihoo.ofbiz.smart.base.validation.Required;
+
 @Entity
 @Table(name = "owners")
 public class Owner extends Person {
+  @Required
   private String address;
 
   private String city;
@@ -50,6 +53,21 @@ public class Owner extends Person {
 
   public void setPets(Set<Pet> pets) {
     this.pets = pets;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("Owner [address=");
+    builder.append(address);
+    builder.append(", city=");
+    builder.append(city);
+    builder.append(", telephone=");
+    builder.append(telephone);
+    builder.append(", pets=");
+    builder.append(pets);
+    builder.append("]");
+    return builder.toString();
   }
   
   

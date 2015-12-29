@@ -33,4 +33,33 @@ public class BaseModel {
   public boolean isNew() {
     return (this.id == null);
   }
+
+  public Date getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(Date createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public Date getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(Date updatedAt) {
+    this.updatedAt = updatedAt;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("BaseModel [id=");
+    builder.append(id);
+    builder.append(", createdAt=");
+    builder.append(createdAt);
+    builder.append(", updatedAt=");
+    builder.append(updatedAt);
+    builder.append("]");
+    return builder.toString();
+  }
 }
