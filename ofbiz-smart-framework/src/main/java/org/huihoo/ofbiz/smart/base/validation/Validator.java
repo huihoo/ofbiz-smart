@@ -6,10 +6,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.AlphanumValidator;
@@ -41,7 +44,7 @@ public class Validator {
 
   private final static Map<Class<? extends Annotation>, List<? extends Class<?>>> builtinConstraints;
 
-  public static final String[] EXCLUDE_INCLUDE_NAMES = {"serialVersionUID", "_EBEAN_", "_ebean"};
+  public static final String[] EXCLUDE_INCLUDE_NAMES = {"serialVersionUID", "_EBEAN_", "_ebean","_ctx","ebean","action.config."};
 
   static {
     Map<Class<? extends Annotation>, List<? extends Class<?>>> tmpConstraints = new HashMap<>();
@@ -66,14 +69,21 @@ public class Validator {
   public static List<ConstraintViolation> validate(Object target) {
     return validate(target, ValidateProfile.ALL);
   }
-
-  public static List<ConstraintViolation> validate(Object target, ValidateProfile profile) {
+  
+  
+  public static List<ConstraintViolation> validate(Object target, Map<String,Object> ctx,ValidateProfile profile) {
     List<ConstraintViolation> constraintViolations = new ArrayList<>();
     if (target == null) {
       return constraintViolations;
     }
    
+    Log.d("Validation Object : " + target, TAG);
     try {
+      Iterator<Entry<String, Object>> iter = ctx.entrySet().iterator();
+      while (iter.hasNext()) {
+        
+      }
+      //FIXME superClass field validation?
       Field[] fields = target.getClass().getDeclaredFields();
       for (Field f : fields) {
         String fieldName = f.getName();
@@ -86,6 +96,41 @@ public class Validator {
           }
         }
         if (exclude) {
+          continue;
+        }
+
+        String fieldTypeName = f.getType().getName();
+        Object value = null;
+        try {
+          value = Ognl.getValue(fieldName, target);
+          Log.d("field(%s,%s,%s)", TAG, fieldName, fieldTypeName, value);
+        } catch (OgnlException e) {
+          Log.w("Unable to get property %s value", TAG, fieldName);
+          continue;
+        }
+
+        validateField(constraintViolations, profile, f, value);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Log.w("Unable to validate for object[%s] : %s", TAG, target, e.getMessage());
+    }
+
+    return constraintViolations;
+  }
+
+  public static List<ConstraintViolation> validate(Object target, ValidateProfile profile) {
+    List<ConstraintViolation> constraintViolations = new ArrayList<>();
+    if (target == null) {
+      return constraintViolations;
+    }
+    Log.d("Validation Object : " + target, TAG);
+    try {
+      //FIXME superClass field validation?
+      Field[] allFields = getFields(target);
+      for (Field f : allFields) {
+        String fieldName = f.getName();
+        if (ignore(fieldName)) {
           continue;
         }
 
@@ -214,5 +259,50 @@ public class Validator {
     } catch (InvocationTargetException e) {
       Log.w("Unable to validate for field[%s] : %s", TAG, f, e.getMessage());
     }
+  }
+  
+  
+  private static Field[] getFields(Object target) {
+    int len = 0;
+    Field[] firstParentFields = null;
+    Field[] secondParentFields = null;
+    //first level superClass
+    Class<?> superClazz = target.getClass().getSuperclass();
+    if (superClazz != null) {
+      firstParentFields = superClazz.getDeclaredFields();
+      len += firstParentFields.length;
+      
+      //second level superClass(max hierarchy level is 2.)
+      Class<?> secondSupperClass = superClazz.getSuperclass();
+      if (secondSupperClass != null) {
+        secondParentFields = secondSupperClass.getDeclaredFields();
+        len += secondParentFields.length;
+      }
+    }
+       
+    Field[] fields = target.getClass().getDeclaredFields();
+    len += fields.length;
+    
+    Field[] allFields = new Field[len];
+    
+    System.arraycopy(fields, 0, allFields, 0, fields.length);
+    
+    if (firstParentFields != null) {
+      System.arraycopy(firstParentFields, 0, allFields, fields.length, firstParentFields.length);
+    }
+    if (secondParentFields != null) {
+      System.arraycopy(secondParentFields, 0, allFields, fields.length + firstParentFields.length, secondParentFields.length);
+    }
+    
+    return allFields;
+  }
+  
+  private static boolean ignore(String fieldName) {
+    for (String excludeName : EXCLUDE_INCLUDE_NAMES) {
+      if (fieldName.equals(excludeName) || fieldName.startsWith(excludeName)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
