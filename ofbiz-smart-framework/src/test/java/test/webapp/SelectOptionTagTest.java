@@ -49,7 +49,7 @@ public class SelectOptionTagTest {
      tag.setClassName("test.entity.CustomerType");
      
      
-     tag.setLabelName("name");
+     tag.setLabelName("name");  
      tag.setValueName("id");
      tag.setLiveTimeInSeconds(3);
      tag.doStartTag();

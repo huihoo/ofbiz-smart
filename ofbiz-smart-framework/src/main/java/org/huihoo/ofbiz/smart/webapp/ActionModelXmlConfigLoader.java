@@ -64,7 +64,7 @@ public class ActionModelXmlConfigLoader {
         try {
           parser = factory.newSAXParser();
           ActionModel actionModel = new ActionModel();
-          //NOTICE: 如果以文件进行解析，有可能会报Content is not allowed in prolog的诡异异常
+          //NOTICE: 如果以File对象进行解析，有可能会报Content is not allowed in prolog的异常
           //parser.parse(ff, new SaxHandler(actionModel));
           parser.parse(new FileInputStream(ff), new SaxHandler(actionModel));
           Log.d("Loaded action config [" + ff.getPath() + "]", TAG);

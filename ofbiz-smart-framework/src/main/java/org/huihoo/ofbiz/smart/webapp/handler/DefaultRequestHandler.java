@@ -21,6 +21,7 @@ import org.huihoo.ofbiz.smart.base.util.PathMatcher;
 import org.huihoo.ofbiz.smart.base.util.ServiceUtil;
 import org.huihoo.ofbiz.smart.entity.Delegator;
 import org.huihoo.ofbiz.smart.service.ServiceDispatcher;
+import org.huihoo.ofbiz.smart.service.ServiceEngineType;
 import org.huihoo.ofbiz.smart.service.ServiceModel;
 import org.huihoo.ofbiz.smart.webapp.ActionModel;
 import org.huihoo.ofbiz.smart.webapp.ProcessType;
@@ -56,6 +57,7 @@ public class DefaultRequestHandler implements RequestHandler {
     ServletContext sc = req.getServletContext();
     //获取保存在Web上下文中的关键对象和配置参数
     Delegator delegator = (Delegator) sc.getAttribute(C.CTX_DELETAGOR);
+    Log.d("Delegator > " + delegator, TAG);
     ServiceDispatcher serviceDispatcher = (ServiceDispatcher) sc.getAttribute(C.CTX_SERVICE_DISPATCHER);
     Properties applicationConfig = (Properties) sc.getAttribute(C.APPLICATION_CONFIG_PROP_KEY);
     List<ActionModel> actionModels = (List<ActionModel>) sc.getAttribute(C.CTX_ACTION_MODEL);
@@ -79,31 +81,33 @@ public class DefaultRequestHandler implements RequestHandler {
     
     if (reqAction != null) {
       Map<String, Object> modelMap = ServiceUtil.returnSuccess();
+      
       //build web ctx for service call.
-      Map<String, Object> ctx = WebAppUtil.buildWebCtx(req);
+      Map<String, Object> webCtx = WebAppUtil.buildWebCtx(req);
+      
       //calling all available configured service
       List<ServiceCall> serviceCalls = reqAction.serviceCallList;
       if (CommUtil.isNotEmpty(serviceCalls)) {
         for (ServiceCall serviceCall : serviceCalls) {
-          ctx.put(C.SERVICE_RESULT_NAME_ATTRIBUTE, serviceCall.resultName);//set service result name
+          webCtx.put(C.SERVICE_RESULT_NAME_ATTRIBUTE, serviceCall.resultName);//set service result name
           ServiceModel sm = new ServiceModel();
           //set param pairs
           if (CommUtil.isNotEmpty(serviceCall.paramPairs)) {
             String p = WebAppUtil.analyzeParamPairString(serviceCall.paramPairs, req);
-            ctx.putAll(ServiceUtil.covertParamPairToMap(p));
+            webCtx.putAll(ServiceUtil.covertParamPairToMap(p));
           }
           //entityAuto service
-          if (serviceCall.serviceName.startsWith("entityAuto#")) {
+          if (serviceCall.serviceName.startsWith( ServiceEngineType.ENTITY_AUTO.value() + "#") ) {
             sm.name = serviceCall.serviceName;
-            sm.engineName = "entityAuto";
+            sm.engineName = ServiceEngineType.ENTITY_AUTO.value();
             sm.entityName = serviceCall.entityName;
-            sm.invoke = serviceCall.serviceName.substring("entityAuto#".length());
+            sm.invoke = serviceCall.serviceName.substring( (ServiceEngineType.ENTITY_AUTO.value() + "#").length() );
           } else {//normal java service
             sm.name = serviceCall.serviceName;
-            sm.engineName = "java";
+            sm.engineName = ServiceEngineType.JAVA.value();
           }
           serviceDispatcher.registerService(sm);
-          Map<String, Object> sResult = serviceDispatcher.runSync(sm.name, ctx);
+          Map<String, Object> sResult = serviceDispatcher.runSync(sm.name, webCtx);
           if (ServiceUtil.isSuccess(sResult)) {
             modelMap.putAll(sResult);
           }
@@ -122,6 +126,7 @@ public class DefaultRequestHandler implements RequestHandler {
         viewType = "jsp";
       }
       View view = viewCache.get(viewType);   
+      //Just for test.
       if (view == null) {
         if ("jsp".equals(viewType)) {
           view = new JspView();          
@@ -134,6 +139,7 @@ public class DefaultRequestHandler implements RequestHandler {
         }
         viewCache.put(viewType, view);
       }
+      
       if (ProcessType.URI_AUTO.value().equals(reqAction.processType)) {
         String viewName = null;
         if (layout != null) {
@@ -143,19 +149,21 @@ public class DefaultRequestHandler implements RequestHandler {
           viewName = jspViewBasePath + targetUri + ".jsp";
         }
         req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, viewName);
+        //TODO
       } else if (ProcessType.ENTITY_AUTO.value().equals(reqAction.processType)) {
         try {
           view = viewCache.get("jsp");
           doEntityAutoAction(modelMap,serviceDispatcher, req, resp,applicationConfig, 
                                                                    targetUri, 
                                                                    jspViewBasePath,uriSuffix,
-                                                                   viewCache,view,reqAction,ctx,layout);
+                                                                   viewCache,view,reqAction,webCtx,layout);
           
         } catch (ViewException e) {
           throw new ServletException(e);
         }
-        return ;//自动处理时，忽略后面的处理
+        return ;
       } else if (ProcessType.BY_CONFIG.value().equals(reqAction.processType)) {
+        //TODO
         req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + targetUri + ".jsp");
       }
       try {
@@ -163,6 +171,8 @@ public class DefaultRequestHandler implements RequestHandler {
       } catch (ViewException e) {
         throw new ServletException(e);
       }
+    } else {
+      resp.sendError(404, "Page not found.");
     }
   }
 
@@ -194,7 +204,7 @@ public class DefaultRequestHandler implements RequestHandler {
    * @param viewCache          界面缓存
    * @param view               当前界面对象
    * @param reqAction          当前Action
-   * @param ctx                当前请求上下文
+   * @param webCtx             当前请求上下文
    * @param layout             布局
    * @throws ViewException
    */
@@ -209,7 +219,7 @@ public class DefaultRequestHandler implements RequestHandler {
                                   Cache<String, View> viewCache,
                                   View view,
                                   Action reqAction,
-                                  Map<String,Object> ctx,
+                                  Map<String,Object> webCtx,
                                   String layout) throws ViewException {
     String[] spiltUri = targetUri.split("/");
     if (spiltUri.length < 2) {
@@ -240,7 +250,7 @@ public class DefaultRequestHandler implements RequestHandler {
     
     Map<String,Object> result = ServiceUtil.returnSuccess();
     ServiceModel sm = new ServiceModel();
-    sm.engineName = "entityAuto";
+    sm.engineName = ServiceEngineType.ENTITY_AUTO.value();
     sm.entityName = entityClazzName;
     
     
@@ -275,11 +285,10 @@ public class DefaultRequestHandler implements RequestHandler {
     //TODO 验证输入参数
     serviceDispatcher.registerService(sm);
     if (sm.invoke != null) {
-      result = serviceDispatcher.runSync(sm.name, ctx);
+      result = serviceDispatcher.runSync(sm.name, webCtx);
     }
     
-    if (ServiceUtil.isSuccess(result)) {
-      
+    if (ServiceUtil.isSuccess(result)) {      
       boolean overrideRedirectFlag = false;
       if (reqAction.response != null && "redirect".equals(reqAction.response.viewType)) {
         redirectView = viewCache.get("redirect");
@@ -314,9 +323,22 @@ public class DefaultRequestHandler implements RequestHandler {
         req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, viewName);
         Log.d("layoutContentView : " + viewName, TAG);
         view.render(modelMap, req, resp);
+        if (req.getSession().getAttribute("flashMap") != null) {
+          req.getSession().removeAttribute("flashMap");
+        }
       }
     } else {
-      Log.d("Result : " + result, TAG);
+      //跳转至上一个界面,并将错误信息和提交的数据保存至FlashSession里
+      webCtx.put(C.RESPOND_VALIDATION_ERRORS, result.get(C.RESPOND_VALIDATION_ERRORS));
+      req.getSession().setAttribute("flashMap", webCtx);
+      String referer = req.getHeader("referer");
+      String encodedRedirectURL = resp.encodeRedirectURL(referer);
+      resp.setStatus(303);
+      resp.setHeader("Location", encodedRedirectURL);
+    }
+    
+    if (redirectView != null) {
+      
     }
   }
 
