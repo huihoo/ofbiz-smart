@@ -126,7 +126,7 @@ public class WebAppUtil {
     }
     String[] paramPair = requestParams.split("=");
     if (paramPair.length % 2 != 0) {
-      throw new IllegalArgumentException("Illegal request param.");
+      throw new IllegalArgumentException("Illegal request params [" + requestParams + "]");
     }
     for (int i = 0; i < paramPair.length; i++) {
       String key = paramPair[i];
@@ -179,5 +179,14 @@ public class WebAppUtil {
       }
     }
   }
-
+  
+  
+  public static String buildQueryString(HttpServletRequest request) {
+    StringBuilder sb = new StringBuilder();
+    String queryString = request.getQueryString();
+    if (CommUtil.isNotEmpty(queryString)) {
+      
+    }
+    return sb.toString();
+  }
 }

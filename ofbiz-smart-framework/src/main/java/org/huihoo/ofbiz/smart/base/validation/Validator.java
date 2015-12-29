@@ -6,14 +6,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
+import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.AlphanumValidator;
 import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.DecimalMaxValidator;
@@ -30,7 +29,6 @@ import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.NullValidator;
 import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.PatternValidator;
 import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.RequiredValidator;
 import org.huihoo.ofbiz.smart.base.validation.constraintvalidator.UrlValidator;
-
 
 import ognl.Ognl;
 import ognl.OgnlException;
@@ -66,63 +64,14 @@ public class Validator {
     builtinConstraints = Collections.unmodifiableMap(tmpConstraints);
   }
 
-  public static List<ConstraintViolation> validate(Object target) {
+  public static Map<String,List<ConstraintViolation>> validate(Object target) {
     return validate(target, ValidateProfile.ALL);
   }
-  
-  
-  public static List<ConstraintViolation> validate(Object target, Map<String,Object> ctx,ValidateProfile profile) {
-    List<ConstraintViolation> constraintViolations = new ArrayList<>();
+
+  public static Map<String,List<ConstraintViolation>> validate(Object target, ValidateProfile profile) {
+    Map<String,List<ConstraintViolation>> constraintViolationMap = new LinkedHashMap<>();
     if (target == null) {
-      return constraintViolations;
-    }
-   
-    Log.d("Validation Object : " + target, TAG);
-    try {
-      Iterator<Entry<String, Object>> iter = ctx.entrySet().iterator();
-      while (iter.hasNext()) {
-        
-      }
-      //FIXME superClass field validation?
-      Field[] fields = target.getClass().getDeclaredFields();
-      for (Field f : fields) {
-        String fieldName = f.getName();
-
-        boolean exclude = false;
-        for (String excludeName : EXCLUDE_INCLUDE_NAMES) {
-          if (fieldName.equals(excludeName) || fieldName.startsWith(excludeName)) {
-            exclude = true;
-            break;
-          }
-        }
-        if (exclude) {
-          continue;
-        }
-
-        String fieldTypeName = f.getType().getName();
-        Object value = null;
-        try {
-          value = Ognl.getValue(fieldName, target);
-          Log.d("field(%s,%s,%s)", TAG, fieldName, fieldTypeName, value);
-        } catch (OgnlException e) {
-          Log.w("Unable to get property %s value", TAG, fieldName);
-          continue;
-        }
-
-        validateField(constraintViolations, profile, f, value);
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-      Log.w("Unable to validate for object[%s] : %s", TAG, target, e.getMessage());
-    }
-
-    return constraintViolations;
-  }
-
-  public static List<ConstraintViolation> validate(Object target, ValidateProfile profile) {
-    List<ConstraintViolation> constraintViolations = new ArrayList<>();
-    if (target == null) {
-      return constraintViolations;
+      return constraintViolationMap;
     }
     Log.d("Validation Object : " + target, TAG);
     try {
@@ -143,21 +92,23 @@ public class Validator {
           Log.w("Unable to get property %s value", TAG, fieldName);
           continue;
         }
-
-        validateField(constraintViolations, profile, f, value);
+        List<ConstraintViolation> tmpList = validateField(profile, f, value);
+        if (CommUtil.isNotEmpty(tmpList)) {
+          constraintViolationMap.put(fieldName, validateField(profile, f, value));
+        }
       }
     } catch (Exception e) {
       e.printStackTrace();
       Log.w("Unable to validate for object[%s] : %s", TAG, target, e.getMessage());
     }
 
-    return constraintViolations;
+    return constraintViolationMap;
   }
 
 
   @SuppressWarnings({"unchecked", "rawtypes"})
-  private static void validateField(List<ConstraintViolation> constraintViolations, ValidateProfile profile, Field f,
-      Object value) {
+  private static List<ConstraintViolation> validateField(ValidateProfile profile, Field f,Object value) {
+    List<ConstraintViolation> constraintViolations = new ArrayList<>();
     Object[] annos = null;
     try {
       String fieldName = f.getName();
@@ -259,6 +210,7 @@ public class Validator {
     } catch (InvocationTargetException e) {
       Log.w("Unable to validate for field[%s] : %s", TAG, f, e.getMessage());
     }
+    return constraintViolations;
   }
   
   

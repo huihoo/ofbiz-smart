@@ -1,7 +1,7 @@
 package org.huihoo.ofbiz.smart.base.util;
 
 
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +43,7 @@ public class ServiceUtil {
   }
 
   public static Map<String, Object> returnProplem(String code, String message,
-                                                  List<ConstraintViolation> constraintViolations) {
+                                                  Map<String,List<ConstraintViolation>> constraintViolationMap) {
     Map<String, Object> result = new HashMap<>();
     if (code != null) {
       result.put(RESPOND_ERROR, code);
@@ -51,14 +51,14 @@ public class ServiceUtil {
     if (message != null) {
       result.put(RESPONSE_MESSAGE, message);
     }
-    if (CommUtil.isNotEmpty(constraintViolations)) {
-      result.put(C.RESPOND_VALIDATION_ERRORS, constraintViolations);
+    if (CommUtil.isNotEmpty(constraintViolationMap)) {
+      result.put(C.RESPOND_VALIDATION_ERRORS, constraintViolationMap);
     }
     return result;
   }
 
   public static Map<String, Object> returnProplem(String code, String message) {
-    return returnProplem(code, message, new ArrayList<ConstraintViolation>());
+    return returnProplem(code, message, null);
   }
 
 

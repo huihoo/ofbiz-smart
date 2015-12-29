@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 
 public class ValidationTest {
   private final static String TAG = ValidationTest.class.getName();
@@ -16,16 +17,18 @@ public class ValidationTest {
   public void testAllInOne() {
     Log.d("Start testing...", TAG);
     ValidationUser vu = new ValidationUser();
-    List<ConstraintViolation> constraintViolationList = Validator.validate(vu);
-    Assert.assertEquals(2, constraintViolationList.size());
+    Map<String,List<ConstraintViolation>> constraintViolationMap = Validator.validate(vu);
+    Log.d("" + constraintViolationMap, TAG);
+    Assert.assertEquals(true, constraintViolationMap.containsKey("username"));
 
     vu.setUsername("ABC");
-    constraintViolationList = Validator.validate(vu);
-    Assert.assertEquals(2, constraintViolationList.size());
+    constraintViolationMap = Validator.validate(vu);
+    Log.d("" + constraintViolationMap, TAG);
+    Assert.assertEquals(true, constraintViolationMap.containsKey("age"));
     
     vu.setAge(20);
-    constraintViolationList = Validator.validate(vu);
-    Assert.assertEquals(1, constraintViolationList.size());
+    constraintViolationMap = Validator.validate(vu);
+    Log.d("" + constraintViolationMap, TAG);
   }
 
 

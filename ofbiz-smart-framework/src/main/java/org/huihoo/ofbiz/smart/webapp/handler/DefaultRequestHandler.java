@@ -323,22 +323,24 @@ public class DefaultRequestHandler implements RequestHandler {
         req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, viewName);
         Log.d("layoutContentView : " + viewName, TAG);
         view.render(modelMap, req, resp);
-        if (req.getSession().getAttribute("flashMap") != null) {
-          req.getSession().removeAttribute("flashMap");
-        }
+        //clear temp object in session.
+        req.getSession().removeAttribute("flashMap");
+        req.getSession().removeAttribute("validationErrors");
+        req.getSession().removeAttribute("errorMessage");
+        req.getSession().removeAttribute("error");
       }
     } else {
-      //跳转至上一个界面,并将错误信息和提交的数据保存至FlashSession里
-      webCtx.put(C.RESPOND_VALIDATION_ERRORS, result.get(C.RESPOND_VALIDATION_ERRORS));
+      //add temp object in session for next uri can get it.
       req.getSession().setAttribute("flashMap", webCtx);
+      req.getSession().setAttribute("validationErrors", result.get(C.RESPOND_VALIDATION_ERRORS));
+      req.getSession().setAttribute("errorMessage", result.get(ServiceUtil.RESPONSE_MESSAGE));
+      req.getSession().setAttribute("error", result.get(ServiceUtil.RESPOND_ERROR));
+      //redirect to last uri
       String referer = req.getHeader("referer");
-      String encodedRedirectURL = resp.encodeRedirectURL(referer);
+      String queryString = req.getQueryString();
+      String encodedRedirectURL = resp.encodeRedirectURL(queryString == null ? referer : referer + "?" + queryString);
       resp.setStatus(303);
       resp.setHeader("Location", encodedRedirectURL);
-    }
-    
-    if (redirectView != null) {
-      
     }
   }
 

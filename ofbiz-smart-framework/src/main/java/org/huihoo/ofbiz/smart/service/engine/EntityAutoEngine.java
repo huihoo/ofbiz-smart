@@ -77,10 +77,9 @@ public class EntityAutoEngine extends GenericAsyncEngine {
         case C.SERVICE_ENGITYAUTO_CREATE:
           Object modelObj = entityClazz.newInstance();
           EntityConverter.convertFrom(modelObj, ctx, delegator);
-          List<ConstraintViolation> constraintViolations =  Validator.validate(modelObj, ValidateProfile.CREATE);
-          if (CommUtil.isNotEmpty(constraintViolations)) {
-            return ServiceUtil.returnProplem("VALIDATION_NOT_PASSED", "Validation being unable to be passed.", 
-                                                                                            constraintViolations);
+          Map<String,List<ConstraintViolation>> constraintViolationMap =  Validator.validate(modelObj, ValidateProfile.CREATE);
+          if (CommUtil.isNotEmpty(constraintViolationMap)) {
+            return ServiceUtil.returnProplem("VALIDATION_NOT_PASSED", "Validation has been not passed.",constraintViolationMap);
           }
           delegator.save(modelObj);  
           if (resultName != null) {
