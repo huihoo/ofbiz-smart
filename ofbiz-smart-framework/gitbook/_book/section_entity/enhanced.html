@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.4" data-basepath=".." data-revision="Fri Jan 01 2016 23:37:47 GMT+0800 (CST)">
+    <div class="book" data-level="2.4" data-basepath=".." data-revision="Sat Jan 02 2016 22:08:08 GMT+0800 (CST)">
     
 
 <div class="book-summary">
@@ -534,7 +534,38 @@
                 
                     <section class="normal" id="section-">
                     
-                        <p>TODO</p>
+                        <p>&#x7531;&#x4E8E;<strong>Delegator</strong>&#x7684;&#x9ED8;&#x8BA4;&#x5B9E;&#x73B0;<strong>EbeanDelegator</strong>&#xFF0C;&#x6784;&#x5EFA;&#x5728;<strong>Ebean</strong>&#x4E4B;&#x4E0A;&#x3002;&#x5B83;&#x8981;&#x6C42;&#x5728;&#x8C03;&#x7528;API&#x4E4B;&#x524D;&#xFF0C;&#x8981;&#x5BF9;&#x5B9E;&#x4F53;&#x8FDB;&#x884C;&#x52A8;&#x6001;&#x52A0;&#x5F3A;&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x52A8;&#x6001;&#x5BF9;&#x5B9E;&#x4F53;&#x8FDB;&#x884C;&#x8F6C;&#x6362;&#x64CD;&#x4F5C;&#xFF0C;&#x6BD4;&#x5982;&#x589E;&#x52A0;&#x5B9E;&#x4F53;&#x7684;toString(),hashCode()&#x65B9;&#x6CD5;&#xFF0C;
+&#x5728;&#x5B9E;&#x4F53;&#x4E2D;&#x589E;&#x52A0; <strong>Ebean</strong>&#x9700;&#x8981;&#x7684;&#x6807;&#x8BC6;&#x5B57;&#x6BB5;&#xFF0C;&#x8FD9;&#x4E9B;&#x5B57;&#x6BB5;&#x4E00;&#x822C;&#x4EE5;<strong>ebean</strong>&#x5F00;&#x5934;&#xFF0C;&#x4EE5;&#x53CA;&#x4E00;&#x4E9B;&#x65B9;&#x6CD5;&#x7B49;&#x7B49;&#x3002;</p>
+<p>&#x5B9E;&#x4F53;&#x7684;&#x52A8;&#x6001;&#x52A0;&#x5F3A;&#x7279;&#x6027;&#xFF0C;&#x57FA;&#x4E8E;<strong>Java Agent</strong>&#x673A;&#x5236;&#x3002;&#x540C;&#x4E00;&#x865A;&#x62DF;&#x673A;&#x6709;&#x4E9B;&#x9650;&#x5236;&#xFF0C;&#x6BD4;&#x5982;&#x5DF2;&#x7ECF;&#x52A8;&#x6001;&#x52A0;&#x5F3A;&#x5E76;&#x52A0;&#x8F7D;&#x5230;<strong>Java&#x865A;&#x62DF;&#x673A;</strong>&#x7684;&#x5B9E;&#x4F53;&#x7C7B;&#xFF0C;&#x4F1A;&#x5F71;&#x54CD;&#x5230;&#x5176;&#x5B83;&#x5B9E;&#x4F53;&#x7C7B;&#x52A0;&#x8F7D;&#x5230;&#x8BE5;&#x865A;&#x62DF;&#x673A;&#x3002;&#x4F1A;&#x9020;&#x6210;&#xFF0C;&#x540C;&#x4E00;&#x4E2A;tomcat&#x65E0;&#x6CD5;&#x8FD0;&#x884C;&#x591A;&#x4E2A; webapp&#x5E94;&#x7528;&#x3002;&#x6240;&#x4EE5;&#x4EC5;&#x5728;&#x5F00;&#x53D1;&#x6A21;&#x5F0F;&#x4E0B;&#xFF0C;<strong>OFBiz Smart</strong>&#x624D;&#x4F1A;&#x4F7F;&#x7528;<strong>Ebean</strong>&#x7684;&#x8FD9;&#x79CD;&#x65B9;&#x5F0F;&#x6765;&#x52A8;&#x6001;&#x52A0;&#x5F3A;&#x5B9E;&#x4F53;&#x7C7B;&#x3002;&#x5982;&#x4E0B;&#x9762;&#x7684;&#x4EE3;&#x7801;&#x6240;&#x793A;&#xFF1A;</p>
+<pre><code>// &#x4EC5;&#x5728;&#x975E;&#x751F;&#x4EA7;&#x73AF;&#x5883;&#x4E0B;&#x901A;&#x8FC7;&#x8FD9;&#x79CD;&#x65B9;&#x5F0F;&#x52A8;&#x6001;&#x589E;&#x5F3A;&#x5B9E;&#x4F53;&#x7279;&#x6027;
+String profile = applicationProps.getProperty(&quot;profile&quot;);
+    if (!C.PROFILE_PRODUCTION.equals(profile)) {
+      String entityPackages = applicationProps.getProperty(C.ENTITY_SCANNING_PACKAGES);
+      if (!AgentLoader.loadAgentFromClasspath(&quot;avaje-ebeanorm-agent&quot;,&quot;debug=1;packages=&quot;+entityPackages)) {
+          Log.i(&quot;avaje-ebeanorm-agent not found in classpath - not dynamically loaded&quot;,TAG);
+      }
+    }
+</code></pre><p>&#x6240;&#x4EE5;&#x5728;&#x751F;&#x4EA7;&#x73AF;&#x5883;&#x4E0B;&#x9762;&#xFF0C;&#x662F;&#x4E0D;&#x4F1A;&#x7528;&#x8FD9;&#x79CD;&#x65B9;&#x5F0F;&#x6765;&#x8F6C;&#x6362;&#x5B9E;&#x4F53;&#x7C7B;&#x7684;&#x3002;</p>
+<p>&#x5728;&#x751F;&#x4EA7;&#x73AF;&#x5883;&#x4E0B;&#x9762;&#xFF0C;&#x4F7F;&#x7528;<strong>Maven Plugin</strong>&#x7684;&#x5F62;&#x5F0F;&#x9884;&#x5148;&#x751F;&#x6210;&#x5DF2;&#x7ECF;&#x8F6C;&#x6362;&#x7684;&#x5B9E;&#x4F53;&#x7C7B;&#x3002;&#x8BE5;<strong>PlugIn</strong>&#x4E3A;:</p>
+<pre><code>          &lt;plugin&gt;
+                &lt;groupId&gt;org.avaje.ebeanorm&lt;/groupId&gt;
+                &lt;artifactId&gt;avaje-ebeanorm-mavenenhancer&lt;/artifactId&gt;
+                &lt;version&gt;4.7.1&lt;/version&gt;
+                &lt;executions&gt;
+                    &lt;execution&gt;
+                        &lt;id&gt;main&lt;/id&gt;
+                        &lt;phase&gt;process-test-classes&lt;/phase&gt;
+                        &lt;configuration&gt;
+                            &lt;packages&gt;test.entity.**&lt;/packages&gt;
+                            &lt;transformArgs&gt;debug=1&lt;/transformArgs&gt;
+                        &lt;/configuration&gt;
+                        &lt;goals&gt;
+                            &lt;goal&gt;enhance&lt;/goal&gt;
+                        &lt;/goals&gt;
+                    &lt;/execution&gt;
+                &lt;/executions&gt;
+            &lt;/plugin&gt;
+</code></pre><p>&#x4F7F;&#x7528;&#x547D;&#x4EE4; <strong> mvn clean install </strong> &#x6784;&#x5EFA;&#x9879;&#x76EE;&#x3002;</p>
 
                     
                     </section>
