@@ -8,7 +8,7 @@
         <title>操作API | OFBiz Smart</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
-        <meta name="generator" content="GitBook 2.3.3">
+        <meta name="generator" content="GitBook 2.2.0">
         
         
         <meta name="HandheldFriendly" content="true"/>
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.2.3" data-basepath=".." data-revision="Tue Dec 22 2015 22:27:43 GMT+0800 (中国标准时间)">
+    <div class="book" data-level="2.2.3" data-basepath=".." data-revision="Sat Jan 02 2016 22:08:08 GMT+0800 (CST)">
     
 
 <div class="book-summary">
@@ -534,8 +534,39 @@
                 
                     <section class="normal" id="section-">
                     
-                        <p>TODO</p>
+                        <p>&#x64CD;&#x4F5C;&#x7C7B;API&#x6307;&#x7684;&#x662F;&#x4FDD;&#x5B58;&#xFF0C;&#x66F4;&#x65B0;&#xFF0C;&#x5220;&#x9664;&#x5B9E;&#x4F53;&#xFF0C;&#x53CA;&#x5BF9;&#x5E94;&#x7684;&#x539F;&#x751F;SQL&#x3002;</p>
+<p>&#x5177;&#x4F53;&#x7684;API&#x5982;&#x4E0B;&#x6240;&#x793A;: </p>
+<pre><code>  void save(Collection&lt;?&gt; entities) throws GenericEntityException;
 
+  void save(Object entity) throws GenericEntityException;
+
+  void update(Collection&lt;?&gt; entities) throws GenericEntityException;
+
+  void update(Object entity) throws GenericEntityException;
+
+  void remove(Collection&lt;?&gt; entities) throws GenericEntityException;
+
+  void remove(Object entity) throws GenericEntityException;
+
+  void removeById(Class&lt;?&gt; entityClazz, Object id) throws GenericEntityException;
+
+  int executeByRawSql(String sql) throws GenericEntityException;
+
+  int executeByRawSql(String sql, List&lt;?&gt; params) throws GenericEntityException;
+</code></pre><p>&#x793A;&#x4F8B;&#x4EE3;&#x7801;&#x7247;&#x6BB5;:</p>
+<pre><code>Customer customer = new Customer();
+customer.setFirstname(&quot;hbh&quot;);
+customer.setLastname(&quot;peter&quot;);
+delegator.save(customer);
+
+customer.setAge(30);
+delegator.update(customer);
+
+int updatedCount = delegator.executeByRawSql(&quot;update customer set age = ? where id = ?&quot;,
+Arrays.asList(new Object[]{30,customer.getId()}));
+
+delegator.removeById(Customer.class,customer.getId());
+</code></pre>
                     
                     </section>
                 

@@ -8,7 +8,7 @@
         <title>查询表达式构建 | OFBiz Smart</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
-        <meta name="generator" content="GitBook 2.3.3">
+        <meta name="generator" content="GitBook 2.2.0">
         
         
         <meta name="HandheldFriendly" content="true"/>
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="2.2.5" data-basepath=".." data-revision="Tue Dec 22 2015 22:27:43 GMT+0800 (中国标准时间)">
+    <div class="book" data-level="2.2.5" data-basepath=".." data-revision="Sat Jan 02 2016 22:08:08 GMT+0800 (CST)">
     
 
 <div class="book-summary">
@@ -534,7 +534,132 @@
                 
                     <section class="normal" id="section-">
                     
-                        <p>TODO</p>
+                        <p>&#x6761;&#x4EF6;&#x8868;&#x8FBE;&#x5F0F;&#x9002;&#x7528;&#x4E8E;&#x4EE5;<strong>byCond</strong>&#x7ED3;&#x5C3E;&#x7684;API&#xFF0C;&#x683C;&#x5F0F;&#x4E3A; <strong>{fieldName,expr,value}{n+1}</strong>&#x3002;&#x4E00;&#x4E2A;&#x6761;&#x4EF6;&#x8868;&#x8FBE;&#x5F0F;&#x7B26;&#x53F7;&apos;<strong>{</strong>&apos;&#x5F00;&#x5934;&#xFF0C;&#x4EE5;&#x7B26;&#x53F7;&apos;<strong>}</strong>&apos;&#x7ED3;&#x5C3E;&#x3002;&#x8868;&#x8FBE;&#x5F0F;&#x91CC;&#x7684;&#x5B57;&#x7B26;&#x4E32;&#x4EE5;&#x9017;&#x53F7;&apos;<strong>,</strong>&apos;&#x9694;&#x5F00;&#xFF0C;&#x7B2C;&#x4E00;&#x4E2A;&#x5B57;&#x7B26;&#x4E32;&#x4E3A;&#x6307;&#x5B9A;&#x7684;&#x5C5E;&#x6027;&#x540D;&#x79F0;&#xFF0C;&#x7B2C;&#x4E8C;&#x4E2A;&#x5B57;&#x7B26;&#x4E32;&#x4E3A;&#x8868;&#x8FBE;&#x5F0F;&#xFF0C;&#x7B2C;&#x4E09;&#x4E2A;&#x4E3A;&#x5177;&#x4F53;&#x7684;&#x503C;&#x3002;&#x5404;<strong>&#x8868;&#x8FBE;&#x5F0F;</strong>&#x4E4B;&#x95F4;&#x4E3A; <strong>&#x4E0E;</strong> &#x7684;&#x5173;&#x7CFB;&#x3002;</p>
+<h3 id="%E6%94%AF%E6%8C%81%E7%9A%84%E8%A1%A8%E8%BE%BE%E5%BC%8F%EF%BC%9A">&#x652F;&#x6301;&#x7684;&#x8868;&#x8FBE;&#x5F0F;&#xFF1A;</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">&#x8868;&#x8FBE;&#x5F0F;</th>
+<th style="text-align:center">&#x63CF;&#x8FF0;</th>
+<th style="text-align:center">&#x793A;&#x4F8B;</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">eq</td>
+<td style="text-align:center">&#x7B49;&#x4E8E;&#x6307;&#x5B9A;&#x7684;&#x503C;</td>
+<td style="text-align:center">{firstName,eq,hbh} firstName&#x7B49;&#x4E8E;&apos;hbh&apos;</td>
+</tr>
+<tr>
+<td style="text-align:center">neq</td>
+<td style="text-align:center">&#x4E0D;&#x7B49;&#x4E8E;&#x503C;&#x5B9A;&#x7684;&#x503C;</td>
+<td style="text-align:center">{firstName,neq,hbh} firstName&#x4E0D;&#x7B49;&#x4E8E;&apos;hbh&apos;</td>
+</tr>
+<tr>
+<td style="text-align:center">ge</td>
+<td style="text-align:center">&#x5927;&#x4E8E;&#x7B49;&#x4E8E;&#x6307;&#x5B9A;&#x7684;&#x503C;</td>
+<td style="text-align:center">{age,ge,25} age&#x5927;&#x4E8E;&#x7B49;&#x4E8E;25</td>
+</tr>
+<tr>
+<td style="text-align:center">gt</td>
+<td style="text-align:center">&#x5927;&#x4E8E;&#x6307;&#x5B9A;&#x7684;&#x503C;</td>
+<td style="text-align:center">{age,gt,25} age&#x5927;&#x4E8E;25</td>
+</tr>
+<tr>
+<td style="text-align:center">le</td>
+<td style="text-align:center">&#x5C0F;&#x4E8E;&#x7B49;&#x4E8E;&#x6307;&#x5B9A;&#x7684;&#x503C;</td>
+<td style="text-align:center">{age,le,30} age&#x5C0F;&#x4E8E;&#x7B49;&#x4E8E;30</td>
+</tr>
+<tr>
+<td style="text-align:center">lt</td>
+<td style="text-align:center">&#x5C0F;&#x4E8E;&#x6307;&#x5B9A;&#x7684;&#x503C;</td>
+<td style="text-align:center">{age,lt,30} age&#x5C0F;&#x4E8E;30</td>
+</tr>
+<tr>
+<td style="text-align:center">between</td>
+<td style="text-align:center">&#x4ECB;&#x4E8E;&#x6307;&#x5B9A;&#x7684;&#x503C;&#x4E4B;&#x95F4;</td>
+<td style="text-align:center">{age,between,20#30} age&#x4ECB;&#x4E8E;20&#x81F3;30&#x4E4B;&#x95F4;</td>
+</tr>
+<tr>
+<td style="text-align:center">in</td>
+<td style="text-align:center">&#x5728;&#x6307;&#x5B9A;&#x7684;&#x503C;&#x96C6;&#x5408;&#x4E4B;&#x5185;</td>
+<td style="text-align:center">{id,in,1#2#3} id&#x5728;&#x6307;&#x5B9A;&#x7684;1,2,3&#x91CC;</td>
+</tr>
+<tr>
+<td style="text-align:center">notIn</td>
+<td style="text-align:center">&#x4E0D;&#x5728;&#x6307;&#x5B9A;&#x7684;&#x503C;&#x96C6;&#x5408;&#x4E4B;&#x5185;</td>
+<td style="text-align:center">{id,notIn,1#2#3} id&#x4E0D;&#x5728;&#x6307;&#x5B9A;&#x7684;1,2,3&#x91CC;</td>
+</tr>
+<tr>
+<td style="text-align:center">like</td>
+<td style="text-align:center">&#x5168;&#x901A;&#x914D;&#x7B26;&#x5339;&#x914D;&#x6307;&#x5B9A;&#x7684;&#x503C;</td>
+<td style="text-align:center">{lastName,like,hbh} lastName &#x542B;&#x6709;&apos;hbh&apos;&#xFF0C;&#x7B49;&#x4EF7;&#x4E8E; %hbh%</td>
+</tr>
+<tr>
+<td style="text-align:center">llike</td>
+<td style="text-align:center">&#x5DE6;&#x901A;&#x914D;&#x7B26;&#x5339;&#x914D;&#x6307;&#x5B9A;&#x7684;&#x503C;</td>
+<td style="text-align:center">{lastName,llike,hbh} lastName &#x4EE5;&apos;hbh&apos;&#x7ED3;&#x5C3E;&#xFF0C;&#x7B49;&#x4EF7;&#x4E8E;%hbh</td>
+</tr>
+<tr>
+<td style="text-align:center">rlike</td>
+<td style="text-align:center">&#x53F3;&#x901A;&#x914D;&#x7B26;&#x5339;&#x914D;&#x6307;&#x5B9A;&#x7684;&#x503C;</td>
+<td style="text-align:center">{lastName,rlike,hbh} lastName &#x4EE5;&apos;hbh&apos;&#x5F00;&#x5934;&#xFF0C;&#x7B49;&#x4EF7;&#x4E8E;hbh%</td>
+</tr>
+<tr>
+<td style="text-align:center">isNull</td>
+<td style="text-align:center">&#x5B57;&#x6BB5;&#x4E3A;&#x7A7A;</td>
+<td style="text-align:center">{birthday,isNull,placeholder(anyValue)} birthday&#x4E3A;&#x7A7A;</td>
+</tr>
+<tr>
+<td style="text-align:center">isNotNull</td>
+<td style="text-align:center">&#x5B57;&#x6BB5;&#x4E0D;&#x4E3A;&#x7A7A;</td>
+<td style="text-align:center">{status,isNotNull,placeholder(anyValue)} birthday&#x4E0D;&#x4E3A;&#x7A7A;</td>
+</tr>
+<tr>
+<td style="text-align:center">or</td>
+<td style="text-align:center">&#x6307;&#x5B9A;&#x4E24;&#x4E2A;&#x6761;&#x4EF6;&#x8868;&#x8FBE;&#x5F0F;&#x4E3A;&#x6216;&#x7684;&#x5173;&#x7CFB;</td>
+<td style="text-align:center">{age,eq,30,or,salary,ge,5000} age&#x7B49;&#x4E8E; 30 &#x6216; salary &#x5927;&#x4E8E;&#x7B49;&#x4E8E; 5000</td>
+</tr>
+</tbody>
+</table>
+<p><strong>&#x6CE8;&#x610F;:</strong></p>
+<blockquote>
+<p>placeholder(anyValue)&#x610F;&#x4E3A;&#x5360;&#x4F4D;&#x7B26;&#xFF0C;&#x53EF;&#x4EE5;&#x662F;&#x4EFB;&#x610F;&#x503C;&#x3002;&#x4EC5;&#x7528;&#x6765;&#x4FDD;&#x8BC1;&#x6761;&#x4EF6;&#x8868;&#x8FBE;&#x5F0F;&#x683C;&#x5F0F;&#x7684;&#x4E00;&#x81F4;&#x6027;&#x3002;</p>
+</blockquote>
+<h3 id="%E7%BA%AF%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%8B%BC%E6%8E%A5%E6%9D%A1%E4%BB%B6%E8%A1%A8%E8%BE%BE%E5%BC%8F">&#x7EAF;&#x5B57;&#x7B26;&#x4E32;&#x62FC;&#x63A5;&#x6761;&#x4EF6;&#x8868;&#x8FBE;&#x5F0F;</h3>
+<p>&#x793A;&#x4F8B;&#xFF1A;</p>
+<pre><code>//gender&#x7B49;&#x4E8E;&apos;Male&apos; level&#x4ECB;&#x4E8E;1&#x81F3;5&#x4E4B;&#x95F4; salary&#x4ECB;&#x4E8E;5000&#x81F3;8000&#x4E4B;&#x95F4;
+//id&#x5728;1,2,3&#x91CC;
+//lastName&#x4E0D;&#x4E3A;&#x7A7A; firstName&#x4E3A;&#x7A7A;
+//level&#x5927;&#x4E8E;&#x7B49;&#x4E8E;1 level&#x5927;&#x4E8E;0 level&#x5C0F;&#x4E8E;&#x7B49;&#x4E8E;10 level&#x5C0F;&#x4E8E;10
+//id&#x4E0D;&#x5728;8,9,10&#x91CC;
+//id&#x5927;&#x4E8E;&#x7B49;&#x4E8E;1 &#x6216; id&#x5C0F;&#x4E8E;&#x7B49;&#x4E8E;100
+String cond = &quot;{gender,eq,Male}{level,between,1#5}{salary,between,5000#8000}&quot;
+           += &quot;{id,in,1#2#3}&quot;
+           += &quot;{lastName,isNotNull,any}{firstName,isNull,any}&quot;
+           += &quot;{level,ge,1}{level,gt,0}{level,le,10}{level,lt,10}&quot;
+           += &quot;{id,notIn,8#9#10}{id,ge,1,or,id,le,100}&quot;;
+</code></pre><h3 id="-expr-%E7%B1%BB%E6%9E%84%E5%BB%BA%E6%9D%A1%E4%BB%B6%E8%A1%A8%E8%BE%BE%E5%BC%8F"><strong>Expr</strong>&#x7C7B;&#x6784;&#x5EFA;&#x6761;&#x4EF6;&#x8868;&#x8FBE;&#x5F0F;</h3>
+<p><strong>Expr</strong>&#x63D0;&#x4F9B;&#x4E86;&#x4E00;&#x79CD;&#x66F4;&#x52A0;&#x53CB;&#x597D;&#x7684;&#x65B9;&#x5F0F;&#x6765;&#x6784;&#x5EFA;&#x6761;&#x4EF6;&#x8868;&#x8FBE;&#x5F0F;&#xFF0C;&#x5404;&#x65B9;&#x6CD5;&#x540D;&#x4E0E;&#x652F;&#x6301;&#x7684;&#x8868;&#x8FBE;&#x5F0F;&#x540C;&#x540D;&#x3002;</p>
+<p>&#x5982;&#x4E0B;&#x6240;&#x793A;&#xFF1A;</p>
+<pre><code>String exprCond = Expr.create().eq(&quot;gender&quot;, &quot;Male&quot;)
+                               .between(&quot;level&quot;, 1,5)
+                               .between(&quot;salary&quot;, 5000, 8000)
+                               .in(&quot;id&quot;, Arrays.asList(new Object[]{1,2,3}))
+                               .notIn(&quot;id&quot;, Arrays.asList(new Object[]{8,9,10}))
+                               .isNotNull(&quot;lastName&quot;)
+                               .isNull(&quot;firstName&quot;)
+                               .ge(&quot;level&quot;, 1)
+                               .gt(&quot;level&quot;, 0)
+                               .le(&quot;level&quot;, 10)
+                               .lt(&quot;level&quot;, 10)
+                               .or(&quot;id,ge,1&quot;, &quot;id,le,100&quot;)
+                               .build();
+</code></pre><p><strong>&#x6CE8;&#x610F;</strong></p>
+<blockquote>
+<p><strong>between</strong>&#x8868;&#x8FBE;&#x5F0F;&#x8981;&#x6307;&#x5B9A;&#x503C;&#x7684;&#x8D77;&#x6B62;&#x8303;&#x56F4;&#xFF0C;&#x4E24;&#x4E2A;&#x503C;&#x4EE5;&apos;#&apos;&#x53F7;&#x5206;&#x9694;&#xFF0C;&#x5982;{age,between,10#20}</p>
+<p><strong>in</strong>,<strong>notIn</strong>&#x8868;&#x8FBE;&#x5F0F;&#x53EF;&#x4EE5;&#x6709;&#x591A;&#x4E2A;&#x503C;&#xFF0C;&#x591A;&#x4E2A;&#x503C;&#x4EE5;&apos;#&#x2018;&#x53F7;&#x5206;&#x9694;&#xFF0C;&#x5982;{id,in,1#2#3}</p>
+</blockquote>
 
                     
                     </section>
