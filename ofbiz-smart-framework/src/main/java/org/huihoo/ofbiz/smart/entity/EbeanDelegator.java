@@ -27,6 +27,7 @@ import org.huihoo.ofbiz.smart.base.cache.SimpleCacheManager;
 import org.huihoo.ofbiz.smart.base.location.FlexibleLocation;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
+import org.huihoo.ofbiz.smart.base.util.StringUtils;
 
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.EbeanServerFactory;
@@ -1051,7 +1052,9 @@ public class EbeanDelegator implements Delegator {
         sqlLine = IOUtils.readLines(FlexibleLocation.resolveLocation(sqlFile).openStream());
         for (String sql : sqlLine) {
           try {
-            executeByRawSql(sql);
+        	  if(StringUtils.isNotBlank(sql)){
+        		  executeByRawSql(sql);
+        	  }
           } catch (GenericEntityException e) {
             Log.w("Unable to execute sql : " + sql, TAG);
           }
