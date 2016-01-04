@@ -8,7 +8,7 @@
         <title>配置 | OFBiz Smart</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
-        <meta name="generator" content="GitBook 2.3.0">
+        <meta name="generator" content="GitBook 2.2.0">
         
         
         <meta name="HandheldFriendly" content="true"/>
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="3.2.1" data-basepath=".." data-revision="Mon Jan 04 2016 17:59:55 GMT+0800 (中国标准时间)">
+    <div class="book" data-level="3.2.1" data-basepath=".." data-revision="Mon Jan 04 2016 20:44:31 GMT+0800 (CST)">
     
 
 <div class="book-summary">
@@ -960,7 +960,7 @@
                     
                         <p><strong>OFBiz Smart</strong>&#x6846;&#x67B6;&#x6709;&#x4E14;&#x53EA;&#x6709;&#x4E00;&#x4E2A;&#x5168;&#x5C40;&#x9ED8;&#x8BA4;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF0C;&#x4F4D;&#x4E8E;<strong>classpath</strong>&#x7684;&#x6839;&#x76EE;&#x5F55;&#x4E0B;&#xFF0C;&#x4E14;&#x540D;&#x4E3A;<strong>application.properties</strong>. &#x6709;&#x5173;&#x5B9E;&#x4F53;&#x5F15;&#x64CE;&#x7684;&#x914D;&#x7F6E;&#x5C31;&#x5728;&#x8BE5;&#x6587;&#x4EF6;&#x91CC;&#x3002;</p>
 <pre><code>#&#x5B9A;&#x4E49;&#x4E86;&#x8981;&#x626B;&#x63CF;&#x7684;&#x5B9E;&#x4F53;&#x6240;&#x5728;&#x7684;&#x5305;&#xFF0C;&#x591A;&#x4E2A;&#x5305;&#x4EE5;&#x9017;&#x53F7;&#x9694;&#x5F00;
- entity.scanning.packages=org.huihoo.samples.petclinic.model.**,test.model.model.**
+entity.scanning.packages=org.huihoo.samples.petclinic.model.**,test.model.model.**
 #&#x5B9A;&#x4E49;&#x4E86;&#x79CD;&#x5B50;&#x6570;&#x636E;SQL&#x6587;&#x4EF6;&#xFF0C;&#x76F8;&#x5BF9;&#x4E8E;classpath&#x76EE;&#x5F55;,&#x591A;&#x4E2A;&#x6587;&#x4EF6;&#x4EE5;&#x9017;&#x53F7;&#x9694;&#x5F00;
 seed.data.sql.file=seed_data.sql,seed_data2.sql
 
@@ -992,7 +992,8 @@ datasource.h2.databaseDriver=org.h2.Driver
 datasource.mysql.provider=
 datasource.mysql.username=root
 datasource.mysql.password=root
-datasource.mysql.databaseUrl=jdbc:mysql://localhost:3306/testdatasource.mysql.databaseDriver=com.mysql.jdbc.Driver
+datasource.mysql.databaseUrl=jdbc:mysql://localhost:3306/test
+datasource.mysql.databaseDriver=com.mysql.jdbc.Driver
 </code></pre><h2 id="%E6%B3%A8%E6%84%8F%EF%BC%9A">&#x6CE8;&#x610F;&#xFF1A;</h2>
 <blockquote>
 <p><strong>datasource.mysql.provider</strong>&#x5C5E;&#x6027;&#x6307;&#x5B9A;&#x4E86;&#x6570;&#x636E;&#x6E90;&#x7684;&#x63D0;&#x4F9B;&#x5B9E;&#x73B0;&#xFF0C;&#x5982;&#x679C;&#x4E0D;&#x6307;&#x5B9A;&#xFF0C;<strong>OFBiz Smart</strong>&#x9ED8;&#x8BA4;&#x63D0;&#x4F9B;&#x4E86;&#x4E00;&#x4E2A;&#x57FA;&#x4E8E;<a href="https://github.com/brettwooldridge/HikariCP" target="_blank">HikariCP</a>&#x7684;&#x5B9E;&#x73B0;&#x3002;&#x5982;&#x679C;&#x6307;&#x5B9A;&#x5176;&#x5B83;&#x5B9E;&#x73B0;&#xFF0C;&#x53C2;&#x8003;<a href="thirdparty_ds.html">&#x7B2C;&#x4E09;&#x65B9;&#x6570;&#x636E;&#x6E90;</a></p>

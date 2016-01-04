@@ -5,13 +5,14 @@
 
 ```
 // 仅在非生产环境下通过这种方式动态增强实体特性
-String profile = applicationProps.getProperty("profile");
-    if (!C.PROFILE_PRODUCTION.equals(profile)) {
-      String entityPackages = applicationProps.getProperty(C.ENTITY_SCANNING_PACKAGES);
-      if (!AgentLoader.loadAgentFromClasspath("avaje-ebeanorm-agent","debug=1;packages="+entityPackages)) {
-          Log.i("avaje-ebeanorm-agent not found in classpath - not dynamically loaded",TAG);
-      }
-    }
+String profile = appConfig.getProperty("profile");
+if (!C.PROFILE_PRODUCTION.equals(profile)) {
+  String entityPackages = appConfig.getProperty(C.ENTITY_SCANNING_PACKAGES);
+  String p = "avaje-ebeanorm-agent","debug=1;packages="+entityPackages;
+  if (!AgentLoader.loadAgentFromClasspath(p)) {
+    Log.i("avaje-ebeanorm-agent not found in classpath - not dynamically loaded",TAG);
+  }
+}
     
 ``` 
 
@@ -20,24 +21,24 @@ String profile = applicationProps.getProperty("profile");
 在生产环境下面，使用**Maven Plugin**的形式预先生成已经转换的实体类。该**PlugIn**为:
 
 ```
-          <plugin>
-				<groupId>org.avaje.ebeanorm</groupId>
-				<artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
-				<version>4.7.1</version>
-				<executions>
-					<execution>
-						<id>main</id>
-						<phase>process-test-classes</phase>
-						<configuration>
-							<packages>test.entity.**</packages>
-							<transformArgs>debug=1</transformArgs>
-						</configuration>
-						<goals>
-							<goal>enhance</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+ <plugin>
+    <groupId>org.avaje.ebeanorm</groupId>
+	<artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
+	<version>4.7.1</version>
+	<executions>
+		<execution>
+			<id>main</id>
+			<phase>process-test-classes</phase>
+			<configuration>
+			<packages>test.entity.**</packages>
+			<transformArgs>debug=1</transformArgs>
+			</configuration>
+			<goals>
+				<goal>enhance</goal>
+			</goals>
+		</execution>
+	</executions>
+</plugin>
 			
 ```
 

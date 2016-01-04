@@ -5,12 +5,12 @@
 API:
 
 ```
-Object findById(Class<?> entityClazz, Object id) throws GenericEntityException;
+Object findById(Class<?> entityClazz, Object id);
 
-Object findById(Class<?> entityClazz, Object id, boolean useCache) throws GenericEntityException;
+Object findById(Class<?> entityClazz, Object id, boolean useCache);
 
 Object findById(Class<?> entityClazz, Object id, boolean useCache, 
-                                                   int liveTimeInSeconds) throws GenericEntityException;
+                                                 int liveTimeInSeconds);
                                                    
 ```
 
@@ -18,10 +18,10 @@ Object findById(Class<?> entityClazz, Object id, boolean useCache,
 
 ```
 //指定缓存多久，以秒为单位
-int liveTimeInSeconds = 60; 
+int ts = 60; 
 
 //查找ID等于1的Customer实体，并缓存60秒
-Customer customer = (Customer) delegator.findById(Customer.class,1L,true,liveTimeInSeconds);
+Customer c = (Customer)delegator.findById(Customer.class, 1L,true,ts);
 
 ```
 
@@ -32,37 +32,37 @@ Customer customer = (Customer) delegator.findById(Customer.class,1L,true,liveTim
 API:
 
 ```
-List<Object> findIdsByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException;
+List<Object> findIdsByAnd(Class<?> entityClazz, Map<String, Object> andMap);
 
-List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException;
+List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap);
 
 List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap, 
-                                              List<String> orderBy) throws GenericEntityException;
+                                            List<String> orderBy);
 
 List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap,
-                                              Set<String> fieldsToSelect, 
-                                              List<String> orderBy, 
-                                              boolean useCache) throws GenericEntityException;
+                                            Set<String> fieldsToSelect, 
+                                            List<String> orderBy, 
+                                            boolean useCache);
                                               
 
 List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap,
-                                              Set<String> fieldsToSelect, 
-                                              List<String> orderBy, 
-                                              boolean useCache, 
-                                              int liveTimeInSeconds) throws GenericEntityException;
+                                            Set<String> fieldsToSelect, 
+                                            List<String> orderBy, 
+                                            boolean useCache, 
+                                            int liveTimeInSeconds);
                                               
                                             
 
-Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException;
+Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap) ;
 
 Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap,
-                                               Set<String> fieldsToSelect, 
-                                               boolean useCache) throws GenericEntityException;
+                                             Set<String> fieldsToSelect, 
+                                             boolean useCache);
 
 Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap,
-                                               Set<String> fieldsToSelect, 
-                                               boolean useCache, 
-                                               int liveTimeInSeconds) throws GenericEntityException;                                   
+                                             Set<String> fieldsToSelect, 
+                                             boolean useCache, 
+                                             int liveTimeInSeconds);                                   
 ```
 
 示例代码:
@@ -70,12 +70,15 @@ Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap,
 ```
 
 //查找 状态为 'ACTIVE' 且 性别为 'MALE' 的所有客户ID
-List<Long> customerIds = (List<Long>)delegator.findIdsByAnd(Customer.class,CommUtil.toMap("status","ACTIVE","gender","MALE"));
+Map<String,Object> andMap = CommUtil.toMap("status","ACTIVE",
+                                           "gender","MALE");
+List<Long> customerIds = (List<Long>)
+                         delegator.findIdsByAnd(Customer.class,andMap);
 
 //性别为 'MALE' 且 状态为 'ACTIVE'
 Map<String,Object> andMap = CommUtil.toMap("gender","MALE","status","ACTIVE");
 //按客户的创建时间降序，年龄升序排序
-List<String> orderBy = Arrays.asList(new String[]{"createdAt desc","age asc"});
+List<String> orderBy = Arrays.asList(new String[]{"createdAt desc","age asc");
 //仅查询客户的firstName,lastName,age三个属性
 Set<String> fieldsToSelect = new LinkedHashSet<>();
 fieldsToSelect.add("firstName");
@@ -83,7 +86,10 @@ fieldsToSelect.add("lastName");
 fieldsToSelect.add("age");
 //缓存300秒，即5分钟
 int liveTimeInSeconds = 300;
-List<Customer> customers = (List<Customer>)delegator.findListByAnd(Customer.class,andMap,fieldsToSelect,true,liveTimeInSeconds);
+List<Customer> customers = (List<Customer>)delegator.findListByAnd(Customer.class,andMap,
+                                        fieldsToSelect,
+                                        true,
+                                        liveTimeInSeconds);
 ```
 
 ### 根据指定的条件表达式查询相关实体
@@ -93,32 +99,33 @@ List<Customer> customers = (List<Customer>)delegator.findListByAnd(Customer.clas
 API:
 
 ```
-List<Object> findIdsByCond(Class<?> entityClazz, String cond) throws GenericEntityException;
+List<Object> findIdsByCond(Class<?> entityClazz, String cond);
 
-List<?> findListByCond(Class<?> entityClazz, String cond) throws GenericEntityException;
-
-List<?> findListByCond(Class<?> entityClazz, String cond, 
-                                               Set<String> fieldsToSelect,
-                                               List<String> orderBy) throws GenericEntityException;
+List<?> findListByCond(Class<?> entityClazz, String cond);
 
 List<?> findListByCond(Class<?> entityClazz, String cond, 
-                                               Set<String> fieldsToSelect,
-                                               List<String> orderBy, 
-                                               boolean useCache) throws GenericEntityException;
+                                             Set<String> fieldsToSelect,
+                                             List<String> orderBy);
 
 List<?> findListByCond(Class<?> entityClazz, String cond, 
-                                               Set<String> fieldsToSelect,
-                                               List<String> orderBy, 
-                                               boolean useCache, 
-                                               int liveTimeInSeconds) throws GenericEntityException;
+                                             Set<String> fieldsToSelect,
+                                             List<String> orderBy, 
+                                             boolean useCache);
+
+List<?> findListByCond(Class<?> entityClazz, String cond, 
+                                             Set<String> fieldsToSelect,
+                                             List<String> orderBy, 
+                                             boolean useCache, 
+                                             int liveTimeInSeconds);
 
 ```
 
 示例代码:
 
 ```
-//查询姓名含有 'hbh' 且 性别 等于 'MALE'的所有客户ID
-List<Long> customerIds = (List<Long>) delegator.findIdsByCond(Customer.class,"{firstName,like,hbh}{gender,eq,MALE}");
+//查询姓名含有 'hbh' 且 性别 等于 'MALE'的所有客户ID"
+String cond = "{firstName,like,hbh}{gender,eq,MALE}";
+List<Long> cIds = (List<Long>) delegator.findIdsByCond(Customer.class,cond);
 
 String cond = "{firstName,like,hbh}{gender,eq,MALE}";
 //按客户的创建时间降序，年龄升序排序
@@ -130,7 +137,11 @@ fieldsToSelect.add("lastName");
 fieldsToSelect.add("age");
 //缓存300秒，即5分钟
 int liveTimeInSeconds = 300;
-List<Customer> customers = (List<Customer>)delegator.findListByCond(Customer.class,cond,fieldsToSelect,true,liveTimeInSeconds);
+List<Customer> customers = (List<Customer>)delegator.findListByCond(Customer.class,
+                                         cond,
+										  fieldsToSelect,
+									      true,
+                                         liveTimeInSeconds);
 
 ```
 
@@ -141,55 +152,63 @@ List<Customer> customers = (List<Customer>)delegator.findListByCond(Customer.cla
 API:
 
 ```
-Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, 
-                                                          int pageNo,
-                                                          int pageSize) throws GenericEntityException;
+Map<String, Object> findPageByAnd(Class<?> entityClazz, 
+                                  Map<String, Object> andMap, 
+                                  int pageNo,
+                                  int pageSize);
 
-Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, 
-                                                    int pageNo,
-                                                    int pageSize, 
-                                                    Set<String> fieldsToSelect, 
-                                                    List<String> orderBy) throws GenericEntityException;
+Map<String, Object> findPageByAnd(Class<?> entityClazz, 
+                                  Map<String, Object> andMap, 
+                                  int pageNo,
+                                  int pageSize, 
+                                  Set<String> fieldsToSelect, 
+                                  List<String> orderBy);
 
-Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, 
-                                                   int pageNo,
-                                                   int pageSize, 
-                                                   Set<String> fieldsToSelect, 
-                                                   List<String> orderBy, 
-                                                   boolean useCache) throws GenericEntityException;
+Map<String, Object> findPageByAnd(Class<?> entityClazz, 
+                                  Map<String, Object> andMap, 
+                                  int pageNo,
+                                  int pageSize, 
+                                  Set<String> fieldsToSelect, 
+                                  List<String> orderBy, 
+                                  boolean useCache);
 
-Map<String, Object> findPageByAnd(Class<?> entityClazz, Map<String, Object> andMap, 
-                                                   int pageNo,
-                                                   int pageSize, 
-                                                   Set<String> fieldsToSelect, 
-                                                   List<String> orderBy, 
-                                                   boolean useCache,
-                                                   int liveTimeInSeconds) throws GenericEntityException;
+Map<String, Object> findPageByAnd(Class<?> entityClazz, 
+                                  Map<String, Object> andMap, 
+                                  int pageNo,
+                                  int pageSize, 
+                                  Set<String> fieldsToSelect, 
+                                  List<String> orderBy, 
+                                  boolean useCache,
+                                  int liveTimeInSeconds);
 
-Map<String, Object> findPageByCond(Class<?> entityClazz, String cond, 
-                                                         int pageNo, 
-                                                         int pageSize) throws GenericEntityException;
+Map<String, Object> findPageByCond(Class<?> entityClazz, 
+                                   String cond, 
+                                   int pageNo, 
+                                   int pageSize);
 
-Map<String, Object> findPageByCond(Class<?> entityClazz, String cond, 
-                                                     int pageNo, 
-                                                     int pageSize,
-                                                     Set<String> fieldsToSelect, 
-                                                     List<String> orderBy) throws GenericEntityException;
+Map<String, Object> findPageByCond(Class<?> entityClazz, 
+								    String cond, 
+                                   int pageNo, 
+                                   int pageSize,
+                                   Set<String> fieldsToSelect, 
+                                   List<String> orderBy);
 
-Map<String, Object> findPageByCond(Class<?> entityClazz, String cond, 
-                                                     int pageNo, 
-                                                     int pageSize,
-                                                     Set<String> fieldsToSelect, 
-                                                     List<String> orderBy, 
-                                                     boolean useCache) throws GenericEntityException;
+Map<String, Object> findPageByCond(Class<?> entityClazz, 
+                                   String cond, 
+                                   int pageNo, 
+                                   int pageSize,
+                                   Set<String> fieldsToSelect, 
+                                   List<String> orderBy, 
+                                   boolean useCache);
 
-Map<String, Object> findPageByCond(Class<?> entityClazz, String cond, 
-                                                     int pageNo, 
-                                                     int pageSize,
-                                                     Set<String> fieldsToSelect, 
-                                                     List<String> orderBy, 
-                                                     boolean useCache, 
-                                                     int liveTimeInSeconds) throws GenericEntityException;
+Map<String, Object> findPageByCond(Class<?> entityClazz, 
+                                   String cond, 
+                                   int pageNo, 
+                                   int pageSize,
+                                   Set<String> fieldsToSelect, 
+                                   List<String> orderBy, 
+                                   boolean useCache, 
+                                   int liveTimeInSeconds) ;
 ```
 
 如上面的API所示，和__byAnd__和__byCond__两种查询API相比，区别在于：
@@ -217,14 +236,14 @@ Map<String, Object> findPageByCond(Class<?> entityClazz, String cond,
 API:
 
 ```
-int countByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException;
+int countByAnd(Class<?> entityClazz, Map<String, Object> andMap) ;
 
-int countByCond(Class<?> entityClazz, String cond) throws GenericEntityException;
+int countByCond(Class<?> entityClazz, String cond) ;
 
 
-int countByRawQuery(String query, String countAlias) throws GenericEntityException;
+int countByRawQuery(String query, String countAlias) ;
 
-int countByRawQuery(String query, String countAlias, List<?> params) throws GenericEntityException;
+int countByRawQuery(String query, String countAlias, List<?> params) ;
   
 ```
 
@@ -244,10 +263,12 @@ int countByRawQuery(String query, String countAlias, List<?> params) throws Gene
 API:
 
 ```
-List<Map<String, Object>> findListByRawQuery(String query, List<?> params) throws GenericEntityException;
+List<Map<String, Object>> findListByRawQuery(String query, 
+                                             List<?> params) ;
 
-List<Map<String, Object>> findListByRawQuery(String query, List<?> params, 
-                                                             boolean useCache) throws GenericEntityException;
+List<Map<String, Object>> findListByRawQuery(String query, 
+                                             List<?> params, 
+                                             boolean useCache) ;
 ```
 
 返回的一个**List**,集合里的元素是**Map**，**Map**里的键值映射，由自定义**query**参数决定。
@@ -255,7 +276,9 @@ List<Map<String, Object>> findListByRawQuery(String query, List<?> params,
 如下所示：
 
 ```
-List<Map<String,Object>> customers = delegator.findListByRawQuery("select id,first_name,last_name from customers",null);
+String rawSql = "select id,first_name,last_name from customers";
+List<Map<String,Object>> customers = delegator
+                                     .findListByRawQuery(rawSql,null);
 
 //返回的集合里的**Map**元素应该是这种结构
 // ('first_name','abc')('last_name','hbh')('id',20)

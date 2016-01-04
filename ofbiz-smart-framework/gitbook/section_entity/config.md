@@ -2,7 +2,7 @@
 
 ```
 #定义了要扫描的实体所在的包，多个包以逗号隔开
- entity.scanning.packages=org.huihoo.samples.petclinic.model.**,test.model.model.**
+entity.scanning.packages=org.huihoo.samples.petclinic.model.**,test.model.model.**
 #定义了种子数据SQL文件，相对于classpath目录,多个文件以逗号隔开
 seed.data.sql.file=seed_data.sql,seed_data2.sql
  
@@ -34,7 +34,8 @@ datasource.h2.databaseDriver=org.h2.Driver
 datasource.mysql.provider=
 datasource.mysql.username=root
 datasource.mysql.password=root
-datasource.mysql.databaseUrl=jdbc:mysql://localhost:3306/testdatasource.mysql.databaseDriver=com.mysql.jdbc.Driver
+datasource.mysql.databaseUrl=jdbc:mysql://localhost:3306/test
+datasource.mysql.databaseDriver=com.mysql.jdbc.Driver
 
 ```
 

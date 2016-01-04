@@ -8,7 +8,7 @@
         <title>查询API | OFBiz Smart</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
-        <meta name="generator" content="GitBook 2.3.0">
+        <meta name="generator" content="GitBook 2.2.0">
         
         
         <meta name="HandheldFriendly" content="true"/>
@@ -40,7 +40,7 @@
     <body>
         
         
-    <div class="book" data-level="3.2.4" data-basepath=".." data-revision="Mon Jan 04 2016 17:59:55 GMT+0800 (中国标准时间)">
+    <div class="book" data-level="3.2.4" data-basepath=".." data-revision="Mon Jan 04 2016 20:44:31 GMT+0800 (CST)">
     
 
 <div class="book-summary">
@@ -961,61 +961,64 @@
                         <p>&#x67E5;&#x8BE2;API&#x6307;&#x7684;&#x662F;&#x67E5;&#x8BE2;&#x5B9E;&#x4F53;&#x7C7B;&#x76F8;&#x5173;&#x7684;API&#xFF0C;&#x5728;&#x5B9E;&#x9645;&#x5F00;&#x53D1;&#x4E2D;&#xFF0C;&#x4F1A;&#x7ECF;&#x5E38;&#x7528;&#x5230;&#x3002;</p>
 <h3 id="%E6%A0%B9%E6%8D%AE%E4%B8%BB%E9%94%AE%E6%9F%A5%E8%AF%A2%E5%AE%9E%E4%BD%93">&#x6839;&#x636E;&#x4E3B;&#x952E;&#x67E5;&#x8BE2;&#x5B9E;&#x4F53;</h3>
 <p>API:</p>
-<pre><code>Object findById(Class&lt;?&gt; entityClazz, Object id) throws GenericEntityException;
+<pre><code>Object findById(Class&lt;?&gt; entityClazz, Object id);
 
-Object findById(Class&lt;?&gt; entityClazz, Object id, boolean useCache) throws GenericEntityException;
+Object findById(Class&lt;?&gt; entityClazz, Object id, boolean useCache);
 
 Object findById(Class&lt;?&gt; entityClazz, Object id, boolean useCache, 
-                                                   int liveTimeInSeconds) throws GenericEntityException;
+                                                 int liveTimeInSeconds);
 </code></pre><p>&#x793A;&#x4F8B;&#x4EE3;&#x7801;&#xFF1A;</p>
 <pre><code>//&#x6307;&#x5B9A;&#x7F13;&#x5B58;&#x591A;&#x4E45;&#xFF0C;&#x4EE5;&#x79D2;&#x4E3A;&#x5355;&#x4F4D;
-int liveTimeInSeconds = 60; 
+int ts = 60; 
 
 //&#x67E5;&#x627E;ID&#x7B49;&#x4E8E;1&#x7684;Customer&#x5B9E;&#x4F53;&#xFF0C;&#x5E76;&#x7F13;&#x5B58;60&#x79D2;
-Customer customer = (Customer) delegator.findById(Customer.class,1L,true,liveTimeInSeconds);
+Customer c = (Customer)delegator.findById(Customer.class, 1L,true,ts);
 </code></pre><h3 id="%E6%A0%B9%E6%8D%AE%E6%8C%87%E5%AE%9A%E7%9A%84%E6%9D%A1%E4%BB%B6%E6%98%A0%E5%B0%84-map-%E6%9F%A5%E8%AF%A2%E5%AE%9E%E4%BD%93">&#x6839;&#x636E;&#x6307;&#x5B9A;&#x7684;&#x6761;&#x4EF6;&#x6620;&#x5C04;<strong>Map</strong>&#x67E5;&#x8BE2;&#x5B9E;&#x4F53;</h3>
 <p>&#x8BE5;&#x7C7B;API&#x4EE5;<strong>byAnd</strong>&#x7ED3;&#x5C3E;&#xFF0C;&#x6839;&#x636E;&#x4F20;&#x5165;&#x7684;&#x5C5E;&#x6027;/&#x503C;&#x6620;&#x5C04;<strong>Map</strong>&#x67E5;&#x627E;&#x76F8;&#x5173;&#x5B9E;&#x4F53;&#x3002;<strong>Map</strong>&#x4E2D;&#x7684;&#x6240;&#x6709;&#x6761;&#x4EF6;&#x6620;&#x5C04;&#x5168;&#x90E8;&#x4E3A;&#x4E0E;&#x7684;&#x5173;&#x7CFB;&#x3002;</p>
 <p>API:</p>
-<pre><code>List&lt;Object&gt; findIdsByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap) throws GenericEntityException;
+<pre><code>List&lt;Object&gt; findIdsByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap);
 
-List&lt;?&gt; findListByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap) throws GenericEntityException;
+List&lt;?&gt; findListByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap);
 
 List&lt;?&gt; findListByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap, 
-                                              List&lt;String&gt; orderBy) throws GenericEntityException;
+                                            List&lt;String&gt; orderBy);
 
 List&lt;?&gt; findListByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap,
-                                              Set&lt;String&gt; fieldsToSelect, 
-                                              List&lt;String&gt; orderBy, 
-                                              boolean useCache) throws GenericEntityException;
+                                            Set&lt;String&gt; fieldsToSelect, 
+                                            List&lt;String&gt; orderBy, 
+                                            boolean useCache);
 
 
 List&lt;?&gt; findListByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap,
-                                              Set&lt;String&gt; fieldsToSelect, 
-                                              List&lt;String&gt; orderBy, 
-                                              boolean useCache, 
-                                              int liveTimeInSeconds) throws GenericEntityException;
+                                            Set&lt;String&gt; fieldsToSelect, 
+                                            List&lt;String&gt; orderBy, 
+                                            boolean useCache, 
+                                            int liveTimeInSeconds);
 
 
 
-Object findUniqueByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap) throws GenericEntityException;
-
-Object findUniqueByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap,
-                                               Set&lt;String&gt; fieldsToSelect, 
-                                               boolean useCache) throws GenericEntityException;
+Object findUniqueByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap) ;
 
 Object findUniqueByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap,
-                                               Set&lt;String&gt; fieldsToSelect, 
-                                               boolean useCache, 
-                                               int liveTimeInSeconds) throws GenericEntityException;
+                                             Set&lt;String&gt; fieldsToSelect, 
+                                             boolean useCache);
+
+Object findUniqueByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap,
+                                             Set&lt;String&gt; fieldsToSelect, 
+                                             boolean useCache, 
+                                             int liveTimeInSeconds);
 </code></pre><p>&#x793A;&#x4F8B;&#x4EE3;&#x7801;:</p>
 <pre><code>
 //&#x67E5;&#x627E; &#x72B6;&#x6001;&#x4E3A; &apos;ACTIVE&apos; &#x4E14; &#x6027;&#x522B;&#x4E3A; &apos;MALE&apos; &#x7684;&#x6240;&#x6709;&#x5BA2;&#x6237;ID
-List&lt;Long&gt; customerIds = (List&lt;Long&gt;)delegator.findIdsByAnd(Customer.class,CommUtil.toMap(&quot;status&quot;,&quot;ACTIVE&quot;,&quot;gender&quot;,&quot;MALE&quot;));
+Map&lt;String,Object&gt; andMap = CommUtil.toMap(&quot;status&quot;,&quot;ACTIVE&quot;,
+                                           &quot;gender&quot;,&quot;MALE&quot;);
+List&lt;Long&gt; customerIds = (List&lt;Long&gt;)
+                         delegator.findIdsByAnd(Customer.class,andMap);
 
 //&#x6027;&#x522B;&#x4E3A; &apos;MALE&apos; &#x4E14; &#x72B6;&#x6001;&#x4E3A; &apos;ACTIVE&apos;
 Map&lt;String,Object&gt; andMap = CommUtil.toMap(&quot;gender&quot;,&quot;MALE&quot;,&quot;status&quot;,&quot;ACTIVE&quot;);
 //&#x6309;&#x5BA2;&#x6237;&#x7684;&#x521B;&#x5EFA;&#x65F6;&#x95F4;&#x964D;&#x5E8F;&#xFF0C;&#x5E74;&#x9F84;&#x5347;&#x5E8F;&#x6392;&#x5E8F;
-List&lt;String&gt; orderBy = Arrays.asList(new String[]{&quot;createdAt desc&quot;,&quot;age asc&quot;});
+List&lt;String&gt; orderBy = Arrays.asList(new String[]{&quot;createdAt desc&quot;,&quot;age asc&quot;);
 //&#x4EC5;&#x67E5;&#x8BE2;&#x5BA2;&#x6237;&#x7684;firstName,lastName,age&#x4E09;&#x4E2A;&#x5C5E;&#x6027;
 Set&lt;String&gt; fieldsToSelect = new LinkedHashSet&lt;&gt;();
 fieldsToSelect.add(&quot;firstName&quot;);
@@ -1023,31 +1026,35 @@ fieldsToSelect.add(&quot;lastName&quot;);
 fieldsToSelect.add(&quot;age&quot;);
 //&#x7F13;&#x5B58;300&#x79D2;&#xFF0C;&#x5373;5&#x5206;&#x949F;
 int liveTimeInSeconds = 300;
-List&lt;Customer&gt; customers = (List&lt;Customer&gt;)delegator.findListByAnd(Customer.class,andMap,fieldsToSelect,true,liveTimeInSeconds);
+List&lt;Customer&gt; customers = (List&lt;Customer&gt;)delegator.findListByAnd(Customer.class,andMap,
+                                        fieldsToSelect,
+                                        true,
+                                        liveTimeInSeconds);
 </code></pre><h3 id="%E6%A0%B9%E6%8D%AE%E6%8C%87%E5%AE%9A%E7%9A%84%E6%9D%A1%E4%BB%B6%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%9F%A5%E8%AF%A2%E7%9B%B8%E5%85%B3%E5%AE%9E%E4%BD%93">&#x6839;&#x636E;&#x6307;&#x5B9A;&#x7684;&#x6761;&#x4EF6;&#x8868;&#x8FBE;&#x5F0F;&#x67E5;&#x8BE2;&#x76F8;&#x5173;&#x5B9E;&#x4F53;</h3>
 <p>&#x8BE5;&#x7C7B;API&#x4EE5;<strong>byCond</strong>&#x7ED3;&#x5C3E;&#xFF0C;&#x6839;&#x636E;&#x4F20;&#x5165;&#x7684;&#x6761;&#x4EF6;&#x8868;&#x8FBE;&#x5F0F;&#xFF0C;&#x8BE5;&#x8868;&#x8FBE;&#x5F0F;&#x4E3A;&#x6846;&#x67B6;&#x672C;&#x8EAB;&#x5B9A;&#x4E49;&#x7684;<a href="query_expr.html"><strong>&#x67E5;&#x8BE2;&#x6761;&#x4EF6;&#x5B57;&#x7B26;&#x4E32;</strong></a>&#xFF0C;&#x6765;&#x67E5;&#x8BE2;&#x76F8;&#x5173;&#x5B9E;&#x4F53;&#x3002;</p>
 <p>API:</p>
-<pre><code>List&lt;Object&gt; findIdsByCond(Class&lt;?&gt; entityClazz, String cond) throws GenericEntityException;
+<pre><code>List&lt;Object&gt; findIdsByCond(Class&lt;?&gt; entityClazz, String cond);
 
-List&lt;?&gt; findListByCond(Class&lt;?&gt; entityClazz, String cond) throws GenericEntityException;
-
-List&lt;?&gt; findListByCond(Class&lt;?&gt; entityClazz, String cond, 
-                                               Set&lt;String&gt; fieldsToSelect,
-                                               List&lt;String&gt; orderBy) throws GenericEntityException;
+List&lt;?&gt; findListByCond(Class&lt;?&gt; entityClazz, String cond);
 
 List&lt;?&gt; findListByCond(Class&lt;?&gt; entityClazz, String cond, 
-                                               Set&lt;String&gt; fieldsToSelect,
-                                               List&lt;String&gt; orderBy, 
-                                               boolean useCache) throws GenericEntityException;
+                                             Set&lt;String&gt; fieldsToSelect,
+                                             List&lt;String&gt; orderBy);
 
 List&lt;?&gt; findListByCond(Class&lt;?&gt; entityClazz, String cond, 
-                                               Set&lt;String&gt; fieldsToSelect,
-                                               List&lt;String&gt; orderBy, 
-                                               boolean useCache, 
-                                               int liveTimeInSeconds) throws GenericEntityException;
+                                             Set&lt;String&gt; fieldsToSelect,
+                                             List&lt;String&gt; orderBy, 
+                                             boolean useCache);
+
+List&lt;?&gt; findListByCond(Class&lt;?&gt; entityClazz, String cond, 
+                                             Set&lt;String&gt; fieldsToSelect,
+                                             List&lt;String&gt; orderBy, 
+                                             boolean useCache, 
+                                             int liveTimeInSeconds);
 </code></pre><p>&#x793A;&#x4F8B;&#x4EE3;&#x7801;:</p>
-<pre><code>//&#x67E5;&#x8BE2;&#x59D3;&#x540D;&#x542B;&#x6709; &apos;hbh&apos; &#x4E14; &#x6027;&#x522B; &#x7B49;&#x4E8E; &apos;MALE&apos;&#x7684;&#x6240;&#x6709;&#x5BA2;&#x6237;ID
-List&lt;Long&gt; customerIds = (List&lt;Long&gt;) delegator.findIdsByCond(Customer.class,&quot;{firstName,like,hbh}{gender,eq,MALE}&quot;);
+<pre><code>//&#x67E5;&#x8BE2;&#x59D3;&#x540D;&#x542B;&#x6709; &apos;hbh&apos; &#x4E14; &#x6027;&#x522B; &#x7B49;&#x4E8E; &apos;MALE&apos;&#x7684;&#x6240;&#x6709;&#x5BA2;&#x6237;ID&quot;
+String cond = &quot;{firstName,like,hbh}{gender,eq,MALE}&quot;;
+List&lt;Long&gt; cIds = (List&lt;Long&gt;) delegator.findIdsByCond(Customer.class,cond);
 
 String cond = &quot;{firstName,like,hbh}{gender,eq,MALE}&quot;;
 //&#x6309;&#x5BA2;&#x6237;&#x7684;&#x521B;&#x5EFA;&#x65F6;&#x95F4;&#x964D;&#x5E8F;&#xFF0C;&#x5E74;&#x9F84;&#x5347;&#x5E8F;&#x6392;&#x5E8F;
@@ -1059,59 +1066,71 @@ fieldsToSelect.add(&quot;lastName&quot;);
 fieldsToSelect.add(&quot;age&quot;);
 //&#x7F13;&#x5B58;300&#x79D2;&#xFF0C;&#x5373;5&#x5206;&#x949F;
 int liveTimeInSeconds = 300;
-List&lt;Customer&gt; customers = (List&lt;Customer&gt;)delegator.findListByCond(Customer.class,cond,fieldsToSelect,true,liveTimeInSeconds);
+List&lt;Customer&gt; customers = (List&lt;Customer&gt;)delegator.findListByCond(Customer.class,
+                                         cond,
+                                          fieldsToSelect,
+                                          true,
+                                         liveTimeInSeconds);
 </code></pre><h3 id="%E5%88%86%E9%A1%B5%E6%9F%A5%E8%AF%A2">&#x5206;&#x9875;&#x67E5;&#x8BE2;</h3>
 <p>&#x5206;&#x9875;API&#x4EE5;<strong>findPage</strong>&#x5F00;&#x5934;&#xFF0C;&#x6709;&#x4E0A;&#x9762;&#x63D0;&#x5230;&#x7684;<strong>byAnd</strong>&#x548C;<strong>byCond</strong>&#x4E24;&#x79CD;&#x67E5;&#x8BE2;&#x65B9;&#x5F0F;&#xFF0C;&#x663E;&#x793A;&#x6307;&#x5B9A;&#x7B2C;&#x51E0;&#x9875;&#xFF0C;&#x6BCF;&#x9875;&#x663E;&#x793A;&#x7684;&#x5927;&#x5C0F;&#x3002;</p>
 <p>API:</p>
-<pre><code>Map&lt;String, Object&gt; findPageByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap, 
-                                                          int pageNo,
-                                                          int pageSize) throws GenericEntityException;
+<pre><code>Map&lt;String, Object&gt; findPageByAnd(Class&lt;?&gt; entityClazz, 
+                                  Map&lt;String, Object&gt; andMap, 
+                                  int pageNo,
+                                  int pageSize);
 
-Map&lt;String, Object&gt; findPageByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap, 
-                                                    int pageNo,
-                                                    int pageSize, 
-                                                    Set&lt;String&gt; fieldsToSelect, 
-                                                    List&lt;String&gt; orderBy) throws GenericEntityException;
+Map&lt;String, Object&gt; findPageByAnd(Class&lt;?&gt; entityClazz, 
+                                  Map&lt;String, Object&gt; andMap, 
+                                  int pageNo,
+                                  int pageSize, 
+                                  Set&lt;String&gt; fieldsToSelect, 
+                                  List&lt;String&gt; orderBy);
 
-Map&lt;String, Object&gt; findPageByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap, 
-                                                   int pageNo,
-                                                   int pageSize, 
-                                                   Set&lt;String&gt; fieldsToSelect, 
-                                                   List&lt;String&gt; orderBy, 
-                                                   boolean useCache) throws GenericEntityException;
+Map&lt;String, Object&gt; findPageByAnd(Class&lt;?&gt; entityClazz, 
+                                  Map&lt;String, Object&gt; andMap, 
+                                  int pageNo,
+                                  int pageSize, 
+                                  Set&lt;String&gt; fieldsToSelect, 
+                                  List&lt;String&gt; orderBy, 
+                                  boolean useCache);
 
-Map&lt;String, Object&gt; findPageByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap, 
-                                                   int pageNo,
-                                                   int pageSize, 
-                                                   Set&lt;String&gt; fieldsToSelect, 
-                                                   List&lt;String&gt; orderBy, 
-                                                   boolean useCache,
-                                                   int liveTimeInSeconds) throws GenericEntityException;
+Map&lt;String, Object&gt; findPageByAnd(Class&lt;?&gt; entityClazz, 
+                                  Map&lt;String, Object&gt; andMap, 
+                                  int pageNo,
+                                  int pageSize, 
+                                  Set&lt;String&gt; fieldsToSelect, 
+                                  List&lt;String&gt; orderBy, 
+                                  boolean useCache,
+                                  int liveTimeInSeconds);
 
-Map&lt;String, Object&gt; findPageByCond(Class&lt;?&gt; entityClazz, String cond, 
-                                                         int pageNo, 
-                                                         int pageSize) throws GenericEntityException;
+Map&lt;String, Object&gt; findPageByCond(Class&lt;?&gt; entityClazz, 
+                                   String cond, 
+                                   int pageNo, 
+                                   int pageSize);
 
-Map&lt;String, Object&gt; findPageByCond(Class&lt;?&gt; entityClazz, String cond, 
-                                                     int pageNo, 
-                                                     int pageSize,
-                                                     Set&lt;String&gt; fieldsToSelect, 
-                                                     List&lt;String&gt; orderBy) throws GenericEntityException;
+Map&lt;String, Object&gt; findPageByCond(Class&lt;?&gt; entityClazz, 
+                                    String cond, 
+                                   int pageNo, 
+                                   int pageSize,
+                                   Set&lt;String&gt; fieldsToSelect, 
+                                   List&lt;String&gt; orderBy);
 
-Map&lt;String, Object&gt; findPageByCond(Class&lt;?&gt; entityClazz, String cond, 
-                                                     int pageNo, 
-                                                     int pageSize,
-                                                     Set&lt;String&gt; fieldsToSelect, 
-                                                     List&lt;String&gt; orderBy, 
-                                                     boolean useCache) throws GenericEntityException;
+Map&lt;String, Object&gt; findPageByCond(Class&lt;?&gt; entityClazz, 
+                                   String cond, 
+                                   int pageNo, 
+                                   int pageSize,
+                                   Set&lt;String&gt; fieldsToSelect, 
+                                   List&lt;String&gt; orderBy, 
+                                   boolean useCache);
 
-Map&lt;String, Object&gt; findPageByCond(Class&lt;?&gt; entityClazz, String cond, 
-                                                     int pageNo, 
-                                                     int pageSize,
-                                                     Set&lt;String&gt; fieldsToSelect, 
-                                                     List&lt;String&gt; orderBy, 
-                                                     boolean useCache, 
-                                                     int liveTimeInSeconds) throws GenericEntityException;
+Map&lt;String, Object&gt; findPageByCond(Class&lt;?&gt; entityClazz, 
+                                   String cond, 
+                                   int pageNo, 
+                                   int pageSize,
+                                   Set&lt;String&gt; fieldsToSelect, 
+                                   List&lt;String&gt; orderBy, 
+                                   boolean useCache, 
+                                   int liveTimeInSeconds) ;
 </code></pre><p>&#x5982;&#x4E0A;&#x9762;&#x7684;API&#x6240;&#x793A;&#xFF0C;&#x548C;<strong>byAnd</strong>&#x548C;<strong>byCond</strong>&#x4E24;&#x79CD;&#x67E5;&#x8BE2;API&#x76F8;&#x6BD4;&#xFF0C;&#x533A;&#x522B;&#x5728;&#x4E8E;&#xFF1A;</p>
 <ol>
 <li>&#x9700;&#x8981;&#x6307;&#x5B9A; <strong>pageNo</strong>&#x548C;<strong>pageSize</strong>&#x4E24;&#x4E2A;&#x53C2;&#x6570;&#x3002;</li>
@@ -1128,14 +1147,14 @@ Map&lt;String, Object&gt; findPageByCond(Class&lt;?&gt; entityClazz, String cond
 <h3 id="%E6%9F%A5%E8%AF%A2%E6%80%BB%E6%95%B0">&#x67E5;&#x8BE2;&#x603B;&#x6570;</h3>
 <p>&#x67E5;&#x8BE2;&#x603B;&#x6570;&#x6307;&#x7684;&#x662F;&#x5404;&#x79CD;<strong>count</strong> API&#x3002;</p>
 <p>API:</p>
-<pre><code>int countByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap) throws GenericEntityException;
+<pre><code>int countByAnd(Class&lt;?&gt; entityClazz, Map&lt;String, Object&gt; andMap) ;
 
-int countByCond(Class&lt;?&gt; entityClazz, String cond) throws GenericEntityException;
+int countByCond(Class&lt;?&gt; entityClazz, String cond) ;
 
 
-int countByRawQuery(String query, String countAlias) throws GenericEntityException;
+int countByRawQuery(String query, String countAlias) ;
 
-int countByRawQuery(String query, String countAlias, List&lt;?&gt; params) throws GenericEntityException;
+int countByRawQuery(String query, String countAlias, List&lt;?&gt; params) ;
 </code></pre><p>&#x6CE8;&#x610F;&#xFF1A;</p>
 <blockquote>
 <p>API&#x4E2D;&#x7684;<strong>countAlias</strong>&#x53C2;&#x6570;&#x6307;&#x7684;&#x662F;&#x7ED9;&#x8FD4;&#x56DE;&#x7684;&#x603B;&#x6570;&#x5B57;&#x6BB5;&#x8D77;&#x4E2A;&#x522B;&#x540D;&#x3002;&#x5FC5;&#x987B;&#x5305;&#x542B;&#x5728;<strong>query</strong>&#x53C2;&#x6570;&#x91CC;&#x3002;
@@ -1145,13 +1164,17 @@ int countByRawQuery(String query, String countAlias, List&lt;?&gt; params) throw
 <h3 id="%E8%87%AA%E5%AE%9A%E4%B9%89sql%E6%9F%A5%E8%AF%A2">&#x81EA;&#x5B9A;&#x4E49;SQL&#x67E5;&#x8BE2;</h3>
 <p>&#x5982;&#x679C;&#x4EE5;&#x4E0A;&#x67E5;&#x8BE2;API&#x90FD;&#x4E0D;&#x80FD;&#x6EE1;&#x8DB3;&#x4E1A;&#x52A1;&#x9700;&#x6C42;&#xFF0C;&#x53EF;&#x4EE5;&#x4F7F;&#x7528;&#x81EA;&#x5B9A;&#x4E49;SQL&#x67E5;&#x8BE2;&#x3002;</p>
 <p>API:</p>
-<pre><code>List&lt;Map&lt;String, Object&gt;&gt; findListByRawQuery(String query, List&lt;?&gt; params) throws GenericEntityException;
+<pre><code>List&lt;Map&lt;String, Object&gt;&gt; findListByRawQuery(String query, 
+                                             List&lt;?&gt; params) ;
 
-List&lt;Map&lt;String, Object&gt;&gt; findListByRawQuery(String query, List&lt;?&gt; params, 
-                                                             boolean useCache) throws GenericEntityException;
+List&lt;Map&lt;String, Object&gt;&gt; findListByRawQuery(String query, 
+                                             List&lt;?&gt; params, 
+                                             boolean useCache) ;
 </code></pre><p>&#x8FD4;&#x56DE;&#x7684;&#x4E00;&#x4E2A;<strong>List</strong>,&#x96C6;&#x5408;&#x91CC;&#x7684;&#x5143;&#x7D20;&#x662F;<strong>Map</strong>&#xFF0C;<strong>Map</strong>&#x91CC;&#x7684;&#x952E;&#x503C;&#x6620;&#x5C04;&#xFF0C;&#x7531;&#x81EA;&#x5B9A;&#x4E49;<strong>query</strong>&#x53C2;&#x6570;&#x51B3;&#x5B9A;&#x3002;</p>
 <p>&#x5982;&#x4E0B;&#x6240;&#x793A;&#xFF1A;</p>
-<pre><code>List&lt;Map&lt;String,Object&gt;&gt; customers = delegator.findListByRawQuery(&quot;select id,first_name,last_name from customers&quot;,null);
+<pre><code>String rawSql = &quot;select id,first_name,last_name from customers&quot;;
+List&lt;Map&lt;String,Object&gt;&gt; customers = delegator
+                                     .findListByRawQuery(rawSql,null);
 
 //&#x8FD4;&#x56DE;&#x7684;&#x96C6;&#x5408;&#x91CC;&#x7684;**Map**&#x5143;&#x7D20;&#x5E94;&#x8BE5;&#x662F;&#x8FD9;&#x79CD;&#x7ED3;&#x6784;
 // (&apos;first_name&apos;,&apos;abc&apos;)(&apos;last_name&apos;,&apos;hbh&apos;)(&apos;id&apos;,20)
