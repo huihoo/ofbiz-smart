@@ -1,7 +1,10 @@
 package org.huihoo.ofbiz.smart.entity;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -27,7 +30,6 @@ import org.huihoo.ofbiz.smart.base.cache.SimpleCacheManager;
 import org.huihoo.ofbiz.smart.base.location.FlexibleLocation;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
-import org.huihoo.ofbiz.smart.base.util.StringUtils;
 
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.EbeanServerFactory;
@@ -1045,25 +1047,48 @@ public class EbeanDelegator implements Delegator {
     if (CommUtil.isEmpty(seedDataSqlCvs)) {
       return ;
     }
-    String[] sqlFileArray = seedDataSqlCvs.split(",");
-    for (String sqlFile : sqlFileArray) {
-      List<String> sqlLine;
-      try {
-        sqlLine = IOUtils.readLines(FlexibleLocation.resolveLocation(sqlFile).openStream());
-        for (String sql : sqlLine) {
-          try {
-        	  if(StringUtils.isNotBlank(sql)){
-        		  executeByRawSql(sql);
-        	  }
-          } catch (GenericEntityException e) {
-            Log.w("Unable to execute sql : " + sql, TAG);
+    boolean allSucceed = true;
+    beginTransaction();
+    try {
+      String[] sqlFileArray = seedDataSqlCvs.split(",");
+      for (String sqlFile : sqlFileArray) {
+        List<String> sqlLine;
+        try {
+          if (FlexibleLocation.resolveLocation(sqlFile + "_resolved") != null) {
+            Log.i("Seed data sql file [%s] has already been resolved.", TAG,sqlFile);
+            continue;
           }
+          URL sqlFileURL = FlexibleLocation.resolveLocation(sqlFile);
+          sqlLine = IOUtils.readLines(sqlFileURL.openStream());
+          for (String sql : sqlLine) {
+            try {
+              if (CommUtil.isNotEmpty(sql) && (sql.startsWith("insert") || sql.startsWith("INSERT")) ) {
+                executeByRawSql(sql);
+              }
+            } catch (GenericEntityException e) {
+              allSucceed = false;
+              Log.w("Unable to execute sql : " + sql, TAG);
+            }
+          }
+          if (allSucceed) {
+            FileOutputStream fos = new FileOutputStream(new File(sqlFileURL.getFile() + "_resolved"));
+            IOUtils.write("OK", fos, C.UTF_8);
+          }
+        } catch (MalformedURLException e1) {
+          allSucceed = false;
+          Log.w("Unable to load sql file : " + sqlFile, TAG);
+        } catch (IOException e1) {
+          allSucceed = false;
+          Log.w("Unable to load sql file : " + sqlFile, TAG);
         }
-      } catch (MalformedURLException e1) {
-        Log.w("Unable to load sql file : " + sqlFile, TAG);
-      } catch (IOException e1) {
-        Log.w("Unable to load sql file : " + sqlFile, TAG);
       }
+    } finally {
+      if (allSucceed) {
+        commitTransaction();
+      } else {
+        rollback();
+      }
+      endTransaction();
     }
   }
 }
