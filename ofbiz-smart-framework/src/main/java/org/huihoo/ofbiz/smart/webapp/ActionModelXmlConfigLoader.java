@@ -38,6 +38,7 @@ public class ActionModelXmlConfigLoader {
   
   
   public void loadXml(String path,List<ActionModel> actionModels) {
+    Log.d("XML config path : " + path, TAG);
     File f = new File(path);
     
     File[] configFiles = f.listFiles(new FileFilter() {
