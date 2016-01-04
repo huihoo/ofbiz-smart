@@ -1,7 +1,7 @@
 # Summary
 
-* [OFBiz Smart简介](intro.md)
-  * [OFBiz Smart是什么](section_intro/what.md)
+* [OFBiz Smart](section_intro/index.md)
+  * [OFBiz Smart是什么](section_intro/what_is.md)
   * [OFBiz Smart的特点](section_intro/features.md)
   * [OFBiz Smart的参考](section_intro/ref.md)
   * [OFBiz Smart能解决什么问题](section_intro/solve.md)
@@ -46,7 +46,7 @@
   * [常用Tablib](section_web/tablib.md)
   * [文件上传](section_web/file_upload.md)
 * [验证框架](section_validation/index.md)
-* [国际化](section_ui/index.md)
-* [日志处理](section_ui/intro.md)
+* [国际化](section_i18n/index.md)
+* [日志处理](section_log/index.md)
 * [附录](section_appendix/index.md)
           
