@@ -54,7 +54,7 @@ public class DefaultRequestHandler implements RequestHandler {
   @Override
   public void handleRequest(HttpServletRequest req, HttpServletResponse resp)
           throws ServletException, IOException {
-    ServletContext sc = req.getServletContext();
+    ServletContext sc = req.getSession().getServletContext();
     //获取保存在Web上下文中的关键对象和配置参数
     Delegator delegator = (Delegator) sc.getAttribute(C.CTX_DELETAGOR);
     Log.d("Delegator > " + delegator, TAG);
