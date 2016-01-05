@@ -61,6 +61,7 @@ public class DispatchServlet extends HttpServlet {
                      "redirect#org.huihoo.ofbiz.smart.webapp.view.RedirectView",
                      "xml#org.huihoo.ofbiz.smart.webapp.view.XmlView",
                      "doc#org.huihoo.ofbiz.smart.webapp.view.HttpApiDocView",
+                     "captcha#org.huihoo.ofbiz.smart.webapp.view.CaptchaView",
   };
 
   @Override

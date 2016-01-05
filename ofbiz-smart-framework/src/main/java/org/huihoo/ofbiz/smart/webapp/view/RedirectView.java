@@ -20,7 +20,7 @@ public class RedirectView implements View {
           HttpServletResponse response) {
     String targetUri = (String) request.getAttribute("targetUri");
     if (CommUtil.isEmpty(targetUri)) {
-      targetUri = "/";
+      targetUri = request.getContextPath() + "/";
     }
     String encodedRedirectURL = response.encodeRedirectURL(targetUri);
     response.setStatus(303);//http://tools.ietf.org/html/rfc7231#section-6.4.4
