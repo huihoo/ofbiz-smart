@@ -26,7 +26,7 @@ datasource.mysql.databaseDriver=com.mysql.jdbc.Driver
 
 如下所示：
 
-```
+```java
 //使用默认数据源
 Customer c1 = new Customer();
 c1.setFirstname("test001");

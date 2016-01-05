@@ -138,10 +138,10 @@ fieldsToSelect.add("age");
 //缓存300秒，即5分钟
 int liveTimeInSeconds = 300;
 List<Customer> customers = (List<Customer>)delegator.findListByCond(Customer.class,
-                                         cond,
+                                          cond,
 										  fieldsToSelect,
 									      true,
-                                         liveTimeInSeconds);
+                                          liveTimeInSeconds);
 
 ```
 
@@ -187,7 +187,7 @@ Map<String, Object> findPageByCond(Class<?> entityClazz,
                                    int pageSize);
 
 Map<String, Object> findPageByCond(Class<?> entityClazz, 
-								    String cond, 
+								   String cond, 
                                    int pageNo, 
                                    int pageSize,
                                    Set<String> fieldsToSelect, 

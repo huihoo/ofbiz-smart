@@ -2,7 +2,7 @@
 
 API: 
 
-```
+```java
   void save(Collection<?> entities);
 
   void save(Object entity);
@@ -25,7 +25,7 @@ API:
 
 示例代码片段:
 
-```
+```java
 Customer customer = new Customer();
 customer.setFirstname("hbh");
 customer.setLastname("peter");

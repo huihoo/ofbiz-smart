@@ -3,7 +3,7 @@
 
 实体的动态加强特性，基于**Java Agent**机制。同一虚拟机有些限制，比如已经动态加强并加载到**Java虚拟机**的实体类，会影响到其它实体类加载到该虚拟机。会造成，同一个tomcat无法运行多个 webapp应用。所以仅在开发模式下，**OFBiz Smart**才会使用**Ebean**的这种方式来动态加强实体类。如下面的代码所示：
 
-```
+```java
 // 仅在非生产环境下通过这种方式动态增强实体特性
 String profile = appConfig.getProperty("profile");
 if (!C.PROFILE_PRODUCTION.equals(profile)) {
@@ -20,7 +20,7 @@ if (!C.PROFILE_PRODUCTION.equals(profile)) {
 
 在生产环境下面，使用**Maven Plugin**的形式预先生成已经转换的实体类。该**PlugIn**为:
 
-```
+```java
  <plugin>
     <groupId>org.avaje.ebeanorm</groupId>
 	<artifactId>avaje-ebeanorm-mavenenhancer</artifactId>

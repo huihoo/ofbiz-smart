@@ -29,7 +29,7 @@ or           | 指定两个条件表达式为或的关系    | {age,eq,30,or,sal
 示例：
 
 
-```
+```java
 //gender等于'Male' level介于1至5之间 salary介于5000至8000之间
 //id在1,2,3里
 //lastName不为空 firstName为空
@@ -51,7 +51,7 @@ String cond = "{gender,eq,Male}{level,between,1#5}{salary,between,5000#8000}"
 如下所示：
 
 
-```
+```java
 String exprCond = Expr.create().eq("gender", "Male")
                                .between("level", 1,5)
                                .between("salary", 5000, 8000)

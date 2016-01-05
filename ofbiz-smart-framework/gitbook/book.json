@@ -14,7 +14,6 @@
   	},
   	"plugins": [
   	  "toggle-chapters",
-  	  "splitter",
       "gitbook-plugin-yahei"
     ]
 }

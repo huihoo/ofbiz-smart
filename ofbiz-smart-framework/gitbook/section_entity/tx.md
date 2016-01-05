@@ -6,7 +6,7 @@
 
 如下所示：
 
-```
+```java
     try {
       delegator.beginTransaction();
       //在这里编写代码
@@ -25,7 +25,7 @@
 
 如下所示：
 
-```
+```java
     delegator.executeWithInTx(new TxCallable() {
       @Override
       public Object call() {
