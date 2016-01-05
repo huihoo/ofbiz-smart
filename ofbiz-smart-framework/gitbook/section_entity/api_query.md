@@ -4,7 +4,7 @@
 
 API:
 
-```
+```java
 Object findById(Class<?> entityClazz, Object id);
 
 Object findById(Class<?> entityClazz, Object id, boolean useCache);
@@ -16,7 +16,7 @@ Object findById(Class<?> entityClazz, Object id, boolean useCache,
 
 示例代码：
 
-```
+```java
 //指定缓存多久，以秒为单位
 int ts = 60; 
 
@@ -31,7 +31,7 @@ Customer c = (Customer)delegator.findById(Customer.class, 1L,true,ts);
 
 API:
 
-```
+```java
 List<Object> findIdsByAnd(Class<?> entityClazz, Map<String, Object> andMap);
 
 List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap);
@@ -67,7 +67,7 @@ Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap,
 
 示例代码:
 
-```
+```java
 
 //查找 状态为 'ACTIVE' 且 性别为 'MALE' 的所有客户ID
 Map<String,Object> andMap = CommUtil.toMap("status","ACTIVE",
@@ -98,7 +98,7 @@ List<Customer> customers = (List<Customer>)delegator.findListByAnd(Customer.clas
 
 API:
 
-```
+```java
 List<Object> findIdsByCond(Class<?> entityClazz, String cond);
 
 List<?> findListByCond(Class<?> entityClazz, String cond);
@@ -122,7 +122,7 @@ List<?> findListByCond(Class<?> entityClazz, String cond,
 
 示例代码:
 
-```
+```java
 //查询姓名含有 'hbh' 且 性别 等于 'MALE'的所有客户ID"
 String cond = "{firstName,like,hbh}{gender,eq,MALE}";
 List<Long> cIds = (List<Long>) delegator.findIdsByCond(Customer.class,cond);
@@ -151,7 +151,7 @@ List<Customer> customers = (List<Customer>)delegator.findListByCond(Customer.cla
 
 API:
 
-```
+```java
 Map<String, Object> findPageByAnd(Class<?> entityClazz, 
                                   Map<String, Object> andMap, 
                                   int pageNo,
@@ -235,7 +235,7 @@ Map<String, Object> findPageByCond(Class<?> entityClazz,
 
 API:
 
-```
+```java
 int countByAnd(Class<?> entityClazz, Map<String, Object> andMap) ;
 
 int countByCond(Class<?> entityClazz, String cond) ;
@@ -262,7 +262,7 @@ int countByRawQuery(String query, String countAlias, List<?> params) ;
 
 API:
 
-```
+```java
 List<Map<String, Object>> findListByRawQuery(String query, 
                                              List<?> params) ;
 
@@ -275,7 +275,7 @@ List<Map<String, Object>> findListByRawQuery(String query,
 
 如下所示：
 
-```
+```java
 String rawSql = "select id,first_name,last_name from customers";
 List<Map<String,Object>> customers = delegator
                                      .findListByRawQuery(rawSql,null);
