@@ -38,6 +38,11 @@ public class CaptchaView implements View {
     response.setDateHeader("Expires", 0);
     response.setContentType(getContentType());
     
+    String captchaKey = request.getParameter("cKey");
+    if (CommUtil.isEmpty(captchaKey)) {
+      captchaKey = "captchaCode";
+    }
+    
     String captchaType = request.getParameter("cType");
     if (CommUtil.isEmpty(captchaType)) {
       captchaType = "alphanum";
@@ -58,11 +63,6 @@ public class CaptchaView implements View {
       hStr = "45";
     }
     
-    String captchaKey = (String) request.getAttribute("captchaKey");
-    if (CommUtil.isEmpty(captchaKey)) {
-      captchaKey = "captchaCode";
-    }
-    
     String source = ALPHNUM_CHARS;
     if ("number".equals(captchaType)) {
       source = NUMBER_CHARS;
@@ -71,6 +71,10 @@ public class CaptchaView implements View {
     }
     
     int randomCharsLength = Integer.valueOf(captchaLengthStr);
+    if (randomCharsLength <= 0 || randomCharsLength > 10) {
+      randomCharsLength = 4;
+    }
+    
     String captchaCode = generateRandomChars(randomCharsLength, source);
     try {
       renderImage(response.getOutputStream(), Integer.valueOf(wStr), Integer.valueOf(hStr), randomCharsLength, source);

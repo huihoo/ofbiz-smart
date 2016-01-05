@@ -28,7 +28,7 @@ public class WebAppUtil {
   private final static String TAG = WebAppUtil.class.getName();
   
   public static Map<String, Object> buildWebCtx(HttpServletRequest req) {
-    ServletContext sc = req.getSession().getServletContext();
+    ServletContext sc = req.getServletContext();
     
     Delegator delegator = (Delegator) sc.getAttribute(C.CTX_DELETAGOR);
     ServiceDispatcher serviceDispatcher =(ServiceDispatcher) sc.getAttribute(C.CTX_SERVICE_DISPATCHER);
@@ -36,7 +36,7 @@ public class WebAppUtil {
     
     Map<String, Object> ctx =CommUtil.toMap(C.CTX_DELETAGOR, delegator
                                            ,C.CTX_SERVICE_DISPATCHER, serviceDispatcher
-                                           ,C.ACTION_CONFIG_BASEPATH_KEY, applicationConfig
+                                           ,C.APPLICATION_CONFIG_PROP_KEY, applicationConfig
                                            ,C.CTX_WEB_HTTP_SERVLET_REQUEST, req
     );
     

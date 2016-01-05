@@ -163,8 +163,26 @@ public class DefaultRequestHandler implements RequestHandler {
         }
         return ;
       } else if (ProcessType.BY_CONFIG.value().equals(reqAction.processType)) {
-        //TODO
-        req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + targetUri + ".jsp");
+        if (reqAction.response != null) {
+          String latyout = reqAction.response.layout;      
+          String tmpViewName = reqAction.response.viewName;
+          
+          if (latyout != null) {
+            req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + layout);
+            if (tmpViewName == null) {
+              tmpViewName = jspViewBasePath + targetUri + ".jsp";
+            }
+            req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, tmpViewName);
+          } else {
+            if (tmpViewName == null) {
+              tmpViewName = jspViewBasePath + targetUri + ".jsp";
+            }
+            req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, tmpViewName);
+          }
+        } else {
+          req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + targetUri + ".jsp");
+        }
+        
       }
       try {
         view.render(modelMap, req, resp);
