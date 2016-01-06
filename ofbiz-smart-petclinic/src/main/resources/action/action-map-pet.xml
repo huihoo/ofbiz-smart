@@ -2,7 +2,7 @@
 <action-map xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="../../../../../ofbiz-smart-framework/src/main/resources/META-INF/action-map.xsd">
 	
-	<action uri="/index" process-type="uriAuto"  nav-tag="home">
+	<action uri="/index" process-type="uriAuto"  nav-tag="home" method="all">
 		<response layout="/layout/layout.jsp" />
 	</action>
 	
