@@ -1,9 +1,6 @@
 {
 	"title" : "OFBiz Smart",
 	"description" : "OFBiz Smart使用指南",
-	"author" : "黄柏华",
-	"language" : "zh-hans",
-	"gitbook": "2.x.x",
 	"links" : {
         "sidebar" : {
             "Home" : "http://code.huihoo.com"
@@ -13,7 +10,7 @@
       "title": "OFBiz Smart"
   	},
   	"plugins": [
-  	  "toggle-chapters",
-      "gitbook-plugin-yahei"
+  		"emphasize",
+  		"gitbook-plugin-yahei"
     ]
 }

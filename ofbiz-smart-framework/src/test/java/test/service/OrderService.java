@@ -14,7 +14,6 @@ import org.huihoo.ofbiz.smart.service.annotation.ServiceDefinition;
 public class OrderService {
   private final static String TAG = OrderService.class.getName();
   
-  
   @ServiceDefinition(
     name = "createOrder"
     ,description = "创建订单"
@@ -30,8 +29,13 @@ public class OrderService {
     ,responseJsonExample = "{'orderId','20151231001','grandTotal',300.00}"
   )
   public static Map<String,Object> createOrder(Map<String,Object> ctx) {
-    Map<String, Object> success = ServiceUtil.returnSuccess();
-    Log.i("Begining create order.", TAG);
-    return success;
+    try {
+      Map<String, Object> resultMap = ServiceUtil.returnSuccess();
+      //TODO
+      return resultMap;
+    } catch(Exception e) {
+      Log.e(e, "OrderService.createOrder occurs exception.", TAG);
+      return ServiceUtil.returnProplem("SERVICE_EXCEPTION", "服务执行发生异常");
+    } 
   }
 }
