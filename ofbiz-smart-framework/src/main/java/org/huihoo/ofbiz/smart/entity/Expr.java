@@ -18,6 +18,9 @@ public class Expr {
   }
   
   public static Expr create() {
+    if (EXPR_SB.length() > 0) {
+      EXPR_SB.delete(0, EXPR_SB.length());
+    }
     return ME;
   }
 
