@@ -13,13 +13,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.cache.Cache;
 import org.huihoo.ofbiz.smart.base.cache.SimpleCacheManager;
 import org.huihoo.ofbiz.smart.base.location.FlexibleLocation;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
+import org.huihoo.ofbiz.smart.base.util.StringUtils;
+import org.huihoo.ofbiz.smart.base.util.xml.IXmlConverter;
 import org.huihoo.ofbiz.smart.entity.Delegator;
 import org.huihoo.ofbiz.smart.entity.EbeanDelegator;
 import org.huihoo.ofbiz.smart.entity.GenericEntityException;
@@ -63,6 +64,8 @@ public class DispatchServlet extends HttpServlet {
                      "doc#org.huihoo.ofbiz.smart.webapp.view.HttpApiDocView",
                      "captcha#org.huihoo.ofbiz.smart.webapp.view.CaptchaView",
   };
+  
+  private static final String XML_HANDLE="org.huihoo.ofbiz.smart.base.util.xml.impl.SmartXmlConverter";
 
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -238,7 +241,36 @@ public class DispatchServlet extends HttpServlet {
         Log.e(e, "Unable to load supported view [" + viewType+ "] [" + viewName +"]", TAG);
       }
     }
-    servletContext.setAttribute(C.CTX_SUPPORTED_VIEW_ATTRIBUTE,VIEW_CACHE);   
+    servletContext.setAttribute(C.CTX_SUPPORTED_VIEW_ATTRIBUTE,VIEW_CACHE);  
+    /**xml handle**/
+    String xmlhandle = applicationConfig.getProperty("smart.xml.handle");
+    if(StringUtils.isBlank(xmlhandle)){
+    	xmlhandle = XML_HANDLE;
+    }
+    if(StringUtils.isNotBlank(xmlhandle)){
+    	try {
+			Object xmlObhject = Class.forName(xmlhandle).newInstance();
+			if(xmlObhject instanceof IXmlConverter){
+				servletContext.setAttribute(C.CTX_SUPPORTED_XML_HANDLE_ATTRIBUTE, xmlObhject);
+			}else{
+				Log.e(null, xmlhandle+"does not implement the interface org.huihoo.ofbiz.smart.base.util.xml.IXmlConverter"+xmlhandle, TAG);
+			}
+		} catch (InstantiationException e) {
+			Log.e(e, "Unable to new  instance "+xmlhandle, TAG);
+		} catch (IllegalAccessException e) {
+			Log.e(e, "Unable to new  instance "+xmlhandle, TAG);
+		} catch (ClassNotFoundException e) {
+			Log.e(e, "Unable to new  instance "+xmlhandle, TAG);
+		}
+    	if((null ==servletContext.getAttribute(C.CTX_SUPPORTED_XML_HANDLE_ATTRIBUTE)) && !(XML_HANDLE.equals(xmlhandle))){
+    		try {
+				Object xmlObhject = Class.forName(XML_HANDLE).newInstance();
+				servletContext.setAttribute(C.CTX_SUPPORTED_XML_HANDLE_ATTRIBUTE, xmlObhject);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+			}
+		}
+    }
   }
   
   protected void loadSeedData(ServletContext servletContext){

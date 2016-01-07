@@ -18,6 +18,9 @@ public final class C {
   // Servlet spec related attributies
   // ========================================================================================
   public static final String DEFAULT_CONTENT_TYPE = "text/html;charset=utf-8";
+  public static final String XML_CONTENT_TYPE = "text/xml;charset=utf-8";
+  public static final String JSON_CONTENT_TYPE = "application/json;charset=utf-8";
+  
   public static final String TEMP_DIR_CONTEXT_ATTRIBUTE = "javax.servlet.context.tempdir";
   public static final String INCLUDE_REQUEST_URI_ATTRIBUTE = "javax.servlet.include.request_uri";
   
@@ -33,6 +36,7 @@ public final class C {
   public static final String CTX_URI_SUFFIX = "_ctx_uri_suffix_";
   public static final String CTX_JSP_VIEW_BASEPATH = "_ctx_jsp_view_basepath_";
   public static final String CTX_SUPPORTED_VIEW_ATTRIBUTE = "_ctx_supported_view_";
+  public static final String CTX_SUPPORTED_XML_HANDLE_ATTRIBUTE = "_ctx_supported_xml_handle";
   // ========================================================================================
   // Cache Related Flag
   // ========================================================================================

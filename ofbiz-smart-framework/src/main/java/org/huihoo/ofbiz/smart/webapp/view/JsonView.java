@@ -5,13 +5,14 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.huihoo.ofbiz.smart.base.C;
 import org.json.JSONObject;
 
 public class JsonView implements View {
 
   @Override
   public String getContentType() {
-    return "application/json;charset=utf-8";
+    return C.JSON_CONTENT_TYPE;
   }
 
   @Override
