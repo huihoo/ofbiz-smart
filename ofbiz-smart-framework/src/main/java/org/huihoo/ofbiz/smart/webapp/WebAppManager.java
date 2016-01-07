@@ -72,7 +72,7 @@ public class WebAppManager {
             req.setAttribute(name, val);
           } else {
             if (fileUploadHandler != null) {
-              String fileName = item.getFieldName();
+              String fileName = item.getName();
               String contentType = item.getContentType();
               ctx.putAll(fileUploadHandler.handle(name,fileName,contentType,stream, ctx));
             }
