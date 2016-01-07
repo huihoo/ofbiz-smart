@@ -27,7 +27,7 @@ import org.huihoo.ofbiz.smart.webapp.ActionModel;
 import org.huihoo.ofbiz.smart.webapp.ProcessType;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.Action;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.ServiceCall;
-import org.huihoo.ofbiz.smart.webapp.WebAppUtil;
+import org.huihoo.ofbiz.smart.webapp.WebAppManager;
 import org.huihoo.ofbiz.smart.webapp.view.JsonView;
 import org.huihoo.ofbiz.smart.webapp.view.JspView;
 import org.huihoo.ofbiz.smart.webapp.view.RedirectView;
@@ -55,7 +55,7 @@ public class DefaultRequestHandler implements RequestHandler {
   public void handleRequest(HttpServletRequest req, HttpServletResponse resp)
           throws ServletException, IOException {
     ServletContext sc = req.getSession().getServletContext();
-    //获取保存在Web上下文中的关键对象和配置参数
+    //get deletagor,serviceDispatcher,applicationProp from web context.
     Delegator delegator = (Delegator) sc.getAttribute(C.CTX_DELETAGOR);
     Log.d("Delegator > " + delegator, TAG);
     ServiceDispatcher serviceDispatcher = (ServiceDispatcher) sc.getAttribute(C.CTX_SERVICE_DISPATCHER);
@@ -83,7 +83,7 @@ public class DefaultRequestHandler implements RequestHandler {
       Map<String, Object> modelMap = ServiceUtil.returnSuccess();
       
       //build web ctx for service call.
-      Map<String, Object> webCtx = WebAppUtil.buildWebCtx(req);
+      Map<String, Object> webCtx = WebAppManager.buildWebCtx(req);
       
       //calling all available configured service
       List<ServiceCall> serviceCalls = reqAction.serviceCallList;
@@ -93,7 +93,7 @@ public class DefaultRequestHandler implements RequestHandler {
           ServiceModel sm = new ServiceModel();
           //set param pairs
           if (CommUtil.isNotEmpty(serviceCall.paramPairs)) {
-            String p = WebAppUtil.analyzeParamPairString(serviceCall.paramPairs, req);
+            String p = WebAppManager.analyzeParamPairString(serviceCall.paramPairs, req);
             webCtx.putAll(ServiceUtil.covertParamPairToMap(p));
           }
           //entityAuto service
@@ -142,7 +142,7 @@ public class DefaultRequestHandler implements RequestHandler {
       
       if (ProcessType.URI_AUTO.value().equals(reqAction.processType)) {
         String viewName = null;
-        if (layout != null) {
+        if (layout != null && !"none".equals(layout)) {
           viewName = jspViewBasePath + layout;
           req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, jspViewBasePath + targetUri + ".jsp");
         } else {
@@ -167,7 +167,7 @@ public class DefaultRequestHandler implements RequestHandler {
           String latyout = reqAction.response.layout;      
           String tmpViewName = reqAction.response.viewName;
           
-          if (latyout != null) {
+          if (latyout != null && !"none".equals(layout)) {
             req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + layout);
             if (tmpViewName == null) {
               tmpViewName = jspViewBasePath + targetUri + ".jsp";
@@ -314,7 +314,7 @@ public class DefaultRequestHandler implements RequestHandler {
         if (CommUtil.isNotEmpty(viewName)) {
           int sIdx = viewName.indexOf("?");
           if (sIdx >= 0) {
-            String newParamString = WebAppUtil.rebuildRequestParams(viewName.substring(sIdx + 1), req, result);
+            String newParamString = WebAppManager.rebuildRequestParams(viewName.substring(sIdx + 1), req, result);
             viewName = viewName.substring(0, sIdx) + uriSuffix + "?" + newParamString;
           }
         }

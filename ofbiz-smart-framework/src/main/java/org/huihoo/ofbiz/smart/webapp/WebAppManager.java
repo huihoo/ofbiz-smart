@@ -23,9 +23,11 @@ import org.huihoo.ofbiz.smart.service.ServiceDispatcher;
 import ognl.Ognl;
 import ognl.OgnlException;
 
-public class WebAppUtil {
+public class WebAppManager {
   
-  private final static String TAG = WebAppUtil.class.getName();
+  private final static String TAG = WebAppManager.class.getName();
+  
+  private static volatile FileUploadHandler fileUploadHandler;
   
   public static Map<String, Object> buildWebCtx(HttpServletRequest req) {
     ServletContext sc = req.getSession().getServletContext();
@@ -43,7 +45,20 @@ public class WebAppUtil {
     boolean isMultipart = ServletFileUpload.isMultipartContent(req);
     
     if (isMultipart) {
+      if (fileUploadHandler == null) {
+        String handlerName = applicationConfig.getProperty("file.upload.handler", "org.huihoo.ofbiz.smart.webapp.DefaultFileUploadHandler");
+        try {
+          fileUploadHandler = (FileUploadHandler) Class.forName(handlerName).newInstance();
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+          Log.w("Unable to load file upload handler [%s]", TAG,handlerName);
+        }
+      }
+      int fileSizeMax = Integer.valueOf(applicationConfig.getProperty("file.upload.per.sizeinmb.max", "5"));
+      int sizeMax = Integer.valueOf(applicationConfig.getProperty("file.upload.sizeinmb.max", "10"));
       ServletFileUpload upload = new ServletFileUpload();
+      upload.setHeaderEncoding(C.UTF_8); 
+      upload.setFileSizeMax(1024 * 1024 * fileSizeMax);
+      upload.setSizeMax(1024 * 1024 * sizeMax);
       FileItemIterator iter;
       try {
         iter = upload.getItemIterator(req);
@@ -56,7 +71,11 @@ public class WebAppUtil {
             ctx.put(name, val);
             req.setAttribute(name, val);
           } else {
-             //TODO File
+            if (fileUploadHandler != null) {
+              String fileName = item.getFieldName();
+              String contentType = item.getContentType();
+              ctx.putAll(fileUploadHandler.handle(name,fileName,contentType,stream, ctx));
+            }
           }
         }
       } catch (FileUploadException | IOException e) {
