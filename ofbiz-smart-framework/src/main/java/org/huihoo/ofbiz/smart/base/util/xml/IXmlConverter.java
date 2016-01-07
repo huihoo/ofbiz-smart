@@ -9,6 +9,6 @@ public interface IXmlConverter{
 	 * @return
 	 * @throws Exception
 	 */
-	public String ObjectToXml(Object object)throws Exception;
+	public String objectToXml(Object object)throws Exception;
 	
 }
