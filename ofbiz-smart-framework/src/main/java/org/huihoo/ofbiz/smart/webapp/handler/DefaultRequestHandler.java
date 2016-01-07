@@ -148,6 +148,9 @@ public class DefaultRequestHandler implements RequestHandler {
         } else {
           viewName = jspViewBasePath + targetUri + ".jsp";
         }
+        if (reqAction.response != null && reqAction.response.viewName != null) {
+          viewName = reqAction.response.viewName;
+        }
         req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, viewName);
         //TODO
       } else if (ProcessType.ENTITY_AUTO.value().equals(reqAction.processType)) {

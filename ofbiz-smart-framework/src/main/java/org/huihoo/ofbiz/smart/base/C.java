@@ -12,6 +12,8 @@ public final class C {
   public static final String JSP_VIEW_NAME_ATTRIBUTE = "viewName";
   public static final String JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE = "layoutContentView";
   
+  public static final String REDIRECT_FLAG_ATTRIBUTE = "redirect://";
+  
   // ========================================================================================
   // Servlet spec related attributies
   // ========================================================================================
