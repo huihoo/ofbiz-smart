@@ -72,6 +72,11 @@ public class WebAppTest {
     delegator = new EbeanDelegator();
     serviceDispatcher = new ServiceDispatcher(delegator);
     
+   
+  }
+
+  @Test
+  public void testDispatchServletInit() throws ServletException, IOException {
     when(context.getAttribute(C.APPLICATION_CONFIG_PROP_KEY)).thenReturn(applicationConfig);
     when(config.getInitParameter("jsp-view-base-path")).thenReturn("");
     when(config.getInitParameter("uri-suffix")).thenReturn("");
@@ -84,16 +89,9 @@ public class WebAppTest {
     when(req.getServletContext()).thenReturn(context);
 
     when(applicationConfig.getProperty(C.SEED_DATA_SQL_FILE_ATTRIBUTE)).thenReturn("");
-  }
-
-  @Test
-  public void testDispatchServletInit() throws ServletException, IOException {
-
     
-
     DispatchServlet dispatchServlet = new DispatchServlet();
     dispatchServlet.init(config);
-
 
     verify(config, times(1)).getInitParameter("jsp-view-base-path");
     verify(config, times(1)).getInitParameter("uri-suffix");
@@ -155,7 +153,10 @@ public class WebAppTest {
 
   
   @Test
-  public void testWebAppManagerFunc() {
+  public void testWebAppManagerFunc() throws MalformedURLException {
+    String viewName = "/WEB-INF/views/index.jsp";
+    initMockReq("/",viewName);
+    
     when(req.getParameter("cityId")).thenReturn("1000");
     when(session.getAttribute("code")).thenReturn("ABC");
     
@@ -189,6 +190,7 @@ public class WebAppTest {
     when(req.getServletContext()).thenReturn(context);
     when(req.getContextPath()).thenReturn("");
     when(req.getRequestURI()).thenReturn(requestUri);
+    when(req.getSession()).thenReturn(session);
     
     MockRequestDispatcher requestDispatcher = new MockRequestDispatcher(viewName);
     when(req.getAttribute("viewName")).thenReturn(viewName);
