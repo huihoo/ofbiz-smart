@@ -193,7 +193,7 @@ public class WebAppManager {
       int bsize = braceIdxList.size();
       if (bsize % 2 == 0) {
         for (int j = 0; j < bsize; j++) {
-          String tmpCond = condition.substring(j,++j);
+          String tmpCond = condition.substring(braceIdxList.get(j) + 1,braceIdxList.get(++j));
           String[] tmpCondToken = tmpCond.split(",");
           String tmpField = tmpCondToken[0];
           String tmpExpr = tmpCondToken[1];

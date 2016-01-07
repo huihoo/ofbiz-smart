@@ -33,6 +33,7 @@ import org.huihoo.ofbiz.smart.webapp.ActionModel;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.Action;
 import org.huihoo.ofbiz.smart.webapp.ActionModelXmlConfigLoader;
 import org.huihoo.ofbiz.smart.webapp.DispatchServlet;
+import org.huihoo.ofbiz.smart.webapp.WebAppManager;
 import org.huihoo.ofbiz.smart.webapp.view.View;
 import org.junit.Assert;
 import org.junit.Before;
@@ -70,11 +71,7 @@ public class WebAppTest {
     viewCache = (Cache<String, View>) SimpleCacheManager.createCache("mock-cache");
     delegator = new EbeanDelegator();
     serviceDispatcher = new ServiceDispatcher(delegator);
-  }
-
-  @Test
-  public void testDispatchServletInit() throws ServletException, IOException {
-
+    
     when(context.getAttribute(C.APPLICATION_CONFIG_PROP_KEY)).thenReturn(applicationConfig);
     when(config.getInitParameter("jsp-view-base-path")).thenReturn("");
     when(config.getInitParameter("uri-suffix")).thenReturn("");
@@ -87,6 +84,12 @@ public class WebAppTest {
     when(req.getServletContext()).thenReturn(context);
 
     when(applicationConfig.getProperty(C.SEED_DATA_SQL_FILE_ATTRIBUTE)).thenReturn("");
+  }
+
+  @Test
+  public void testDispatchServletInit() throws ServletException, IOException {
+
+    
 
     DispatchServlet dispatchServlet = new DispatchServlet();
     dispatchServlet.init(config);
@@ -150,6 +153,20 @@ public class WebAppTest {
     Assert.assertNotNull(action);
   }
 
+  
+  @Test
+  public void testWebAppManagerFunc() {
+    when(req.getParameter("cityId")).thenReturn("1000");
+    when(session.getAttribute("code")).thenReturn("ABC");
+    
+    String condition =  "{age,eq,30}{gender,eq,male}{status,eq,1}{city,eq,requestScope.cityId}{code,eq,sessionScope.code}";
+    String parsedCond = WebAppManager.parseCondition(condition, req);
+    Assert.assertEquals("{age,eq,30}{gender,eq,male}{status,eq,1}{city,eq,1000}{code,eq,ABC}", parsedCond);
+    
+    when(req.getQueryString()).thenReturn("s_age_eq=30&s_gender_eq=male&s_status_eq=1&s_city_eq_=1000&s_code_eq=ABC");
+    parsedCond = WebAppManager.parseConditionFromQueryString(req);
+    Assert.assertEquals("{age,eq,30}{gender,eq,male}{status,eq,1}{city,eq,1000}{code,eq,ABC}", parsedCond);
+  }
 
   private void initMockReq(String requestUri,String viewName) throws MalformedURLException {
     when(config.getInitParameter("jsp-view-base-path")).thenReturn("/WEB-INF/views/");
