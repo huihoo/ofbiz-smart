@@ -2,7 +2,9 @@ package org.huihoo.ofbiz.smart.webapp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -102,54 +104,143 @@ public class WebAppManager {
         }
       }
     }
-    
-    
     return ctx;
   }
   
   
-  public static String analyzeParamPairString(String paramPair,HttpServletRequest req) {
+  public static String parseParamPairString(String paramPair,HttpServletRequest req) {
     StringBuilder sb = new StringBuilder();
     String[] pToken = paramPair.split(",");
     int len = pToken.length;
     for (int i = 0; i < len; i++) {
       String t = pToken[i];
+      Object val = t;
       if (t.startsWith("requestScope.")) {
-        String val = req.getParameter(t.substring("requestScope.".length()));
-        if (val == null) {
-          val = "";
-        }
-        sb.append(val);
+        val = req.getParameter( t.substring("requestScope.".length()) );
       } else if (t.startsWith("sessionScope.")){
-        Object val = req.getSession().getAttribute(t.substring("requestScope.".length()));
-        if (val == null) {
-          val = "";
-        }
-        sb.append(val);
-      } else {
-        sb.append(t);
+        val = req.getSession().getAttribute( t.substring("requestScope.".length()) );
       }
+      if (CommUtil.isEmpty(val)) {
+        val = "";
+      }
+      
+      sb.append(val);
       
       if (i < len - 1) {
         sb.append(",");
       }
     }
+    Log.d("Origal paramPair[%s] parsed paramPair[%s]", TAG,paramPair,sb);
     return sb.toString();
   }
   
   
-  public static String rebuildRequestParams(String requestParams,HttpServletRequest req,Map<String,Object> resultMap) {
+  public static String parseConditionFromQueryString(HttpServletRequest req) {
     StringBuilder sb = new StringBuilder();
-    if (CommUtil.isEmpty(requestParams)) {
+    String queryString = req.getQueryString();
+    if (CommUtil.isNotEmpty(queryString)) {
+      String[] paramPairArray = queryString.split("&");
+      int len = paramPairArray.length;
+      for (int i = 0; i <len ; i++) {
+        String[] paramPair = paramPairArray[i].split("=");
+        String key = paramPair[0];
+        if (!key.startsWith("s_")) {
+          continue;
+        }
+        String[] keyToken = key.split("_");
+        String fieldName = keyToken[1];
+        String expr = keyToken[2];
+        
+        String t = paramPair[1];
+        Object val = t;
+        if (t.startsWith("requestScope.")) {
+          val = req.getParameter( t.substring("requestScope.".length()) );
+        } else if (t.startsWith("sessionScope.")){
+          val = req.getSession().getAttribute( t.substring("requestScope.".length()) );
+        }
+        if (CommUtil.isEmpty(val)) {
+          val = "";
+        }
+        if (CommUtil.isNotEmpty(val)) {
+          sb.append("{")
+            .append(fieldName)
+            .append(",")
+            .append(expr)
+            .append(",")
+            .append(val)
+            .append("}");
+        }
+      }
+    }
+    Log.d("Origal condition[%s] parsed condition[%s]", TAG,queryString,sb);
+    return sb.toString();
+  }
+  
+  public static String parseCondition(String condition,HttpServletRequest req) {
+    StringBuilder sb = new StringBuilder();
+    List<Integer> braceIdxList = new ArrayList<>();
+    if (CommUtil.isNotEmpty(condition)) {
+      char[] chars = condition.toCharArray();
+      int clen = chars.length;
+      for (int i = 0; i < clen; i++) {
+        int c = (int) chars[i];
+        if (c == 123 || c == 125) {
+          braceIdxList.add(i);
+        }
+      }
+    }
+    if (!braceIdxList.isEmpty()) {
+      int bsize = braceIdxList.size();
+      if (bsize % 2 == 0) {
+        for (int j = 0; j < bsize; j++) {
+          String tmpCond = condition.substring(j,++j);
+          String[] tmpCondToken = tmpCond.split(",");
+          String tmpField = tmpCondToken[0];
+          String tmpExpr = tmpCondToken[1];
+          String tmpVal = tmpCondToken[2];
+          Object val = tmpVal;
+          if (tmpVal.startsWith("requestScope.")) {
+            val = req.getParameter( tmpVal.substring("requestScope.".length()) );
+          } else if (tmpVal.startsWith("sessionScope.")) {
+            val = req.getSession().getAttribute( tmpVal.substring("requestScope.".length()) );
+          }
+          if (CommUtil.isNotEmpty(val)) {
+            sb.append("{")
+              .append(tmpField)
+              .append(",")
+              .append(tmpExpr)
+              .append(",")
+              .append(val)
+              .append("}");
+          }
+        }
+      }
+    }
+    Log.d("Origal condition[%s] parsed condition[%s]", TAG,condition,sb);
+    return sb.toString();
+  }
+  
+  
+  
+ /**
+  * 解析查询参数
+  * 
+  * @param queryString
+  * @param req
+  * @param resultMap
+  * @return 重构
+  */
+  public static String parseQueryString(String queryString,HttpServletRequest req,Map<String,Object> resultMap) {
+    StringBuilder sb = new StringBuilder();
+    if (CommUtil.isEmpty(queryString)) {
       return sb.toString();
     }
-    String[] paramPair = requestParams.split("=");
-    if (paramPair.length % 2 != 0) {
-      throw new IllegalArgumentException("Illegal request params [" + requestParams + "]");
-    }
-    for (int i = 0; i < paramPair.length; i++) {
-      String key = paramPair[i];
-      String val = paramPair[++i];
+    String[] paramPairArray = queryString.split("&");
+    int len = paramPairArray.length;
+    for (int i = 0; i <len ; i++) {
+      String[] paramPair = paramPairArray[i].split("=");
+      String key = paramPair[0];
+      String val = paramPair[1];
       int leftBrace = val.indexOf("{");
       int rightBrace = val.indexOf("}");
       if (leftBrace >= 0 && rightBrace >= 0) {
@@ -182,7 +273,11 @@ public class WebAppManager {
       } else {
         sb.append(key).append("=").append(val); 
       }
+      if (i < len -1) {
+        sb.append("&");
+      }
     }
+    Log.d("Origal queryString[%s] parsed queryString[%s]", TAG,queryString,sb);
     return sb.toString();
   }
   
@@ -197,15 +292,5 @@ public class WebAppManager {
         request.removeAttribute(modelName);
       }
     }
-  }
-  
-  
-  public static String buildQueryString(HttpServletRequest request) {
-    StringBuilder sb = new StringBuilder();
-    String queryString = request.getQueryString();
-    if (CommUtil.isNotEmpty(queryString)) {
-      
-    }
-    return sb.toString();
   }
 }

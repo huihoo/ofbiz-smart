@@ -93,9 +93,14 @@ public class DefaultRequestHandler implements RequestHandler {
           ServiceModel sm = new ServiceModel();
           //set param pairs
           if (CommUtil.isNotEmpty(serviceCall.paramPairs)) {
-            String p = WebAppManager.analyzeParamPairString(serviceCall.paramPairs, req);
-            webCtx.putAll(ServiceUtil.covertParamPairToMap(p));
+            String p = WebAppManager.parseParamPairString(serviceCall.paramPairs, req);
+            webCtx.put(C.ENTITY_ANDMAP, ServiceUtil.covertParamPairToMap(p));
           }
+          //set condition
+          if (CommUtil.isNotEmpty(serviceCall.condition)) {
+            webCtx.put(C.ENTITY_CONDTION, "");
+          }
+          
           //entityAuto service
           if (serviceCall.serviceName.startsWith( ServiceEngineType.ENTITY_AUTO.value() + "#") ) {
             sm.name = serviceCall.serviceName;
@@ -317,7 +322,7 @@ public class DefaultRequestHandler implements RequestHandler {
         if (CommUtil.isNotEmpty(viewName)) {
           int sIdx = viewName.indexOf("?");
           if (sIdx >= 0) {
-            String newParamString = WebAppManager.rebuildRequestParams(viewName.substring(sIdx + 1), req, result);
+            String newParamString = WebAppManager.parseQueryString(viewName.substring(sIdx + 1), req, result);
             viewName = viewName.substring(0, sIdx) + uriSuffix + "?" + newParamString;
           }
         }
