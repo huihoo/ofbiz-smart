@@ -11,6 +11,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -24,6 +25,7 @@ import org.huihoo.ofbiz.smart.base.cache.Cache;
 import org.huihoo.ofbiz.smart.base.cache.SimpleCacheManager;
 import org.huihoo.ofbiz.smart.base.location.FlexibleLocation;
 import org.huihoo.ofbiz.smart.base.util.Log;
+import org.huihoo.ofbiz.smart.base.util.ServiceUtil;
 import org.huihoo.ofbiz.smart.entity.Delegator;
 import org.huihoo.ofbiz.smart.entity.EbeanDelegator;
 import org.huihoo.ofbiz.smart.entity.GenericEntityException;
@@ -167,6 +169,32 @@ public class WebAppTest {
     when(req.getQueryString()).thenReturn("s_age_eq=30&s_gender_eq=male&s_status_eq=1&s_city_eq_=1000&s_code_eq=ABC");
     parsedCond = WebAppManager.parseConditionFromQueryString(req);
     Assert.assertEquals("{age,eq,30}{gender,eq,male}{status,eq,1}{city,eq,1000}{code,eq,ABC}", parsedCond);
+    
+    Map<String,Object> resultMap = ServiceUtil.returnSuccess();
+    resultMap.put("model", "MODEL");
+    
+    when(session.getAttribute("userId")).thenReturn("1000");
+    String queryString = "name=hbh&status=active&userid={sessionScope.userId}&model={model}";
+    String parsedStr = WebAppManager.parseQueryString(queryString, req, resultMap);
+    Assert.assertEquals("name=hbh&status=active&userid=1000&model=MODEL", parsedStr);
+    
+    when(session.getAttribute("t")).thenReturn("t");
+    when(req.getParameter("userId")).thenReturn("1000");
+    String pps = WebAppManager.parseParamPairString("name,hbh,status,active,user_id,requestScope.userId,t,sessionScope.t", req);
+    Assert.assertEquals("name,hbh,status,active,user_id,1000,t,t", pps);
+    
+    Map<String,Object> modelMap = ServiceUtil.returnSuccess();
+    
+    Map<String,Object> errorMap = ServiceUtil.returnProplem("ERROR01", "Error1");
+    
+    modelMap.putAll(errorMap);
+    
+    
+    errorMap = ServiceUtil.returnProplem("ERROR02", "Error2");
+    modelMap.putAll(errorMap);
+    
+    Log.d("" + modelMap, TAG);
+    
   }
 
   private void initMockReq(String requestUri,String viewName) throws MalformedURLException {

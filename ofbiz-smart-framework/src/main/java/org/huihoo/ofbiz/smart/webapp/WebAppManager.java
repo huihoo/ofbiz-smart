@@ -221,15 +221,6 @@ public class WebAppManager {
   }
   
   
-  
- /**
-  * 解析查询参数
-  * 
-  * @param queryString
-  * @param req
-  * @param resultMap
-  * @return 重构
-  */
   public static String parseQueryString(String queryString,HttpServletRequest req,Map<String,Object> resultMap) {
     StringBuilder sb = new StringBuilder();
     if (CommUtil.isEmpty(queryString)) {
@@ -245,31 +236,25 @@ public class WebAppManager {
       int rightBrace = val.indexOf("}");
       if (leftBrace >= 0 && rightBrace >= 0) {
         String valKey = val.substring(leftBrace + 1, rightBrace);
-        
+        Object finalVal = null;
         if (valKey.startsWith("requestScope.")) {
-          String finalVal = req.getParameter( valKey.substring("requestScope.".length()) );
-          if (finalVal == null) {
-            finalVal = "";
-          }
-          sb.append(key).append("=").append(finalVal);
+          finalVal = req.getParameter( valKey.substring("requestScope.".length()) );
         } else if (valKey.startsWith("sessionScope.")) {
-          Object finalVal = req.getSession().getAttribute( valKey.substring("sessionScope.".length()) );
-          if (finalVal == null) {
-            finalVal = "";
-          }
-          sb.append(key).append("=").append(finalVal);
+          finalVal = req.getSession().getAttribute( valKey.substring("sessionScope.".length()) );
         } else {
           if (resultMap != null) {
             try {
-              Object finalVal = Ognl.getValue(valKey, resultMap);
-              sb.append(key).append("=").append(finalVal);
+              finalVal = Ognl.getValue(valKey, resultMap);
             } catch (OgnlException e) {
               sb.append(key).append("=").append("unResloved");
               Log.w("Unable to get value of [" + valKey + "]", TAG);
             }
           } 
         }
-        
+        if (finalVal == null) {
+          finalVal = "";
+        }
+        sb.append(key).append("=").append(finalVal);
       } else {
         sb.append(key).append("=").append(val); 
       }

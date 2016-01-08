@@ -24,7 +24,7 @@ public class JspView implements View {
   public void render(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response)
       throws ViewException {
     WebAppManager.setModelAsRequestAttributies(model, request);
-    String viewName = (String) request.getAttribute("viewName");
+    String viewName = (String) request.getAttribute(C.JSP_VIEW_NAME_ATTRIBUTE);
     RequestDispatcher rd = request.getRequestDispatcher(viewName); 
     if (rd == null) {
       throw new ViewException("Could not get RequestDispatcher for [" + viewName + "]");
