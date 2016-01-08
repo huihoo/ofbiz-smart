@@ -15,6 +15,8 @@ public class ActionModel implements Serializable {
     public String uri;
 
     public String method;
+    
+    public String queryCondition;
 
     public String processType;
     

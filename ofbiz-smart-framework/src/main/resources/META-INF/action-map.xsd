@@ -166,6 +166,16 @@
 			</xs:simpleType>
 		</xs:attribute>
 		
+		<xs:attribute type="xs:string" name="query-condition">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						process-type为entityAuto时指定的查询条件
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		
 		<xs:attribute type="xs:string" name="nav-tag">
 			<xs:annotation>
 				<xs:documentation>

@@ -94,7 +94,7 @@ public class WebAppManager {
           req.setAttribute(parameterName, value);
         } else {
           String[] arrayValue = req.getParameterValues(parameterName);
-          if (CommUtil.isNotEmpty(arrayValue)) {
+          if (CommUtil.isNotEmpty(arrayValue) && CommUtil.isNotEmpty(arrayValue[0])) {
             ctx.put(parameterName, arrayValue);
             req.setAttribute(parameterName, arrayValue);
           } else {
@@ -151,7 +151,7 @@ public class WebAppManager {
         String fieldName = keyToken[1];
         String expr = keyToken[2];
         
-        String t = paramPair[1];
+        String t = paramPair.length == 1 ? "" : paramPair[1];
         Object val = t;
         if (t.startsWith("requestScope.")) {
           val = req.getParameter( t.substring("requestScope.".length()) );
@@ -231,7 +231,7 @@ public class WebAppManager {
     for (int i = 0; i <len ; i++) {
       String[] paramPair = paramPairArray[i].split("=");
       String key = paramPair[0];
-      String val = paramPair[1];
+      String val = paramPair.length == 1 ? "" : paramPair[1];
       int leftBrace = val.indexOf("{");
       int rightBrace = val.indexOf("}");
       if (leftBrace >= 0 && rightBrace >= 0) {

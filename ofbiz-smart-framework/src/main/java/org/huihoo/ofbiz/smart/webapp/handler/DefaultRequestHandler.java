@@ -132,7 +132,9 @@ public class DefaultRequestHandler implements RequestHandler {
           }
           //set condition
           if (CommUtil.isNotEmpty(serviceCall.condition)) {
-            webCtx.put(C.ENTITY_CONDTION, "");
+            webCtx.put(C.ENTITY_CONDTION, WebAppManager.parseCondition(serviceCall.condition, req));
+          } else {
+            webCtx.put(C.ENTITY_CONDTION, WebAppManager.parseConditionFromQueryString(req));
           }
           
           //entityAuto service
@@ -334,6 +336,11 @@ public class DefaultRequestHandler implements RequestHandler {
     //TODO 验证输入参数
     serviceDispatcher.registerService(sm);
     if (sm.invoke != null) {
+      if (reqAction.queryCondition != null) {
+        webCtx.put(C.ENTITY_CONDTION, WebAppManager.parseCondition(reqAction.queryCondition, req));
+      } else {
+        webCtx.put(C.ENTITY_CONDTION, WebAppManager.parseConditionFromQueryString(req));
+      }
       result = serviceDispatcher.runSync(sm.name, webCtx);
     }
     

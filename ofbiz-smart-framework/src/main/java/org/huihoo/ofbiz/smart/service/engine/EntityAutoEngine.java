@@ -73,6 +73,11 @@ public class EntityAutoEngine extends GenericAsyncEngine {
       }
       Map<String,Object> successResult = ServiceUtil.returnSuccess();
       String resultName = (String) ctx.get(C.SERVICE_RESULT_NAME_ATTRIBUTE);
+      String condition = (String) ctx.get(C.ENTITY_CONDTION);
+      Map<String, Object> andMap = (Map<String, Object>) ctx.get(C.ENTITY_ANDMAP);
+      Set<String> fieldsToSelect = (Set<String>) ctx.get(C.ENTITY_FIELDS_TO_SELECT);
+      List<String> orderBy = (List<String>) ctx.get(C.ENTITY_ORDERBY);
+      
       switch (serviceModel.invoke) {
         case C.SERVICE_ENGITYAUTO_CREATE:
           Object modelObj = entityClazz.newInstance();
@@ -108,7 +113,7 @@ public class EntityAutoEngine extends GenericAsyncEngine {
         case C.SERVICE_ENGITYAUTO_REMOVE:
           id = ctx.get(C.ENTITY_ID_NAME);
           if (CommUtil.isEmpty(id)) {
-            return ServiceUtil.returnProplem("ENTITY_ID_REQUIRED","The entity id required.");
+              return ServiceUtil.returnProplem("ENTITY_ID_REQUIRED","The entity id required.");
           }
           obj = delegator.findById(entityClazz, id);
           if (obj != null) {
@@ -126,7 +131,10 @@ public class EntityAutoEngine extends GenericAsyncEngine {
         case C.SERVICE_ENGITYAUTO_FINDBYID:
           id = ctx.get(C.ENTITY_ID_NAME);
           if (CommUtil.isEmpty(id)) {
-            return ServiceUtil.returnProplem("ENTITY_ID_REQUIRED","The entity id required.");
+            id = ( andMap == null ? null : andMap.get(C.ENTITY_ID_NAME) );
+            if (CommUtil.isEmpty(id)) {
+              return ServiceUtil.returnProplem("ENTITY_ID_REQUIRED","The entity id required.");
+            }
           }
           obj = delegator.findById(entityClazz, id,useCache);
           if (resultName != null) {
@@ -137,10 +145,6 @@ public class EntityAutoEngine extends GenericAsyncEngine {
           break;
         case C.SERVICE_ENGITYAUTO_FINDLISTBYAND:
         case C.SERVICE_ENGITYAUTO_FINDLISTBYCOND:
-          String condition = (String) ctx.get(C.ENTITY_CONDTION);
-          Map<String, Object> andMap = (Map<String, Object>) ctx.get(C.ENTITY_ANDMAP);
-          Set<String> fieldsToSelect = (Set<String>) ctx.get(C.ENTITY_FIELDS_TO_SELECT);
-          List<String> orderBy = (List<String>) ctx.get(C.ENTITY_ORDERBY);
           if (orderBy == null && hasUpdatedAtField(entityClazz)) {
             orderBy = Arrays.asList(new String[]{C.ENTITY_ORDERBY_DEFAULT_FIELD});
           }

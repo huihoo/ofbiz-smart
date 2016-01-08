@@ -30,9 +30,10 @@ public class RedirectView implements View {
     if (redirectUrl == null) {
       redirectUrl = (String) request.getAttribute(C.JSP_VIEW_NAME_ATTRIBUTE);
       
-      if (CommUtil.isEmpty(redirectUrl)) {
+      if (CommUtil.isEmpty(redirectUrl) || redirectUrl.startsWith("/WEB-INF/")) {
         redirectUrl = (String) request.getAttribute("redirectUrl");
       }
+      
       if (redirectUrl == null) {
         redirectUrl = request.getContextPath() + "/" ;
       }

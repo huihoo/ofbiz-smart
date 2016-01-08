@@ -52,9 +52,11 @@ public class EntityConverter {
           
           if (anno != null) {
             Object id = ctx.get(name);
-            Log.d("[%s] has referenced model [#%s]", TAG,targetObj.getClass(),id);
-            Object modelValue = delegator.findById(field.getType(), ctx.get(name));
-            Ognl.setValue(realFieldName, onglCtx, targetObj, modelValue);
+            if (CommUtil.isNotEmpty(id)) {
+              Log.d("[%s] has referenced model [#%s]", TAG,targetObj.getClass(),id);
+              Object modelValue = delegator.findById(field.getType(), ctx.get(name));
+              Ognl.setValue(realFieldName, onglCtx, targetObj, modelValue);
+            }
           }
           
         } else {
