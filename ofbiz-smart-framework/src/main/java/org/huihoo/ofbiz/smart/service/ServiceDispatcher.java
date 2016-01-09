@@ -6,7 +6,9 @@ import org.huihoo.ofbiz.smart.base.location.FlexibleLocation;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.base.util.ServiceUtil;
+import org.huihoo.ofbiz.smart.base.validation.ConstraintViolation;
 import org.huihoo.ofbiz.smart.entity.Delegator;
+import org.huihoo.ofbiz.smart.service.annotation.Parameter;
 import org.huihoo.ofbiz.smart.service.annotation.Service;
 import org.huihoo.ofbiz.smart.service.annotation.ServiceDefinition;
 import org.huihoo.ofbiz.smart.service.engine.GenericEngine;
@@ -131,13 +133,24 @@ public class ServiceDispatcher {
       if (persist && transaction) {
         delegator.beginTransaction();
       }
-      //TODO 输入参数的验证
       
+      Map<String, Object> verifyResult = verifyParameters(ctx, null, serviceModel);
+      if (ServiceUtil.isError(verifyResult)) {
+        Log.w("Service[%s] input parameters is invalid.", TAG,serviceName);
+        return verifyResult;
+      }
       //TODO 服务的认证
       
       Map<String,Object> result = engine.runSync(serviceName, ctx);
       
-      //TODO 输出参数的验证
+      if (ServiceUtil.isSuccess(result)) {
+        verifyResult = verifyParameters(ctx, result, serviceModel);
+        if (ServiceUtil.isError(verifyResult)) {
+          Log.w("Service[%s] output parameters is invalid.", TAG,serviceName);
+          return verifyResult;
+        }
+      }
+      
       if (CommUtil.isNotEmpty(serviceCallbacks)) {
         for (ServiceCallback sCallback : serviceCallbacks) {
           sCallback.receiveEvent(ctx, result);
@@ -240,9 +253,60 @@ public class ServiceDispatcher {
   // ===================================================================
   // Private Method
   // ===================================================================
-  private void verifyParameters() {
+  private Map<String, Object> verifyParameters(Map<String, Object> ctx,Map<String, Object> result,ServiceModel sm) {
+    Map<String, Object> validationResult = ServiceUtil.returnSuccess();
+    Map<String,List<ConstraintViolation>> violationsMap = new LinkedHashMap<>();
     
+    if (sm.parameters != null && sm.parameters.length > 0) {
+      List<ConstraintViolation> violations = new ArrayList<>();
+      for (Parameter p : sm.parameters) {
+        String name = p.name();
+        if (CommUtil.isEmpty(name)) {
+          continue;
+        }
+        boolean optional = p.optinal();
+        Class<?> type = p.type();
+        String mode = p.mode();
+        boolean valueRequired = p.valueReqiured();
+        if (result != null) {//verify output
+          if ("OUT".equals(mode) || "IN_AND_OUT".equals(mode)) {
+            if (!optional && !result.containsKey(name)) {
+              violations.add(new ConstraintViolation(sm.name + "." + name, "Output parameter[" + name + "] must be setting.", null));
+              continue;
+            }
+            
+            if (valueRequired && CommUtil.isEmpty(result.get(name))) {
+              violations.add(new ConstraintViolation(sm.name + "." + name, "Output parameter[" + name + "] value is empty.", null));
+            }
+            //TODO 类型检测
+          }
+        } else { //verify input
+          if ("IN".equals(mode) || "IN_AND_OUT".equals(mode)) {
+            if (!optional && !ctx.containsKey(name)) {
+              violations.add(new ConstraintViolation(sm.name + "." + name, "Input parameter[" + name + "] must be setting.", null));
+              continue;
+            }
+            
+            if (valueRequired && CommUtil.isEmpty(ctx.get(name))) {
+              violations.add(new ConstraintViolation(sm.name + "." + name, "Input parameter[" + name + "] value is empty.", null));
+            }
+            //TODO 类型检测
+            if (String.class.getName().equals(type.getName())) {
+              
+            }
+          } 
+        }
+      }
+      if (violations.size() > 0) {
+        violationsMap.put(sm.name, violations);
+      }
+    }
+    if (!violationsMap.isEmpty()) {
+      return ServiceUtil.returnProplem("SERVICE_PARAMETERS_INVALID", "Service input or output parameters is invalid.", violationsMap);
+    }
+    return validationResult;
   }
+  
   private void loadAndFilterServiceClazz() {
     Set<Class<?>> serviceClasses = new LinkedHashSet<Class<?>>();
     String[] scanResNamesArray = scanResNames.split(",");
