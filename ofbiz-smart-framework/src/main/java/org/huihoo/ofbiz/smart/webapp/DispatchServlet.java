@@ -19,7 +19,6 @@ import org.huihoo.ofbiz.smart.base.cache.SimpleCacheManager;
 import org.huihoo.ofbiz.smart.base.location.FlexibleLocation;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
-import org.huihoo.ofbiz.smart.base.util.StringUtils;
 import org.huihoo.ofbiz.smart.base.util.xml.IXmlConverter;
 import org.huihoo.ofbiz.smart.entity.Delegator;
 import org.huihoo.ofbiz.smart.entity.EbeanDelegator;
@@ -244,10 +243,10 @@ public class DispatchServlet extends HttpServlet {
     servletContext.setAttribute(C.CTX_SUPPORTED_VIEW_ATTRIBUTE,VIEW_CACHE);  
     /**xml handle**/
     String xmlhandle = applicationConfig.getProperty("smart.xml.handle");
-    if(StringUtils.isBlank(xmlhandle)){
+    if(CommUtil.isEmpty(xmlhandle)){
     	xmlhandle = XML_HANDLE;
     }
-    if(StringUtils.isNotBlank(xmlhandle)){
+    if(CommUtil.isNotEmpty(xmlhandle)){
     	try {
 			Object xmlObhject = Class.forName(xmlhandle).newInstance();
 			if(xmlObhject instanceof IXmlConverter){
