@@ -3,6 +3,8 @@
 	version="3.0" id="ofbiz-smart-petclinic">
 	<display-name>ofbiz-smart-petclinic</display-name>
 	
+	
+	
 	<servlet>
 		<servlet-name>SmartServlet</servlet-name>
 		<servlet-class>org.huihoo.ofbiz.smart.webapp.DispatchServlet</servlet-class>
@@ -25,6 +27,10 @@
 		<init-param>
 			<param-name>api-doc-uri-base</param-name>
 			<param-value>/doc</param-value>
+		</init-param>
+		<init-param>
+			<param-name>use-smart-session</param-name>
+			<param-value>true</param-value>
 		</init-param>
 		
 		<load-on-startup>1</load-on-startup>

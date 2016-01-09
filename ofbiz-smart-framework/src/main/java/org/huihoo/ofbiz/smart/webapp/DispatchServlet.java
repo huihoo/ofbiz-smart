@@ -3,9 +3,12 @@ package org.huihoo.ofbiz.smart.webapp;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Properties;
 
+import javax.servlet.DispatcherType;
+import javax.servlet.FilterRegistration.Dynamic;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -25,6 +28,10 @@ import org.huihoo.ofbiz.smart.entity.EbeanDelegator;
 import org.huihoo.ofbiz.smart.entity.GenericEntityException;
 import org.huihoo.ofbiz.smart.service.GenericServiceException;
 import org.huihoo.ofbiz.smart.service.ServiceDispatcher;
+import org.huihoo.ofbiz.smart.session.ExpiringSession;
+import org.huihoo.ofbiz.smart.session.MapSessionRepository;
+import org.huihoo.ofbiz.smart.session.SessionRepository;
+import org.huihoo.ofbiz.smart.session.web.http.SessionRepositoryFilter;
 import org.huihoo.ofbiz.smart.webapp.handler.ApiDocRequestHandler;
 import org.huihoo.ofbiz.smart.webapp.handler.DefaultRequestHandler;
 import org.huihoo.ofbiz.smart.webapp.handler.HttpApiRequestHandler;
@@ -44,6 +51,7 @@ public class DispatchServlet extends HttpServlet {
   private final static Cache<String,View> VIEW_CACHE = 
                             (Cache<String,View>) SimpleCacheManager.createCache("Request-View-Cache");
   
+  private volatile boolean useSmartSession;
   /** JSP界面所在跟目录 */
   private volatile String jspViewBathPath;
   /** 请求uri后缀 */
@@ -151,11 +159,23 @@ public class DispatchServlet extends HttpServlet {
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
+    
     jspViewBathPath = config.getInitParameter("jsp-view-base-path");
     uriSuffix = config.getInitParameter("uri-suffix");
     httpApiUrlBase = config.getInitParameter("http-api-uri-base");
     restApiUrlBase = config.getInitParameter("rest-api-uri-base");
     apiDocUriBase = config.getInitParameter("api-doc-uri-base");
+    String tmpUss = config.getInitParameter("use-smart-session");
+    useSmartSession = Boolean.valueOf(tmpUss == null ? "true": tmpUss);
+    
+    if (useSmartSession) {
+      SessionRepository<ExpiringSession> sessionRepository =new MapSessionRepository();
+      SessionRepositoryFilter<ExpiringSession> filter = new SessionRepositoryFilter<ExpiringSession>(sessionRepository);
+      Dynamic fr = config.getServletContext().addFilter("smartSessionFilter", filter);
+      fr.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "*" + uriSuffix);
+      fr.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "*.jsp");
+      Log.i("Use smart session to replace container session.", TAG);
+    }
     
     if (CommUtil.isEmpty(jspViewBathPath)) {
       jspViewBathPath = "/WEB-INF/views";
