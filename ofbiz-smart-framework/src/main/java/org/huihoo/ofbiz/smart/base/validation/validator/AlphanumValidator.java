@@ -1,4 +1,4 @@
-package org.huihoo.ofbiz.smart.base.validation.constraintvalidator;
+package org.huihoo.ofbiz.smart.base.validation.validator;
 
 
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
