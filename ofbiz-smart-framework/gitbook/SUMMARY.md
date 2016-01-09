@@ -30,6 +30,7 @@
   * [服务的文档](section_service/doc.md)
 * [WebApp](section_web/index.md)
   * [DispatchServlet](section_web/dispatch_servlet.md)
+  * [会话管理](section_web/session.md)
   * [Action配置](section_web/action.md)
   * [请求处理器](section_web/request_handler.md)
       * [默认请求处理器](section_web/req_default.md)
