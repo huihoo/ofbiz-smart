@@ -31,7 +31,7 @@ public class ServiceDispatcher {
   private final static Map<String, GenericEngine> ENGINE_MAP = new ConcurrentHashMap<>();
 
   /** 服务回调接口缓存 */
-  private final static Map<String, ServiceCallback> SERVICE_CALLBACK_MAP = new ConcurrentHashMap<>();
+  private final static Map<String, List<ServiceCallback>> SERVICE_CALLBACK_MAP = new ConcurrentHashMap<>();
 
   /** 所有服务定义的上下文信息缓存 */
   private final static Map<String, ServiceModel> SERVICE_CONTEXT_MAP = new ConcurrentHashMap<>();
@@ -85,13 +85,20 @@ public class ServiceDispatcher {
     loadAndFilterServiceClazz();
   }
 
-
+  /**
+   * 同步执行指定的服务
+   * 
+   * @param serviceName  服务的名称
+   * @param ctx          服务执行上下文
+   * @return  <code>Map</code> 
+   */
   public Map<String, Object> runSync(String serviceName, Map<String, Object> ctx) {
     long beginTime = System.currentTimeMillis();
     boolean transaction = false;
     boolean persist = false;
     boolean exception = false;
-   
+    List<ServiceCallback> serviceCallbacks = null ;
+    
     try {
       if (!C.PROFILE_PRODUCTION.equals(profile)) {
         // In test,develop profile, always load it.
@@ -110,6 +117,7 @@ public class ServiceDispatcher {
         return ServiceUtil.returnProplem("UNSUPPORTED_SERVICE_ENGINE", "Unsupported service ["+ serviceName + "]");
       }
       
+      serviceCallbacks = SERVICE_CALLBACK_MAP.get(serviceName);
       transaction = serviceModel.transaction;
       persist = serviceModel.persist;
       
@@ -130,12 +138,21 @@ public class ServiceDispatcher {
       Map<String,Object> result = engine.runSync(serviceName, ctx);
       
       //TODO 输出参数的验证
-      
-      
-      //TODO 服务回调的执行
+      if (CommUtil.isNotEmpty(serviceCallbacks)) {
+        for (ServiceCallback sCallback : serviceCallbacks) {
+          sCallback.receiveEvent(ctx, result);
+        }
+      }
       
       return result;
     } catch (Exception e) {
+      //service callback
+      if (CommUtil.isNotEmpty(serviceCallbacks)) {
+        for (ServiceCallback sCallback : serviceCallbacks) {
+          sCallback.receiveEvent(ctx, e);
+        }
+      }
+      
       if (persist && transaction && delegator != null) {
         delegator.rollback();
       }
@@ -183,16 +200,18 @@ public class ServiceDispatcher {
   }
 
 
-  public void registerCallback(String serviceCallbackClazzName) {
+  public void registerCallback(String serviceName,String serviceCallbackClazzName) {
     if (CommUtil.isEmpty(serviceCallbackClazzName)) {
       return;
     }
     try {
+      List<ServiceCallback> callbacks = new ArrayList<>();
       ClassLoader loader = Thread.currentThread().getContextClassLoader();
       Class<?> c = loader.loadClass(serviceCallbackClazzName);
       Constructor<ServiceCallback> cn = CommUtil.cast(c.getConstructor());
       ServiceCallback serviceCallback = cn.newInstance();
-      SERVICE_CALLBACK_MAP.put(serviceCallback.getClass().getName(), serviceCallback);
+      callbacks.add(serviceCallback);
+      SERVICE_CALLBACK_MAP.put(serviceName, callbacks);
     } catch (NoSuchMethodException e) {
       Log.e(e, "Unable to register serviceCallback[" + serviceCallbackClazzName + "]", TAG);
     } catch (ClassNotFoundException e) {
@@ -221,6 +240,9 @@ public class ServiceDispatcher {
   // ===================================================================
   // Private Method
   // ===================================================================
+  private void verifyParameters() {
+    
+  }
   private void loadAndFilterServiceClazz() {
     Set<Class<?>> serviceClasses = new LinkedHashSet<Class<?>>();
     String[] scanResNamesArray = scanResNames.split(",");
@@ -248,7 +270,7 @@ public class ServiceDispatcher {
         if (sd == null) {
           continue;
         }
-        Log.d("Service [%s][%s] found.", TAG,sClazz.getName(),method.getName());
+        
         ServiceModel sm = new ServiceModel();
         sm.engineName = sd.type();
         sm.entityName = sd.entityName();
@@ -261,18 +283,22 @@ public class ServiceDispatcher {
         sm.persist = sd.persist();
         sm.callback = sd.callback();
         sm.requireAuth = sd.requireAuth();
+        sm.parameters = sd.parameters();
         if (sm.callback != null && sm.callback.length > 0) {
+          List<ServiceCallback> callbacks = new ArrayList<>();
           for (Class<?> clz : sm.callback) {
             try {
               Constructor<ServiceCallback> cn = CommUtil.cast(clz.getConstructor());
               ServiceCallback serviceCallback = cn.newInstance();
-              SERVICE_CALLBACK_MAP.put(clz.getName(), serviceCallback);
+              callbacks.add(serviceCallback);
             } catch(Exception e) {
               Log.w("Unable to load service callback class [%s]", TAG, clz);
             }
           }
+          SERVICE_CALLBACK_MAP.put(sm.name, callbacks);
         }
         SERVICE_CONTEXT_MAP.put(sm.name, sm);
+        Log.d("Service [%s][%s] found. Definition[%s]", TAG,sClazz.getName(),method.getName(),sm);
       }
     }
   }

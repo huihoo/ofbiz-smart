@@ -2,6 +2,7 @@ package org.huihoo.ofbiz.smart.entity;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -122,7 +123,6 @@ public class EntityConverter {
         } else {
           result = Boolean.FALSE;
         }
-        
       } else if( (toType == Long.class || toType == long.class) ) {
         if (CommUtil.isNotEmpty(value)) {
           result = Long.valueOf("" + value);
@@ -130,6 +130,18 @@ public class EntityConverter {
       } else if( (toType == Integer.class || toType == int.class) ) {
         if (CommUtil.isNotEmpty(value)) {
           result = Integer.valueOf("" + value);
+        }
+      } else if( (toType == Double.class || toType == double.class) ) {
+        if (CommUtil.isNotEmpty(value)) {
+          result = Double.valueOf("" + value);
+        }
+      } else if( (toType == Float.class || toType == float.class) ) {
+        if (CommUtil.isNotEmpty(value)) {
+          result = Float.valueOf("" + value);
+        }
+      } else if( (toType == BigDecimal.class) ) {
+        if (CommUtil.isNotEmpty(value)) {
+          result = new BigDecimal("" + value);
         }
       } 
       else {

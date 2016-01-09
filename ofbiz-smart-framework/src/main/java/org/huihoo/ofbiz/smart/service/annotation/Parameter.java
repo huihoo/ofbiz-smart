@@ -8,27 +8,32 @@ import java.lang.annotation.Target;
 /**
  *
  * <P>
- * 指定服务的输入参数
+ * 服务参数
  * </P>
  *
  * @since 1.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
-public @interface InParameter {
-
+public @interface Parameter {
   /** 参数名称 */
   String name();
+
+  /** 参数类型 */
+  Class<?> type() default String.class;
+
+  /** 参数输入输出模式,仅支持 IN(输入),OUT(输出),IN_AND_OUT(即是输入，又可以是输出) */
+  String mode() default "IN";
+
+  /** 参数是否可选 */
+  boolean optinal() default true;
 
   /** 参数描述 */
   String description() default "";
 
-  /** 参数是否必须 */
-  boolean required() default false;
+  /** 参数的值是否必须 */
+  boolean valueReqiured() default false;
 
   /** 参数的默认值 */
   String defaultValue() default "";
-  
-  /** 参数类型 */
-  Class<?> type() default String.class;
 }

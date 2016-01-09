@@ -7,6 +7,8 @@ import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.entity.Expr;
 import org.huihoo.ofbiz.smart.entity.GenericEntityException;
+import org.huihoo.ofbiz.smart.entity.TxCallable;
+import org.huihoo.ofbiz.smart.entity.TxRunnable;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -109,7 +111,7 @@ public class DelegatorTest extends BaseTestCase {
 
     ids = delegator.findIdsByCond(Customer.class, "{lastName,eq,Peter}");
     Assert.assertEquals(1, ids.size());
-
+    delegator.useDataSource("mysql").save(customer);
     Map<String, Object> pageResult =
         delegator.findPageByAnd(Customer.class, CommUtil.toMap("lastName", "Peter"), 1, 10);
     Assert.assertNotNull(pageResult);
@@ -209,5 +211,32 @@ public class DelegatorTest extends BaseTestCase {
     Connection con = delegator.getConnection();
     Assert.assertNotNull("raw connection ---> " + con);
     con.close();
+    
+    
+    try {
+      delegator.beginTransaction();
+      
+      delegator.commitTransaction();
+    } catch (Exception e) {
+      delegator.rollback();
+    } finally {
+      delegator.endTransaction();
+    }
+    
+    delegator.executeWithInTx(new TxCallable() {
+      @Override
+      public Object call() {
+        
+        return null;
+      }
+    });
+    
+    delegator.executeWithInTx(new TxRunnable() {
+      @Override
+      public void run() {
+        
+      }
+    });
+    
   }
 }

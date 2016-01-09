@@ -45,17 +45,15 @@ public @interface ServiceDefinition {
   /** 实体的名称(如果有) */
   String entityName() default "";
 
-  Class<ServiceCallback>[]callback() default {};
+  /** 服务回调数组 */
+  Class<ServiceCallback>[] callback() default {};
 
-  /** 输入参数集合 */
-  InParameter[]inParameters() default @InParameter(name = "");
+  /** 服务参数数组 */
+  Parameter[] parameters() default @Parameter(name = "");
 
-  /** 输出参数集合 */
-  OutParameter[]outParameters() default @OutParameter(name = "");
-  
   /** JSON格式的返回示例 */
   String responseJsonExample() default "";
-  
+
   /** XML格式的返回示例 */
   String responseXmlExample() default "";
 }
