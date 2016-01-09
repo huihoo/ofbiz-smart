@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.huihoo.ofbiz.smart.session.web.http;
+package org.huihoo.ofbiz.smart.webapp;
 
 import java.io.IOException;
 import java.util.Collections;

@@ -31,7 +31,6 @@ import org.huihoo.ofbiz.smart.service.ServiceDispatcher;
 import org.huihoo.ofbiz.smart.session.ExpiringSession;
 import org.huihoo.ofbiz.smart.session.MapSessionRepository;
 import org.huihoo.ofbiz.smart.session.SessionRepository;
-import org.huihoo.ofbiz.smart.session.web.http.SessionRepositoryFilter;
 import org.huihoo.ofbiz.smart.webapp.handler.ApiDocRequestHandler;
 import org.huihoo.ofbiz.smart.webapp.handler.DefaultRequestHandler;
 import org.huihoo.ofbiz.smart.webapp.handler.HttpApiRequestHandler;
