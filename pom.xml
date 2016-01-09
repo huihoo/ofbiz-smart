@@ -38,6 +38,13 @@
 		</developer>
 	</developers>
 
+
+	<scm>
+		<connection>scm:git:git@code.huihoo.com:huihoo/ofbiz-smart.git</connection>
+		<developerConnection>scm:git:git@code.huihoo.com:huihoo/ofbiz-smart.git</developerConnection>
+		<url>git@code.huihoo.com:huihoo/ofbiz-smart.git</url>
+	</scm>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.7</java.version>
@@ -228,7 +235,7 @@
 				<version>${h2.database.version}</version>
 				<scope>test</scope>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.json</groupId>
 				<artifactId>json</artifactId>
@@ -302,25 +309,11 @@
 				</executions>
 			</plugin>
 
-
-			<plugin>
-				<groupId>org.avaje.ebeanorm</groupId>
-				<artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
-				<version>4.7.1</version>
-				<executions>
-					<execution>
-						<id>main</id>
-						<phase>process-test-classes</phase>
-						<configuration>
-							<packages>test.entity.**</packages>
-							<transformArgs>debug=1</transformArgs>
-						</configuration>
-						<goals>
-							<goal>enhance</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+			<!-- <plugin> <groupId>org.avaje.ebeanorm</groupId> <artifactId>avaje-ebeanorm-mavenenhancer</artifactId> 
+				<version>4.7.1</version> <executions> <execution> <id>main</id> <phase>process-classes</phase> 
+				<configuration> <packages>test.entity.**</packages> <transformArgs>debug=1</transformArgs> 
+				</configuration> <goals> <goal>enhance</goal> </goals> </execution> </executions> 
+				</plugin> -->
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -387,6 +380,70 @@
 			</plugin>
 		</plugins>
 	</reporting>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<!-- Source -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>2.2.1</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- Javadoc -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>2.9.1</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- GPG -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+			<distributionManagement>
+				<snapshotRepository>
+					<id>oss</id>
+					<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+				</snapshotRepository>
+				<repository>
+					<id>oss</id>
+					<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+				</repository>
+			</distributionManagement>
+		</profile>
+	</profiles>
+
+
 	<modules>
 
 		<module>ofbiz-smart-framework</module>
