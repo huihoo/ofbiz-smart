@@ -48,7 +48,7 @@ persist|是否需要持久化(默认为true)，为true时，delegator不能为�
 requireAuth | 是否需要身份认证，true需要，false不需要，默认为false
 export| 是否对外提供远程调用，true提供，false不提供，默认为false
 entityName | 指定的实体名称(如果有)
-callback |服务回调数组（如果有）
+callback |[服务回调](callback.md)数组（如果有）
 parameters |服务的参数（如果有）
 responseJsonExample |服务返回为json时的对应json字符串示例（如果有）
 responseXmlExample |服务返回为xml时的对应xml字符串示例（如果有）
