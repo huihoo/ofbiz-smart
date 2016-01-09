@@ -49,42 +49,28 @@ requireAuth | 是否需要身份认证，true需要，false不需要，默认为
 export| 是否对外提供远程调用，true提供，false不提供，默认为false
 entityName | 指定的实体名称(如果有)
 callback |服务回调数组（如果有）
-inParameters |输入参数定义数组（如果有）
-outParameters |输出参数定义数组（如果有）
+parameters |服务的参数（如果有）
 responseJsonExample |服务返回为json时的对应json字符串示例（如果有）
 responseXmlExample |服务返回为xml时的对应xml字符串示例（如果有）
 
-## InParameter
+## Parameter
 
-> InParameter注解定义了服务的输入参数
+> Parameter注解定义了服务的输入输出参数
 
-> 如果服务定义了具体的输入参数，服务引擎会对输入参数进行严格的验证，所有参数通过验证后，服务才被调用。
-
-定义属性:
-
-名称                                   | 描述                                    
-:-----------:| :-----------
-name         | 参数的名称
-description  | 参数的描述
-required     | 参数是否必需，true必须，false非必须，默认为false
-defaultValue | 参数默认值，默认为空
-type         | 参数Class类型，默认为**String.class**
-
-## OutParameter
-
-> OutParameter注解定义了服务的输出参数
-
-> 如果服务定义了具体的输出参数，服务引擎会对输出参数进行严格的验证，所有参数通过验证后，才返回成功的服务调用结果。
+> 如果服务定义了具体的参数，服务引擎会对参数进行严格的验证，输入参数验证通过后，才调用服务；输出参数验证通过后，才返回调用结果。
 
 定义属性:
 
 名称                                   | 描述                                    
 :-----------:| :-----------
 name         | 参数的名称
-description  | 参数的描述
-required     | 参数是否必需，true必须，false非必须，默认为false
-defaultValue | 参数默认值，默认为空
 type         | 参数Class类型，默认为**String.class**
+optional     | 参数是否可选,true可选,false不可选(默认true)
+mode         | 参数的输入输出模式,只能是IN(仅输入),OUT(仅输出),IN_AND_OUT(输入输出都有)
+description  | 参数的描述
+valueRequired| 参数的值是否必需，true必须，false非必须，默认为false
+defaultValue | 参数默认值，默认为空
+
 
 服务定义示例：
 
@@ -95,12 +81,10 @@ public class UserService {
   @ServiceDefinition(
     name = "userEnter"
     ,description = "用户登录"
-    ,inParameters = {
-        @InParameter(name = "username",required = true,description = "用户名")
-       ,@InParameter(name = "password",required = true,description = "用户密码")
-    }
-    ,outParameters = {
-        @OutParameter(name = "userId",required = true,description = "用户ID")  
+    ,parameters = {
+        @Parameter(name = "username",optional=false, mode="IN",valueRequired = true,description = "用户名")
+       ,@Parameter(name = "password",optional=false,mode="IN",valueRequired = true,description = "用户密码")
+       ,@Parameter(name = "userId",type=Long.class,optional=false,mode="OUT",description = "用户ID")  
     }
     ,responseJsonExample = "{'userId','10000'}"
   )
