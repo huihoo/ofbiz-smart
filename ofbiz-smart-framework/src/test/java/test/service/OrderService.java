@@ -47,6 +47,7 @@ public class OrderService {
        ,@Parameter(name = "orderId",optinal = false,mode="OUT",description = "创建成功的订单编号") 
        ,@Parameter(name = "grandTotal",type = BigDecimal.class,optinal = false,mode="OUT",description = "订单总价") 
     }
+    ,callback = {OrderServiceCallback.class}
     ,responseJsonExample = "{'orderId','20151231001','grandTotal',300.00}"
   )
   public static Map<String,Object> createOrder2(Map<String,Object> ctx) {

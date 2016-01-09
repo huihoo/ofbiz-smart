@@ -46,7 +46,7 @@ public @interface ServiceDefinition {
   String entityName() default "";
 
   /** 服务回调数组 */
-  Class<ServiceCallback>[] callback() default {};
+  Class<? extends ServiceCallback>[] callback() default {};
 
   /** 服务参数数组 */
   Parameter[] parameters() default @Parameter(name = "");

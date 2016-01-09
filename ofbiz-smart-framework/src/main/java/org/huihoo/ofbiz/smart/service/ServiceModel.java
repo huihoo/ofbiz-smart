@@ -18,7 +18,7 @@ public class ServiceModel implements Serializable {
   public boolean export = false;
   public boolean persist = true;
   public boolean transaction = false;
-  public Class<ServiceCallback>[] callback;
+  public Class<? extends ServiceCallback>[] callback;
   public Parameter[] parameters;
 
   @Override
