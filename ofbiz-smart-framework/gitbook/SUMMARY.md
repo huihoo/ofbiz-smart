@@ -44,6 +44,8 @@
       * [XmlView](section_web/view_xml.md)
       * [CaptchaView](section_web/view_captcha.md)
       * [HttpApiDocView](section_web/view_http_api_doc.md)
+      * [自定义界面](section_web/view_custom.md)
+      * [界面布局](section_web/view_layout.md)
   * [文件上传](section_web/file_upload.md)
   * [常用标签](section_web/tablib.md)
 * [验证框架](section_validation/index.md)

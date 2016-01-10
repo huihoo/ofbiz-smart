@@ -26,7 +26,7 @@ public class SelectOptionTag extends TagSupport {
   private String className;
   private String labelName = "name";
   private String valueName = "id";
-  private Object currentId;
+  private Object currentValue;
   private String condition;
   private int liveTimeInSeconds;
 
@@ -45,7 +45,7 @@ public class SelectOptionTag extends TagSupport {
       for (Object obj : allObjects) {
         String select = "";
         Object id = Ognl.getValue(valueName, obj);
-        if (id != null && String.valueOf(id).equals(String.valueOf(currentId))) {
+        if (id != null && String.valueOf(id).equals(String.valueOf(currentValue))) {
           select = "selected='selected'";
         }
         optionSb.append("<option value='"+id+"' "+select+">"+Ognl.getValue(labelName, obj)+"</option>").append(lineSepa);
@@ -74,15 +74,6 @@ public class SelectOptionTag extends TagSupport {
   public void setClassName(String className) {
     this.className = className;
   }
-
-  public Object getCurrentId() {
-    return currentId;
-  }
-
-  public void setCurrentId(Object currentId) {
-    this.currentId = currentId;
-  }
-
 
 
 
@@ -137,6 +128,20 @@ public class SelectOptionTag extends TagSupport {
 
   public void setLiveTimeInSeconds(int liveTimeInSeconds) {
     this.liveTimeInSeconds = liveTimeInSeconds;
+  }
+
+
+
+
+  public Object getCurrentValue() {
+    return currentValue;
+  }
+
+
+
+
+  public void setCurrentValue(Object currentValue) {
+    this.currentValue = currentValue;
   }
 
 }

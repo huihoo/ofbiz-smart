@@ -139,9 +139,9 @@
 		</attribute>
 		<attribute>
 			<description>
-					当前的ID
+					当前的值
 				</description>
-			<name>currentId</name>
+			<name>currentValue</name>
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>

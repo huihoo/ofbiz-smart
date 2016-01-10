@@ -68,7 +68,7 @@ public class SelectOptionTagTest {
      sb.append("<option value='2' >跟踪客户</option>").append("\r\n");
      sb.append("<option value='3' >VIP客户</option>").append("\r\n");
      sb.append("<option value='4' >非客户</option>").append("\r\n");
-     tag.setCurrentId(1);
+     tag.setCurrentValue(1);
      tag.doStartTag();
      tag.doEndTag();
      Mockito.verify(jspWriter, Mockito.times(1)).println(sb.toString());

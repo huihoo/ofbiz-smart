@@ -19,8 +19,6 @@ import org.huihoo.ofbiz.smart.base.util.ServiceUtil;
 
 public class DefaultFileUploadHandler implements FileUploadHandler {
   private final static String TAG = DefaultFileUploadHandler.class.getName();
-  
-  private final static SimpleDateFormat FORMATTER = new SimpleDateFormat("yyyy/MM/dd"); 
   private final static String DEFAULT_CONTENT_TYPE_CVS = "image/x-png,image/pjpeg,image/gif,image/jpeg,image/png";
   
   @Override
@@ -34,6 +32,7 @@ public class DefaultFileUploadHandler implements FileUploadHandler {
     Properties prop = (Properties) webCtx.get(C.APPLICATION_CONFIG_PROP_KEY);
     String saveRootPath = req.getServletContext().getRealPath("");
     String fileSaveRelativePath = prop.getProperty("file.upload.save.relative.path","/upload");
+    String fileFolderDateFormatter = prop.getProperty("file.upload.folder.date.formatter","yyyy/MM/dd");
     String[] allowContentTypes = prop.getProperty("file.upload.allow.content.type",DEFAULT_CONTENT_TYPE_CVS).split(",");
     
     boolean allowed = false;
@@ -49,12 +48,14 @@ public class DefaultFileUploadHandler implements FileUploadHandler {
       return ServiceUtil.returnProplem("INVALID_FILE_CONTENTTYPE", "invalid file content type");
     }
     
+    SimpleDateFormat formatter = new SimpleDateFormat(fileFolderDateFormatter); 
+    
     File uploadDir = new File(saveRootPath + fileSaveRelativePath);
     if (!uploadDir.exists()) {
       uploadDir.mkdirs();
     }
     
-    String fmtFolder = FORMATTER.format(new Date());
+    String fmtFolder = formatter.format(new Date());
     File fmtDir = new File(saveRootPath + fileSaveRelativePath + "/" + fmtFolder);
     if (!fmtDir.exists()) {
       fmtDir.mkdirs();
@@ -82,8 +83,10 @@ public class DefaultFileUploadHandler implements FileUploadHandler {
       resultMap.put(fieldName, fileRelativePath);
       resultMap.put(fieldName + "_file_saved_file", targetFile);
       resultMap.put(fieldName + "_file_field_name", fieldName);
-      resultMap.put(fieldName + "_file_origal_file_name", fileName);
+      resultMap.put(fieldName + "_file_new_name", fileNewName);
+      resultMap.put(fieldName + "_file_origal_name", fileName);
       resultMap.put(fieldName + "_file_content_type", contentType);
+      resultMap.put(fieldName + "_file_size", targetFile.length());
       return resultMap; 
     } catch (Exception e) {
       Log.e(e, "Save File occurs an exception.", TAG);
