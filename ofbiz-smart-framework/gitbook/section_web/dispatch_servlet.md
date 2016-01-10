@@ -21,6 +21,7 @@ uri-suffix        | 请求的后缀标识
 http-api-uri-base | Http API请求处理的URI根路径
 rest-api-uri-base | Rest API请求处理的URI根路径
 api-doc-uri-base  | Api Doc请求处理的URI根路径 
+use-smart-session | 是否使用OFBiz Smart实现的[会话管理](session.md),true是,false否
 
 ### 配置示例：
 
@@ -47,6 +48,10 @@ api-doc-uri-base  | Api Doc请求处理的URI根路径
 	<init-param>
 		<param-name>api-doc-uri-base</param-name>
 		<param-value>/doc</param-value>
+	</init-param>
+	<init-param>
+		<param-name>use-smart-session</param-name>
+		<param-value>true</param-value>
 	</init-param>
 	<load-on-startup>1</load-on-startup>
 </servlet>
