@@ -10,7 +10,9 @@
       "title": "OFBiz Smart"
   	},
   	"plugins": [
-  		"emphasize",
-  		"gitbook-plugin-yahei"
-    ]
+  		"emphasize"
+    ],
+    "styles": {
+        "website": "styles/website.css"
+    }
 }
