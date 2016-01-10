@@ -8,7 +8,7 @@
 
 > ServiceDispatcher在服务执行前进行验证，认证等操作(如果有必要），在服务执行完成后，进行验证，国际化返回码等操作(如果有必要)。
 
-> ServiceDispatcher会统计每个服务的执行时间，根据配置的service.slowtime.milliseconds属性，会单独进行日志记录。
+> ServiceDispatcher会统计每个服务的执行时间，根据配置的**service.slowtime.milliseconds**属性，会单独进行日志记录。
 
 > ServiceDispatcher是一个比较重的对象，但它不是以单例模式设计的，所以要求应用方自行管理该对象，强烈建议应用中中仅存在唯一实例。
 
@@ -26,4 +26,31 @@ Map<String,Object> resultMap = serviceDispatcher.runSync("service001", ctx);
 
 resultMap = serviceDispatcher.runSync("service002", ctx);
 
+```
+
+# 返回成功
+
+如果服务调用成功，返回的**Map**对象必然含名为**success**的key。
+
+判断服务调用成功:
+
+```java
+Map<String,Object> resultMap = serviceDispatcher.runSync("service",ctx);
+if (ServiceUtil.isSuccess(resultMap)) {
+  //...
+}
+```
+
+# 返回失败
+
+服务的输入参数，输出参数验证不通过，服务调用发生异常，自定义返回了错误码，都被视为失败的服务调用。
+失败的服务调用返回的**Map**对象必然包含名为**error**的key。
+
+判断服务调用失败:
+
+```java
+Map<String,Object> resultMap = serviceDispatcher.runSync("service",ctx);
+if (ServiceUtil.isError(resultMap)) {
+  //...
+}
 ```
