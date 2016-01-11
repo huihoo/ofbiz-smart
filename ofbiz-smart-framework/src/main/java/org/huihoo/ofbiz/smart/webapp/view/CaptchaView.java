@@ -130,7 +130,7 @@ public class CaptchaView implements View {
       g2.drawLine(x, y, xl,yl);
     }
     
-    String chars = generateRandomChars(randomCharsLength, source);
+  
     
     int fontSize = h - 5;
     
@@ -145,7 +145,7 @@ public class CaptchaView implements View {
       g2.setColor(getRandColor(1, 150));
       g2.setTransform(affine); 
       
-      g2.drawChars(chars.toCharArray(), i, 1, ((w-10) / randomCharsLength) * i + 5, h/2 + fontSize/2 - 10);
+      g2.drawChars(source.toCharArray(), i, 1, ((w-10) / randomCharsLength) * i + 5, h/2 + fontSize/2 - 10);
     }
 
 
