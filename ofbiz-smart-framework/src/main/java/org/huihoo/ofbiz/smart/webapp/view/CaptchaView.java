@@ -77,7 +77,7 @@ public class CaptchaView implements View {
     
     String captchaCode = generateRandomChars(randomCharsLength, source);
     try {
-      renderImage(response.getOutputStream(), Integer.valueOf(wStr), Integer.valueOf(hStr), randomCharsLength, source);
+      renderImage(response.getOutputStream(), Integer.valueOf(wStr), Integer.valueOf(hStr), randomCharsLength, captchaCode);
       request.getSession().setAttribute(captchaKey, captchaCode);
     } catch (IOException e) {
       throw new ViewException(e);
