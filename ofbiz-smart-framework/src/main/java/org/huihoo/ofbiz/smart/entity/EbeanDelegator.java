@@ -1059,6 +1059,9 @@ public class EbeanDelegator implements Delegator {
             continue;
           }
           URL sqlFileURL = FlexibleLocation.resolveLocation(sqlFile);
+          if(null == sqlFileURL){
+        	  break ;
+          }
           sqlLine = IOUtils.readLines(sqlFileURL.openStream());
           for (String sql : sqlLine) {
             try {
