@@ -151,6 +151,7 @@ public class DefaultRequestHandler implements RequestHandler {
           lastResult = serviceDispatcher.runSync(sm.name, webCtx);
           modelMap.putAll(lastResult);
           if (ServiceUtil.isError(lastResult)) {
+            modelMap = lastResult;
             break;
           }
         }
