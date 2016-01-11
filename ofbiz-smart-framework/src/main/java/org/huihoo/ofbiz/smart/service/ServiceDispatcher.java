@@ -70,6 +70,11 @@ public class ServiceDispatcher {
     scanResNames = applicationConfig.getProperty(C.SERVICE_SCANNING_NAMES);
     profile = applicationConfig.getProperty(C.PROFILE_NAME);
     slowTimeInMilliSeconds = Integer.valueOf(applicationConfig.getProperty(C.SERVICE_SLOWTIME_MILLISECONDS, "30000"));
+    /**transaction**/
+    String transaction = applicationConfig.getProperty("service.scanning.transaction");
+    if(CommUtil.isNotEmpty(transaction)){
+    	TransactionScanning.setTransactionSacnning(transaction);
+    }
     if (CommUtil.isEmpty(scanResNames)) {
       throw new GenericServiceException("Config[service.scanning.names] is empty.");
     }
@@ -342,9 +347,17 @@ public class ServiceDispatcher {
         sm.invoke = method.getName();
         sm.name = sd.name();
         sm.description = sd.description();
-        sm.transaction = sd.transaction();
-        sm.export = sd.export();
+        
         sm.persist = sd.persist();
+        sm.transaction = sd.transaction();
+        if(!sm.transaction){
+        	boolean istran = TransactionScanning.isTransaction(method.getName());
+        	if(istran){
+        		sm.persist = istran;
+                sm.transaction = istran;	
+        	}
+        }
+        sm.export = sd.export();
         sm.callback = sd.callback();
         sm.requireAuth = sd.requireAuth();
         sm.parameters = sd.parameters();
