@@ -359,6 +359,12 @@ public class DefaultRequestHandler implements RequestHandler {
       return ;
     }
     
+    if (view instanceof JsonView || view instanceof XmlView) {
+      view.render(modelMap, req, resp);
+      return ;
+    }
+    
+    //For JspView,RedirectView
     String viewName = (String) req.getAttribute(C.JSP_VIEW_NAME_ATTRIBUTE);
     if (ServiceUtil.isSuccess(result)) {      
       boolean overrideRedirectFlag = false;
