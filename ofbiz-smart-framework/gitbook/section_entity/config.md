@@ -3,6 +3,8 @@
 ```
 #定义了要扫描的实体所在的包，多个包以逗号隔开
 entity.scanning.packages=org.huihoo.samples.petclinic.model.**,test.model.model.**
+# 事务开启扫描方法，以注解配置优先
+#service.scanning.transaction=insert*,update*,delete*,save*
 #定义了种子数据SQL文件，相对于classpath目录,多个文件以逗号隔开
 seed.data.sql.file=seed_data.sql,seed_data2.sql
  
@@ -38,6 +40,8 @@ datasource.mysql.databaseUrl=jdbc:mysql://localhost:3306/test
 datasource.mysql.databaseDriver=com.mysql.jdbc.Driver
 
 ```
+#xml view处理器，可自己扩展
+#smart.xml.handle=org.huihoo.ofbiz.smart.base.util.xml.impl.SmartXmlConverter
 
 ##注意：
 > **datasource.mysql.provider**属性指定了数据源的提供实现，如果不指定，**OFBiz Smart**默认提供了一个基于[HikariCP](https://github.com/brettwooldridge/HikariCP)的实现。如果指定其它实现，参考[第三方数据源](../section_entity/thirdparty_ds.html)
