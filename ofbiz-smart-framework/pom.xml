@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.huihoo</groupId>
 		<artifactId>ofbiz-smart</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>ofbiz-smart-framework</artifactId>
 

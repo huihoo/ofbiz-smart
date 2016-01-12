@@ -4,12 +4,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.huihoo</groupId>
 	<artifactId>ofbiz-smart</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>ofbiz-smart</name>
 	<url>http://code.huihoo.com/huihoo/ofbiz-smart</url>
-	<description>A tiny,smart,powerful web framework inspired by OFBiz framework,ROR,Jodd and Spring Boot.
+	<description>
+		A tiny,smart,powerful web framework inspired by OFBiz Framework,MoqUI,Spring Boot and ROR.
 	</description>
 
 	<licenses>
@@ -314,7 +315,11 @@
 				<configuration> <packages>test.entity.**</packages> <transformArgs>debug=1</transformArgs> 
 				</configuration> <goals> <goal>enhance</goal> </goals> </execution> </executions> 
 				</plugin> -->
+				
+					
+				
 		</plugins>
+		
 		<pluginManagement>
 			<plugins>
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
@@ -448,5 +453,6 @@
 
 		<module>ofbiz-smart-framework</module>
 		<module>ofbiz-smart-petclinic</module>
+		<module>test</module>
 	</modules>
 </project>
