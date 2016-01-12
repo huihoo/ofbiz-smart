@@ -104,54 +104,56 @@ public class CaptchaView implements View {
   public void renderImage(OutputStream os, int w, int h, int randomCharsLength, String source) throws IOException {
     BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
     Graphics2D g2 = (Graphics2D) img.getGraphics();
-
-    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
-    // 设置边框色
-    g2.setColor(Color.GRAY);
-    g2.fillRect(0, 0, w, h);
-
-    // 设置背景色 
-    Color c = getRandColor(200, 250);  
-    g2.setColor(c); 
-    g2.fillRect(0, 2, w, h-4);  
-
-
-    // 绘制干扰线
-    Random random = new Random();
-    g2.setColor(getRandColor(160, 200));
-    for (int i = 0; i < 60; i++) {
-      int x = 0;
-      int y = random.nextInt(h - 1);
-      int xl = w;
-      int yl = random.nextInt(h - 1);
-      g2.setColor(getRandColor(150, 160));
-      g2.drawLine(x, y, xl,yl);
-    }
-    
+    try {
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
   
-    
-    int fontSize = h - 5;
-    
-    Font font = new Font("Times", Font.BOLD, fontSize);
-    g2.setFont(font);
-   
-    Random rand = new Random();
-    for (int i = 0; i < randomCharsLength; i++) {
-      //随机旋转
-      AffineTransform affine = new AffineTransform();  
-      affine.setToRotation(Math.PI / 4 * rand.nextDouble() * (rand.nextBoolean() ? 1 : -1), (w / randomCharsLength) * i + fontSize/2, h/2);  
-      g2.setColor(getRandColor(1, 150));
-      g2.setTransform(affine); 
+      // 设置边框色
+      g2.setColor(Color.GRAY);
+      g2.fillRect(0, 0, w, h);
+  
+      // 设置背景色 
+      Color c = getRandColor(200, 250);  
+      g2.setColor(c); 
+      g2.fillRect(0, 2, w, h-4);  
+  
+  
+      // 绘制干扰线
+      Random random = new Random();
+      g2.setColor(getRandColor(160, 200));
+      for (int i = 0; i < 60; i++) {
+        int x = 0;
+        int y = random.nextInt(h - 1);
+        int xl = w;
+        int yl = random.nextInt(h - 1);
+        g2.setColor(getRandColor(150, 160));
+        g2.drawLine(x, y, xl,yl);
+      }
+            
+      int fontSize = h - 5;
       
-      g2.drawChars(source.toCharArray(), i, 1, ((w-10) / randomCharsLength) * i + 5, h/2 + fontSize/2 - 10);
-    }
-
-
-    g2.dispose();
+      Font font = new Font("Times", Font.BOLD, fontSize);
+      g2.setFont(font);
+     
+      Random rand = new Random();
+      for (int i = 0; i < randomCharsLength; i++) {
+        //随机旋转
+        AffineTransform affine = new AffineTransform();  
+        affine.setToRotation(Math.PI / 4 * rand.nextDouble() * (rand.nextBoolean() ? 1 : -1), 
+                                                      (w / randomCharsLength) * i + fontSize / 2d, h / 2d);  
+        g2.setColor(getRandColor(1, 150));
+        g2.setTransform(affine); 
+        
+        g2.drawChars(source.toCharArray(), i, 1, ((w-10) / randomCharsLength) * i + 5, h / 2 + fontSize / 2 - 10);
+      }
+      
+      ImageIO.write(img, "jpg", os);
     
-    ImageIO.write(img, "jpg", os);
+    } finally {
+      if (g2 != null) {
+        g2.dispose();
+      }
+    }
   }
 
 

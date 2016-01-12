@@ -281,7 +281,7 @@ public class PaginationTag extends TagSupport {
    */
   public int[] getInterval() {
     int[] interval = new int[2];
-    int neHalf = (int) Math.ceil(this.displayNum / 2);
+    int neHalf = (int) Math.ceil(this.displayNum / 2d);
     int upperLimit = this.totalPage - this.displayNum;
     int start =
             this.currentPage > neHalf ? Math

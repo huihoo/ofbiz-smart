@@ -70,4 +70,8 @@
 	<action uri="/vet/list" process-type="entityAuto"  nav-tag="vet">
 		<response layout="/layout/layout.jsp"/>
 	</action>
+	
+	<action uri="/captcha">
+		<response view-type="captcha"/>
+	</action>
 </action-map>
