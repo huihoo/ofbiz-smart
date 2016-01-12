@@ -55,8 +55,8 @@ public class WebAppManager {
           Log.w("Unable to load file upload handler [%s]", TAG,handlerName);
         }
       }
-      int fileSizeMax = Integer.valueOf(applicationConfig.getProperty("file.upload.per.sizeinmb.max", "5"));
-      int sizeMax = Integer.valueOf(applicationConfig.getProperty("file.upload.sizeinmb.max", "10"));
+      int fileSizeMax = Integer.parseInt(applicationConfig.getProperty("file.upload.per.sizeinmb.max", "5"));
+      int sizeMax = Integer.parseInt(applicationConfig.getProperty("file.upload.sizeinmb.max", "10"));
       ServletFileUpload upload = new ServletFileUpload();
       upload.setHeaderEncoding(C.UTF_8); 
       upload.setFileSizeMax(1024 * 1024 * fileSizeMax);

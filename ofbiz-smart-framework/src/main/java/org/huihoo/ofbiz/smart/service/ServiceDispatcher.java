@@ -69,7 +69,7 @@ public class ServiceDispatcher {
 
     scanResNames = applicationConfig.getProperty(C.SERVICE_SCANNING_NAMES);
     profile = applicationConfig.getProperty(C.PROFILE_NAME);
-    slowTimeInMilliSeconds = Integer.valueOf(applicationConfig.getProperty(C.SERVICE_SLOWTIME_MILLISECONDS, "30000"));
+    slowTimeInMilliSeconds = Integer.parseInt(applicationConfig.getProperty(C.SERVICE_SLOWTIME_MILLISECONDS, "30000"));
     /**transaction**/
     String transaction = applicationConfig.getProperty("service.scanning.transaction");
     if(CommUtil.isNotEmpty(transaction)){

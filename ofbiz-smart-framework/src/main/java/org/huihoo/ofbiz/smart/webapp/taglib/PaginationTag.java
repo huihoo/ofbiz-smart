@@ -142,7 +142,7 @@ public class PaginationTag extends TagSupport {
       HttpServletRequest req = (HttpServletRequest) pageContext.getRequest();
       String cPage = req.getParameter(this.pageFlag);
       if (CommUtil.isNotEmpty(cPage)) {
-        if (CommUtil.isNumber(cPage)) this.currentPage = Integer.valueOf(cPage);
+        if (CommUtil.isNumber(cPage)) this.currentPage = Integer.parseInt(cPage);
       }
       String pageBody = renderPaginationBody();
       Log.d("Pagination : " + pageBody, TAG);

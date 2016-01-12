@@ -315,11 +315,11 @@
 				<configuration> <packages>test.entity.**</packages> <transformArgs>debug=1</transformArgs> 
 				</configuration> <goals> <goal>enhance</goal> </goals> </execution> </executions> 
 				</plugin> -->
-				
-					
-				
+
+
+
 		</plugins>
-		
+
 		<pluginManagement>
 			<plugins>
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
@@ -383,6 +383,18 @@
 					<useStandardDocletOptions>true</useStandardDocletOptions>
 				</configuration>
 			</plugin>
+
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>3.0.3</version>
+				<configuration>
+					<!-- Optional directory to put findbugs xml report -->
+				</configuration>
+			</plugin>
+
+
 		</plugins>
 	</reporting>
 

@@ -40,8 +40,8 @@ public class SimpleCacheManager {
     try {
       prop.load(FlexibleLocation.resolveLocation(C.APPLICATION_CONFIG_NAME).openStream());
       cacheProviderName = prop.getProperty(C.CACHE_PROVIDER_NAME, "org.huihoo.ofbiz.smart.base.cache.DefaultCache");
-      timeToLiveSeconds = Integer.valueOf(prop.getProperty(C.CACHE_DEFAULT_TIMETOLIVESECONDS, "60"));
-      maxEntries = Integer.valueOf(prop.getProperty(C.CACHE_DEFAULT_MAXENTRIES, "1024"));
+      timeToLiveSeconds = Integer.parseInt(prop.getProperty(C.CACHE_DEFAULT_TIMETOLIVESECONDS, "60"));
+      maxEntries = Integer.parseInt(prop.getProperty(C.CACHE_DEFAULT_MAXENTRIES, "1024"));
       Log.i("Using cache provider is : " + cacheProviderName, TAG);
     } catch (MalformedURLException e) {
       Log.e(e, "Unable to load application config properties.", TAG);

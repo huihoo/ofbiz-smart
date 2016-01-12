@@ -125,19 +125,19 @@ public class EntityConverter {
         }
       } else if( (toType == Long.class || toType == long.class) ) {
         if (CommUtil.isNotEmpty(value)) {
-          result = Long.valueOf("" + value);
+          result = Long.parseLong("" + value);
         }
       } else if( (toType == Integer.class || toType == int.class) ) {
         if (CommUtil.isNotEmpty(value)) {
-          result = Integer.valueOf("" + value);
+          result = Integer.parseInt("" + value);
         }
       } else if( (toType == Double.class || toType == double.class) ) {
         if (CommUtil.isNotEmpty(value)) {
-          result = Double.valueOf("" + value);
+          result = Double.parseDouble("" + value);
         }
       } else if( (toType == Float.class || toType == float.class) ) {
         if (CommUtil.isNotEmpty(value)) {
-          result = Float.valueOf("" + value);
+          result = Float.parseFloat("" + value);
         }
       } else if( (toType == BigDecimal.class) ) {
         if (CommUtil.isNotEmpty(value)) {

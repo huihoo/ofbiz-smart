@@ -169,8 +169,8 @@ public class EntityAutoEngine extends GenericAsyncEngine {
           if (orderBy == null && hasUpdatedAtField(entityClazz)) {
             orderBy = Arrays.asList(new String[]{C.ENTITY_ORDERBY_DEFAULT_FIELD});
           }
-          Integer pageNo = Integer.valueOf((ctx.get(C.PAGE_PAGE_NO) == null ? 1 : ctx.get(C.PAGE_PAGE_NO)) + "");
-          Integer pageSize = Integer.valueOf((ctx.get(C.PAGE_PAGE_SIZE) == null ? 20 : ctx.get(C.PAGE_PAGE_SIZE)) + "");
+          Integer pageNo = Integer.parseInt((ctx.get(C.PAGE_PAGE_NO) == null ? 1 : ctx.get(C.PAGE_PAGE_NO)) + "");
+          Integer pageSize = Integer.parseInt((ctx.get(C.PAGE_PAGE_SIZE) == null ? 20 : ctx.get(C.PAGE_PAGE_SIZE)) + "");
           
           Map<String, Object> pMap = null;
           if (CommUtil.isNotEmpty(condition)) {

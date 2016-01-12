@@ -70,14 +70,14 @@ public class CaptchaView implements View {
       source = LETTER_CHARS;
     }
     
-    int randomCharsLength = Integer.valueOf(captchaLengthStr);
+    int randomCharsLength = Integer.parseInt(captchaLengthStr);
     if (randomCharsLength <= 0 || randomCharsLength > 10) {
       randomCharsLength = 4;
     }
     
     String captchaCode = generateRandomChars(randomCharsLength, source);
     try {
-      renderImage(response.getOutputStream(), Integer.valueOf(wStr), Integer.valueOf(hStr), randomCharsLength, captchaCode);
+      renderImage(response.getOutputStream(), Integer.parseInt(wStr), Integer.parseInt(hStr), randomCharsLength, captchaCode);
       request.getSession().setAttribute(captchaKey, captchaCode);
     } catch (IOException e) {
       throw new ViewException(e);
