@@ -403,7 +403,11 @@ public class DefaultRequestHandler implements RequestHandler {
       } else {
         String layout = reqAction.response == null ? "" : reqAction.response.layout;
         req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + layout);
-        req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, viewName);
+        if (req.getAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE) == null) {
+          if ( !(jspViewBasePath + layout).equals(viewName) ) {
+            req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, viewName);
+          }
+        }
         Log.d("layoutContentView : " + viewName, TAG);
         view.render(modelMap, req, resp);
         //clear temp object in session.
