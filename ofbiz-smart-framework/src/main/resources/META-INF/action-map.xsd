@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+	license agreements. See the NOTICE file distributed with this work for additional 
+	information regarding copyright ownership. The ASF licenses this file to 
+	you under the Apache License, Version 2.0 (the "License"); you may not use 
+	this file except in compliance with the License. You may obtain a copy of 
+	the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+	by applicable law or agreed to in writing, software distributed under the 
+	License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+	OF ANY KIND, either express or implied. See the License for the specific 
+	language governing permissions and limitations under the License. -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+	<!-- ====================== Root Element ======================= -->
+	<xs:element name="action-map">
+		<xs:annotation>
+			<xs:documentation>
+				<![CDATA[
+					请求映射的根元素，表示应用的所有请求映射配置。
+				]]>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element maxOccurs="unbounded" name="action">
+					<xs:annotation>
+						<xs:documentation>
+							<![CDATA[
+								定义的请求动作，它对应一次请求。
+							]]>
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+
+							<xs:element maxOccurs="1" name="page-title" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>
+										<![CDATA[
+											页面的Title。
+										]]>
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+
+
+							<xs:element maxOccurs="1" name="more-css" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>
+										<![CDATA[
+											引用的其它css文件，多个以逗号隔开。一般在布局文件中引入的css不满足时，设置。
+										]]>
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+
+							<xs:element maxOccurs="1" name="more-javascripts"
+								type="xs:string">
+								<xs:annotation>
+									<xs:documentation>
+										<![CDATA[
+											引用的其它js文件，多个以逗号隔开。一般在布局文件中引入的js不满足时，设置。
+										]]>
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+
+							
+
+							<xs:element name="service-call" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>
+										<![CDATA[
+											服务调用
+										]]>
+									</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attributeGroup ref="attlist.service"></xs:attributeGroup>
+								</xs:complexType>
+							</xs:element>
+
+
+
+							<xs:element name="response" maxOccurs="1">
+								<xs:annotation>
+									<xs:documentation>
+										<![CDATA[
+											指定输出响应内容
+										]]>
+									</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attributeGroup ref="attlist.response"></xs:attributeGroup>
+								</xs:complexType>
+							</xs:element>
+
+						</xs:sequence>
+						<xs:attributeGroup ref="attlist.action" />
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+	<!-- ====================== Attribute Group ======================= -->
+	<xs:attributeGroup name="attlist.action">
+		<xs:attribute type="xs:string" name="uri" use="required">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						请求的URI
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="method" default="all">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						请求允许的方式,get仅允许GET请求;post仅允许POST请求;all允许所有请求。
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:token">
+					<xs:enumeration value="all" />
+					<xs:enumeration value="get" />
+					<xs:enumeration value="post" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+
+		<xs:attribute name="require-auth" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						请求是否需要登录认证，默认不需要。
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:token">
+					<xs:enumeration value="true" />
+					<xs:enumeration value="false" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		
+		
+		<xs:attribute name="process-type" default="byConfig">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						请求处理类型。
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:token">
+					<xs:enumeration value="byConfig" />
+					<xs:enumeration value="uriAuto" />
+					<xs:enumeration value="entityAuto" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		
+		<xs:attribute type="xs:string" name="query-condition">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						process-type为entityAuto时指定的查询条件
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		
+		<xs:attribute type="xs:string" name="nav-tag">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						导航标签，用于标识导航名称
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+
+	</xs:attributeGroup>
+
+
+	<xs:attributeGroup name="attlist.service">
+	
+		<xs:attribute name="service-name">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						服务的名称
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+
+		<xs:attribute name="entity-name">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						实体的全路径名称
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		
+		<xs:attribute name="condition">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						事件处理类指定条件字符串
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+
+		<xs:attribute name="param-pairs">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						参数对
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+
+		<xs:attribute name="order-by">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						排序串
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		
+		<xs:attribute name="result-name">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						给返回的结果集Map定义一个名字
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		
+		<xs:attribute name="livetime-in-seconds">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						缓存有效时间，0为一直有效
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		
+
+	</xs:attributeGroup>
+
+
+	<xs:attributeGroup name="attlist.response">
+		<xs:attribute name="view-type" default="jsp">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						界面类型。
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:token">
+					<xs:enumeration value="auto" />
+					<xs:enumeration value="jsp" />
+					<xs:enumeration value="json" />
+					<xs:enumeration value="xml" />
+					<xs:enumeration value="html" />
+					<xs:enumeration value="redirect" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		
+		<xs:attribute name="view-name" default="none">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						界面名称
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+
+		<xs:attribute name="layout" default="none">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						布局(如果界面需要应用布局)
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:attributeGroup>
+
+</xs:schema>
