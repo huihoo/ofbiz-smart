@@ -6,8 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
@@ -20,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 
 public class CaptchaView implements View {
-  //去掉了1,0,i,o几个容易混淆的字符
   private static final String ALPHNUM_CHARS = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
   private static final String NUMBER_CHARS = "23456789";
   private static final String LETTER_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ";
@@ -108,17 +105,13 @@ public class CaptchaView implements View {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
   
-      // 设置边框色
       g2.setColor(Color.GRAY);
       g2.fillRect(0, 0, w, h);
-  
-      // 设置背景色 
+      
       Color c = getRandColor(200, 250);  
       g2.setColor(c); 
-      g2.fillRect(0, 2, w, h-4);  
-  
-  
-      // 绘制干扰线
+      g2.fillRect(0, 2, w, h-4); 
+      
       Random random = new Random();
       g2.setColor(getRandColor(160, 200));
       for (int i = 0; i < 60; i++) {
@@ -165,11 +158,5 @@ public class CaptchaView implements View {
     int g = fc + random.nextInt(bc - fc);
     int b = fc + random.nextInt(bc - fc);
     return new Color(r, g, b);
-  }
-
-  public static void main(String args[]) throws IOException {
-    CaptchaView captchaView = new CaptchaView();
-    FileOutputStream os = new FileOutputStream(new File("test.jpg"));
-    captchaView.renderImage(os, 135, 45, 6, null);
   }
 }
