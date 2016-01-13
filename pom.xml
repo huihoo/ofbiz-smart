@@ -50,12 +50,12 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.7</java.version>
 		<junit.version>4.12</junit.version>
-		<logback.classic.version>1.1.3</logback.classic.version>
-		<ebean.orm.version>6.13.4</ebean.orm.version>
-		<ebean.orm.agent.version>4.7.1</ebean.orm.agent.version>
+		<ebean.orm.version>6.15.1</ebean.orm.version>
+		<ebean.orm.agent.version>4.8.1</ebean.orm.agent.version>
 		<ebean.agentloader.version>2.1.2</ebean.agentloader.version>
 		<servlet.version>3.0.1</servlet.version>
-		<slf4j.version>1.7.12</slf4j.version>
+		<slf4j.version>1.7.13</slf4j.version>
+		<logback.classic.version>1.1.3</logback.classic.version>
 		<ongl.version>3.1.2</ongl.version>
 		<javassit.version>3.20.0-GA</javassit.version>
 
@@ -86,12 +86,24 @@
 				<artifactId>jcl-over-slf4j</artifactId>
 				<version>${slf4j.version}</version>
 				<scope>runtime</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-api</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-classic</artifactId>
 				<version>${logback.classic.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-api</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<!-- sl4fj end -->
 
@@ -101,8 +113,8 @@
 				<version>${ongl.version}</version>
 				<exclusions>
 					<exclusion>
-						<groupId>org.javassist</groupId>
-						<artifactId>javassit.version</artifactId>
+						<groupId>javassist</groupId>
+						<artifactId>javassist</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -118,25 +130,68 @@
 				<groupId>org.avaje.ebeanorm</groupId>
 				<artifactId>avaje-ebeanorm</artifactId>
 				<version>${ebean.orm.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-api</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 
 			<dependency>
 				<groupId>org.avaje.ebeanorm</groupId>
 				<artifactId>avaje-ebeanorm-agent</artifactId>
 				<version>${ebean.orm.agent.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>javax.persistence</groupId>
+						<artifactId>persistence-api</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 
 			<dependency>
 				<groupId>org.avaje</groupId>
 				<artifactId>avaje-agentloader</artifactId>
 				<version>${ebean.agentloader.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-api</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 
 			<dependency>
 				<groupId>net.sf.ehcache</groupId>
 				<artifactId>ehcache</artifactId>
 				<version>${ehcache.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-api</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
+
+			<dependency>
+				<groupId>com.zaxxer</groupId>
+				<artifactId>HikariCP</artifactId>
+				<version>2.4.3</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<dependency>
+				<groupId>org.json</groupId>
+				<artifactId>json</artifactId>
+				<version>20151123</version>
+			</dependency>
+
 
 			<!-- Java EE -->
 			<dependency>
@@ -175,13 +230,6 @@
 				<scope>runtime</scope>
 			</dependency>
 
-
-			<dependency>
-				<groupId>com.zaxxer</groupId>
-				<artifactId>HikariCP</artifactId>
-				<version>2.4.3</version>
-			</dependency>
-
 			<!-- test -->
 			<dependency>
 				<groupId>junit</groupId>
@@ -201,12 +249,14 @@
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-test</artifactId>
 				<version>4.2.4.RELEASE</version>
+				<scope>test</scope>
 			</dependency>
 
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-web</artifactId>
 				<version>4.2.4.RELEASE</version>
+				<scope>test</scope>
 			</dependency>
 
 			<dependency>
@@ -237,11 +287,7 @@
 				<scope>test</scope>
 			</dependency>
 
-			<dependency>
-				<groupId>org.json</groupId>
-				<artifactId>json</artifactId>
-				<version>20070829</version>
-			</dependency>
+
 
 		</dependencies>
 	</dependencyManagement>
