@@ -14,8 +14,8 @@ public class OrderService {
   private final static String TAG = OrderService.class.getName();
   
   @ServiceDefinition(
-    name = "createOrder"
-    ,description = "创建订单"
+    name = "createOrderFail"
+    ,description = "创建订单但参数验证不通过"
     ,parameters = {
         @Parameter(name = "fromChannel",optinal = false,mode="IN", description = "订单来源")
        ,@Parameter(name = "userId",type = Long.class,optinal = false,mode="IN",description = "订单创建者ID")
@@ -25,7 +25,7 @@ public class OrderService {
     }
     ,responseJsonExample = "{'orderId','20151231001','grandTotal',300.00}"
   )
-  public static Map<String,Object> createOrder(Map<String,Object> ctx) {
+  public static Map<String,Object> createOrderFail(Map<String,Object> ctx) {
     try {
       Map<String, Object> resultMap = ServiceUtil.returnSuccess();
       //TODO
@@ -38,8 +38,8 @@ public class OrderService {
   
   
   @ServiceDefinition(
-    name = "createOrder2"
-    ,description = "创建订单2"
+    name = "createOrderSuccess"
+    ,description = "成功创建订单"
     ,parameters = {
         @Parameter(name = "fromChannel",optinal = false,mode="IN", description = "订单来源")
        ,@Parameter(name = "userId",type = Long.class,optinal = false,mode="IN",description = "订单创建者ID")
@@ -50,7 +50,7 @@ public class OrderService {
     ,callback = {OrderServiceCallback.class}
     ,responseJsonExample = "{'orderId','20151231001','grandTotal',300.00}"
   )
-  public static Map<String,Object> createOrder2(Map<String,Object> ctx) {
+  public static Map<String,Object> createOrderSuccess(Map<String,Object> ctx) {
     try {
       Map<String, Object> resultMap = ServiceUtil.returnSuccess();
       resultMap.put("orderId", "2016010199292");

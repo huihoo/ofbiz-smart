@@ -36,7 +36,14 @@ import org.huihoo.ofbiz.smart.webapp.ActionModel.Action;
 import org.huihoo.ofbiz.smart.webapp.ActionModelXmlConfigLoader;
 import org.huihoo.ofbiz.smart.webapp.DispatchServlet;
 import org.huihoo.ofbiz.smart.webapp.WebAppManager;
+import org.huihoo.ofbiz.smart.webapp.view.CaptchaView;
+import org.huihoo.ofbiz.smart.webapp.view.JsonView;
+import org.huihoo.ofbiz.smart.webapp.view.JspView;
+import org.huihoo.ofbiz.smart.webapp.view.RedirectView;
 import org.huihoo.ofbiz.smart.webapp.view.View;
+import org.huihoo.ofbiz.smart.webapp.view.XmlView;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,10 +78,14 @@ public class WebAppTest {
     config = mock(ServletConfig.class);
     applicationConfig = mock(Properties.class);
     viewCache = (Cache<String, View>) SimpleCacheManager.createCache("mock-cache");
+    viewCache.put("jsp", new JspView());
+    viewCache.put("redirect", new RedirectView());
+    viewCache.put("json", new JsonView());
+    viewCache.put("xml", new XmlView());
+    viewCache.put("captcha", new CaptchaView());
+    
     delegator = new EbeanDelegator();
     serviceDispatcher = new ServiceDispatcher(delegator);
-    
-   
   }
 
   @Test
@@ -105,25 +116,76 @@ public class WebAppTest {
   }
 
   @Test
-  public void testDoGetSuccess() throws IOException, ServletException, GenericEntityException, GenericServiceException {
+  public void testDoGetSuccess() throws Exception {
+    //JspView
     String viewName = "/WEB-INF/views/index.jsp";
-    initMockReq("/",viewName);
+    when(req.getRequestURI()).thenReturn("/");
+    initMockReq(viewName);
 
     Vector<String> v = new Vector<String>();
     v.addElement("username");
     when(req.getParameter("username")).thenReturn("hbh");
-
     Enumeration<String> enumeration = v.elements();
     when(req.getParameterNames()).thenReturn(enumeration);
     
     dispatchServlet.init(config);
     dispatchServlet.doGet(req, resp);
-
-    Log.d("Content:" + resp.getContentAsString(), TAG);
+    
+    String viewContent = resp.getContentAsString();
+    Log.d("View content:" + viewContent, TAG);
 
     verify(req, times(1)).getRequestDispatcher(viewName);
     Assert.assertEquals("text/html;charset=utf-8", resp.getContentType());
     Assert.assertEquals("hbh", req.getParameter("username"));
+    Assert.assertEquals("/WEB-INF/views/index.jsp", req.getAttribute(C.JSP_VIEW_NAME_ATTRIBUTE));
+    Assert.assertNull(req.getAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE));
+    
+  }
+  
+  
+  @Test
+  public void testRequestForJsonViewFail() throws Exception {
+    //JspView
+    String viewName = "";
+    initMockReq(viewName);
+    when(req.getRequestURI()).thenReturn("/order/createFail");
+    
+    Vector<String> v = new Vector<String>();
+    v.addElement("username");
+    when(req.getParameter("username")).thenReturn("hbh");
+    Enumeration<String> enumeration = v.elements();
+    when(req.getParameterNames()).thenReturn(enumeration);
+    
+    dispatchServlet.init(config);
+    dispatchServlet.doGet(req, resp);
+    String viewContent = resp.getContentAsString();
+    Log.d("View content:" + viewContent, TAG);
+    JSONObject jsonObject = new JSONObject(viewContent);
+    Assert.assertEquals(true, jsonObject.has("error"));
+    Assert.assertEquals(true, jsonObject.has("validation_errors"));
+  }
+  
+  @Test
+  public void testRequestForJsonViewSuccess() throws Exception {
+    String viewName = "";
+    initMockReq(viewName);
+    when(req.getRequestURI()).thenReturn("/order/createSuccess");
+    Vector<String> v = new Vector<String>();
+    v = new Vector<String>();
+    v.addElement("fromChannel");
+    v.addElement("userId");
+    v.addElement("paymentMethod");
+    when(req.getParameter("fromChannel")).thenReturn("WEB");
+    when(req.getParameter("userId")).thenReturn("1000");
+    when(req.getParameter("paymentMethod")).thenReturn("ALI_PAY");
+    Enumeration<String> enumeration = v.elements();
+    when(req.getParameterNames()).thenReturn(enumeration);
+    dispatchServlet.init(config);
+    dispatchServlet.doGet(req, resp);
+    String viewContent = resp.getContentAsString();
+    Log.d("View content:" + viewContent, TAG);
+    JSONObject jsonObject = new JSONObject(viewContent);
+    Assert.assertEquals(true, jsonObject.has("success"));
   }
 
   @Test
@@ -135,12 +197,12 @@ public class WebAppTest {
     Log.d("actionModels > " + actionModels, TAG);
     Assert.assertEquals(true, actionModels.size() > 0);
 
-    Action action = shouldHasAction("/order/create", actionModels);
+    Action action = shouldHasAction("/order/createFail", actionModels);
     Assert.assertNotNull(action);
     Assert.assertEquals(true, "byConfig".equals(action.processType));
     Assert.assertEquals(true, action.serviceCallList.size() == 1);
 
-    Assert.assertEquals(true, action.serviceCallList.get(0).serviceName.equals("createOrder"));
+    Assert.assertEquals(true, action.serviceCallList.get(0).serviceName.equals("createOrderFail"));
     Assert.assertEquals(true, "json".equals(action.response.viewType));
 
     action = shouldHasAction("/product/detail", actionModels);
@@ -157,7 +219,8 @@ public class WebAppTest {
   @Test
   public void testWebAppManagerFunc() throws MalformedURLException {
     String viewName = "/WEB-INF/views/index.jsp";
-    initMockReq("/",viewName);
+    when(req.getRequestURI()).thenReturn("/");
+    initMockReq(viewName);
     
     when(req.getParameter("cityId")).thenReturn("1000");
     when(session.getAttribute("code")).thenReturn("ABC");
@@ -197,7 +260,7 @@ public class WebAppTest {
     
   }
 
-  private void initMockReq(String requestUri,String viewName) throws MalformedURLException {
+  private void initMockReq(String viewName) throws MalformedURLException {
     when(config.getInitParameter("jsp-view-base-path")).thenReturn("/WEB-INF/views/");
     when(config.getInitParameter("uri-suffix")).thenReturn("");
     when(config.getInitParameter("http-api-uri-base")).thenReturn("/api");
@@ -215,9 +278,10 @@ public class WebAppTest {
     when(context.getAttribute(C.CTX_SUPPORTED_VIEW_ATTRIBUTE)).thenReturn(viewCache);
     when(context.getAttribute(C.CTX_ACTION_MODEL)).thenReturn(getActionModels());
 
+    
     when(req.getServletContext()).thenReturn(context);
     when(req.getContextPath()).thenReturn("");
-    when(req.getRequestURI()).thenReturn(requestUri);
+    when(session.getServletContext()).thenReturn(context);
     when(req.getSession()).thenReturn(session);
     
     MockRequestDispatcher requestDispatcher = new MockRequestDispatcher(viewName);

@@ -28,19 +28,13 @@ import org.huihoo.ofbiz.smart.webapp.ProcessType;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.Action;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.ServiceCall;
 import org.huihoo.ofbiz.smart.webapp.WebAppManager;
-import org.huihoo.ofbiz.smart.webapp.view.CaptchaView;
 import org.huihoo.ofbiz.smart.webapp.view.JsonView;
-import org.huihoo.ofbiz.smart.webapp.view.JspView;
 import org.huihoo.ofbiz.smart.webapp.view.RedirectView;
 import org.huihoo.ofbiz.smart.webapp.view.View;
 import org.huihoo.ofbiz.smart.webapp.view.ViewException;
 import org.huihoo.ofbiz.smart.webapp.view.XmlView;
-
 import ognl.Ognl;
 import ognl.OgnlException;
-
-
-
 
 public class DefaultRequestHandler implements RequestHandler {
   private final static String TAG = DefaultRequestHandler.class.getName();
@@ -143,11 +137,11 @@ public class DefaultRequestHandler implements RequestHandler {
             sm.engineName = ServiceEngineType.ENTITY_AUTO.value();
             sm.entityName = serviceCall.entityName;
             sm.invoke = serviceCall.serviceName.substring( (ServiceEngineType.ENTITY_AUTO.value() + "#").length() );
+            serviceDispatcher.registerService(sm);
           } else {//normal java service
             sm.name = serviceCall.serviceName;
             sm.engineName = ServiceEngineType.JAVA.value();
           }
-          serviceDispatcher.registerService(sm);
           lastResult = serviceDispatcher.runSync(sm.name, webCtx);
           modelMap.putAll(lastResult);
           if (ServiceUtil.isError(lastResult)) {
@@ -168,22 +162,7 @@ public class DefaultRequestHandler implements RequestHandler {
       if (viewType == null) {
         viewType = "jsp";
       }
-      View view = viewCache.get(viewType);   
-      //Just for test.
-      if (view == null) {
-        if ("jsp".equals(viewType)) {
-          view = new JspView();          
-        } else if ("redirect".equals(viewType)) {
-          view = new RedirectView();
-        } else if ("json".equals(viewType)) {
-          view = new JsonView();
-        } else if ("xml".equals(viewType)) {
-          view = new XmlView();
-        } else if ("captcha".equals(viewType)) {
-          view = new CaptchaView();
-        }
-        viewCache.put(viewType, view);
-      }
+      View view = viewCache.get(viewType); 
       
       if (ProcessType.URI_AUTO.value().equals(reqAction.processType)) {
         String viewName = null;

@@ -165,7 +165,7 @@ public class DispatchServlet extends HttpServlet {
     restApiUrlBase = config.getInitParameter("rest-api-uri-base");
     apiDocUriBase = config.getInitParameter("api-doc-uri-base");
     String tmpUss = config.getInitParameter("use-smart-session");
-    useSmartSession = Boolean.valueOf(tmpUss == null ? "true": tmpUss);
+    useSmartSession = Boolean.valueOf(tmpUss == null ? "false": tmpUss);
     
     if (useSmartSession) {
       SessionRepository<ExpiringSession> sessionRepository =new MapSessionRepository();
