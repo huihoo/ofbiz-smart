@@ -13,12 +13,15 @@
  */
 package org.huihoo.ofbiz.smart.webapp;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Locale;
@@ -31,7 +34,7 @@ import java.util.Locale;
  * @author Rob Winch
  */
 abstract class OnCommittedResponseWrapper extends HttpServletResponseWrapper {
-  private final Log logger = LogFactory.getLog(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private boolean disableOnCommitted;
 
