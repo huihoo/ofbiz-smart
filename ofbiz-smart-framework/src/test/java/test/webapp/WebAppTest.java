@@ -35,6 +35,7 @@ import org.huihoo.ofbiz.smart.webapp.ActionModel;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.Action;
 import org.huihoo.ofbiz.smart.webapp.ActionModelXmlConfigLoader;
 import org.huihoo.ofbiz.smart.webapp.DispatchServlet;
+import org.huihoo.ofbiz.smart.webapp.WebAppContext;
 import org.huihoo.ofbiz.smart.webapp.WebAppManager;
 import org.huihoo.ofbiz.smart.webapp.view.CaptchaView;
 import org.huihoo.ofbiz.smart.webapp.view.JsonView;
@@ -276,6 +277,9 @@ public class WebAppTest {
     when(context.getAttribute(C.CTX_URI_SUFFIX)).thenReturn("");
     when(context.getAttribute(C.CTX_SUPPORTED_VIEW_ATTRIBUTE)).thenReturn(viewCache);
     when(context.getAttribute(C.CTX_ACTION_MODEL)).thenReturn(getActionModels());
+    
+    WebAppContext webAppContext = new WebAppContext(context);
+    when(context.getAttribute("webAppContext")).thenReturn(webAppContext);
 
     
     when(req.getServletContext()).thenReturn(context);

@@ -4,9 +4,6 @@ package org.huihoo.ofbiz.smart.webapp.handler;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,12 +16,11 @@ import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.base.util.PathMatcher;
 import org.huihoo.ofbiz.smart.base.util.ServiceUtil;
-import org.huihoo.ofbiz.smart.entity.Delegator;
-import org.huihoo.ofbiz.smart.service.ServiceDispatcher;
 import org.huihoo.ofbiz.smart.service.ServiceEngineType;
 import org.huihoo.ofbiz.smart.service.ServiceModel;
 import org.huihoo.ofbiz.smart.webapp.ActionModel;
 import org.huihoo.ofbiz.smart.webapp.ProcessType;
+import org.huihoo.ofbiz.smart.webapp.WebAppContext;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.Action;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.ServiceCall;
 import org.huihoo.ofbiz.smart.webapp.WebAppManager;
@@ -33,6 +29,7 @@ import org.huihoo.ofbiz.smart.webapp.view.RedirectView;
 import org.huihoo.ofbiz.smart.webapp.view.View;
 import org.huihoo.ofbiz.smart.webapp.view.ViewException;
 import org.huihoo.ofbiz.smart.webapp.view.XmlView;
+
 import ognl.Ognl;
 import ognl.OgnlException;
 
@@ -44,41 +41,11 @@ public class DefaultRequestHandler implements RequestHandler {
                    (Cache<String,String>) SimpleCacheManager.createCache("Request-Handler-EntityClazz-Cache");
   
   
-  private static volatile Delegator delegator;
-  private static volatile ServiceDispatcher serviceDispatcher;
-  private static volatile Properties applicationConfig;
-  private static volatile List<ActionModel> actionModels;
-  private static volatile Cache<String,View> viewCache;
-  private static volatile String jspViewBasePath;
-  private static volatile String uriSuffix;
   
-  @SuppressWarnings("unchecked")
   @Override
   public void handleRequest(HttpServletRequest req, HttpServletResponse resp)
           throws ServletException, IOException {
-    ServletContext sc = req.getSession().getServletContext();
-    //get deletagor,serviceDispatcher,applicationProp from web context.
-    if  (delegator == null) {
-      delegator = (Delegator) sc.getAttribute(C.CTX_DELETAGOR);
-    }
-    if (serviceDispatcher == null) {
-      serviceDispatcher = (ServiceDispatcher) sc.getAttribute(C.CTX_SERVICE_DISPATCHER);
-    }
-    if (applicationConfig == null) {
-      applicationConfig = (Properties) sc.getAttribute(C.APPLICATION_CONFIG_PROP_KEY);
-    }
-    if (actionModels == null) {
-      actionModels = (List<ActionModel>) sc.getAttribute(C.CTX_ACTION_MODEL);
-    }
-    if (viewCache == null) {
-      viewCache = (Cache<String,View>) sc.getAttribute(C.CTX_SUPPORTED_VIEW_ATTRIBUTE);
-    }
-    if (jspViewBasePath == null) {
-      jspViewBasePath = (String) sc.getAttribute(C.CTX_JSP_VIEW_BASEPATH);
-    }
-    if (uriSuffix == null) {
-      uriSuffix = (String) sc.getAttribute(C.CTX_URI_SUFFIX);
-    }
+    WebAppContext wac = (WebAppContext) req.getSession().getServletContext().getAttribute("webAppContext");
     
     //remove contextpath
     String targetUri = req.getRequestURI();
@@ -87,11 +54,11 @@ public class DefaultRequestHandler implements RequestHandler {
     }
 
     //remove uri suffix
-    if (CommUtil.isNotEmpty(uriSuffix) && targetUri.endsWith(uriSuffix)) {
-      targetUri = targetUri.substring(0, targetUri.indexOf(uriSuffix));
+    if (CommUtil.isNotEmpty(wac.uriSuffix) && targetUri.endsWith(wac.uriSuffix)) {
+      targetUri = targetUri.substring(0, targetUri.indexOf(wac.uriSuffix));
     }
     
-    Action reqAction = matchAction(actionModels, targetUri);
+    Action reqAction = matchAction(wac.actionModels, targetUri);
     Log.d("Action : " + reqAction, TAG);
     
     if (reqAction != null) {
@@ -137,12 +104,12 @@ public class DefaultRequestHandler implements RequestHandler {
             sm.engineName = ServiceEngineType.ENTITY_AUTO.value();
             sm.entityName = serviceCall.entityName;
             sm.invoke = serviceCall.serviceName.substring( (ServiceEngineType.ENTITY_AUTO.value() + "#").length() );
-            serviceDispatcher.registerService(sm);
+            wac.serviceDispatcher.registerService(sm);
           } else {//normal java service
             sm.name = serviceCall.serviceName;
             sm.engineName = ServiceEngineType.JAVA.value();
           }
-          lastResult = serviceDispatcher.runSync(sm.name, webCtx);
+          lastResult = wac.serviceDispatcher.runSync(sm.name, webCtx);
           modelMap.putAll(lastResult);
           if (ServiceUtil.isError(lastResult)) {
             modelMap = lastResult;
@@ -162,15 +129,15 @@ public class DefaultRequestHandler implements RequestHandler {
       if (viewType == null) {
         viewType = "jsp";
       }
-      View view = viewCache.get(viewType); 
+      View view = wac.viewCache.get(viewType); 
       
       if (ProcessType.URI_AUTO.value().equals(reqAction.processType)) {
         String viewName = null;
         if (layout != null && !"none".equals(layout)) {
-          viewName = jspViewBasePath + layout;
-          req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, jspViewBasePath + targetUri + ".jsp");
+          viewName = wac.jspViewBasePath + layout;
+          req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, wac.jspViewBasePath + targetUri + ".jsp");
         } else {
-          viewName = jspViewBasePath + targetUri + ".jsp";
+          viewName = wac.jspViewBasePath + targetUri + ".jsp";
         }
         if (reqAction.response != null && reqAction.response.viewName != null) {
           viewName = reqAction.response.viewName;
@@ -179,8 +146,8 @@ public class DefaultRequestHandler implements RequestHandler {
         //TODO
       } else if (ProcessType.ENTITY_AUTO.value().equals(reqAction.processType)) {
         try {
-          view = viewCache.get("jsp");
-          doEntityAutoAction(modelMap,req, resp,targetUri,view,reqAction,webCtx,layout);
+          view = wac.viewCache.get("jsp");
+          doEntityAutoAction(modelMap,req, resp,targetUri,reqAction,webCtx,layout,wac);
           
         } catch (ViewException e) {
           throw new ServletException(e);
@@ -192,24 +159,24 @@ public class DefaultRequestHandler implements RequestHandler {
           String tmpViewName = reqAction.response.viewName;
           
           if (latyout != null && !"none".equals(layout)) {
-            req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + layout);
+            req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, wac.jspViewBasePath + layout);
             if (tmpViewName == null) {
-              tmpViewName = jspViewBasePath + targetUri + ".jsp";
+              tmpViewName = wac.jspViewBasePath + targetUri + ".jsp";
             }
             req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, tmpViewName);
           } else {
             if (tmpViewName == null) {
-              tmpViewName = jspViewBasePath + targetUri + ".jsp";
+              tmpViewName = wac.jspViewBasePath + targetUri + ".jsp";
             }
             req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, tmpViewName);
           }
         } else {
-          req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + targetUri + ".jsp");
+          req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, wac.jspViewBasePath + targetUri + ".jsp");
         }
         
       }
       try {
-        handleResultAndRenderView(modelMap, lastResult, webCtx, view, reqAction,null, req, resp);
+        handleResultAndRenderView(modelMap, lastResult, webCtx, view, reqAction,null, req, resp,wac);
       } catch (ViewException e) {
         throw new ServletException(e);
       }
@@ -245,14 +212,12 @@ public class DefaultRequestHandler implements RequestHandler {
    * @param layout             布局
    * @throws ViewException
    */
-  private void doEntityAutoAction(Map<String,Object> modelMap,
-                                  HttpServletRequest req,
-                                  HttpServletResponse resp,
-                                  String targetUri, 
-                                  View view,
-                                  Action reqAction,
-                                  Map<String,Object> webCtx,
-                                  String layout) throws ViewException {
+  private void doEntityAutoAction(Map<String,Object> modelMap,HttpServletRequest req,
+                                                              HttpServletResponse resp,
+                                                              String targetUri, 
+                                                              Action reqAction,
+                                                              Map<String,Object> webCtx,
+                                                              String layout,WebAppContext wac) throws ViewException {
     String[] spiltUri = targetUri.split("/");
     if (spiltUri.length < 2) {
       throw new IllegalArgumentException("The string array length of targeturi splited by '/' must be greater and equals to 2.");
@@ -262,7 +227,7 @@ public class DefaultRequestHandler implements RequestHandler {
     Log.d("Guessed Engity Name : " + guessEntityName, TAG);
     String entityClazzName = ENTITY_CLAZZ_NAME_CACHE.get(guessEntityName);
     if (entityClazzName == null) {
-      String entityScanningPkg = applicationConfig.getProperty(C.ENTITY_SCANNING_PACKAGES);
+      String entityScanningPkg = wac.applicationConfig.getProperty(C.ENTITY_SCANNING_PACKAGES);
       String[] espToken = entityScanningPkg.split(",");
       for (String t : espToken) {
         entityClazzName = t.substring(0,t.indexOf(".**")) + "." + guessEntityName;
@@ -279,6 +244,7 @@ public class DefaultRequestHandler implements RequestHandler {
     if (entityClazzName == null) {
       throw new IllegalArgumentException("Entity name [" + guessEntityName + "] related to entity class not found.");
     }
+    View view = null;
     
     Map<String,Object> result = ServiceUtil.returnSuccess();
     ServiceModel sm = new ServiceModel();
@@ -290,41 +256,41 @@ public class DefaultRequestHandler implements RequestHandler {
     if (targetUri.endsWith("/list") || targetUri.endsWith("/index")) {
       sm.name = sm.engineName + "#" + C.SERVICE_ENGITYAUTO_FINDPAGEBYCOND;
       sm.invoke = C.SERVICE_ENGITYAUTO_FINDPAGEBYCOND;
-      viewName = jspViewBasePath + "/" +entityNameInUri + "/list.jsp";
+      viewName = wac.jspViewBasePath + "/" +entityNameInUri + "/list.jsp";
     } else if (targetUri.endsWith("/create") || targetUri.endsWith("/add")) {
-      viewName = jspViewBasePath + "/" + entityNameInUri + "/form.jsp";
+      viewName = wac.jspViewBasePath + "/" + entityNameInUri + "/form.jsp";
     } else if (targetUri.endsWith("/save") || targetUri.endsWith("/new")) {
       sm.name = sm.engineName + "#" + C.SERVICE_ENGITYAUTO_CREATE;
       sm.invoke = C.SERVICE_ENGITYAUTO_CREATE;
-      viewName = jspViewBasePath + "/" +entityNameInUri + "/view.jsp"; 
-      view = viewCache.get("redirect");
+      viewName = wac.jspViewBasePath + "/" +entityNameInUri + "/view.jsp"; 
+      view = wac.viewCache.get("redirect");
     } else if (targetUri.endsWith("/update") || targetUri.endsWith("/modify")) {
       sm.name = sm.engineName + "#" + C.SERVICE_ENGITYAUTO_UPDATE;
       sm.invoke = C.SERVICE_ENGITYAUTO_UPDATE;
-      viewName = jspViewBasePath + "/" +entityNameInUri + "/view.jsp";
-      view = viewCache.get("redirect");
+      viewName = wac.jspViewBasePath + "/" +entityNameInUri + "/view.jsp";
+      view = wac.viewCache.get("redirect");
     } else if (targetUri.endsWith("/view") || targetUri.endsWith("/detail")) {
       sm.name = sm.engineName + "#" + C.SERVICE_ENGITYAUTO_FINDBYID;
       sm.invoke = C.SERVICE_ENGITYAUTO_FINDBYID;
-      viewName = jspViewBasePath + "/" +entityNameInUri + "/view.jsp";
+      viewName = wac.jspViewBasePath + "/" +entityNameInUri + "/view.jsp";
     } else if (targetUri.endsWith("/edit")) {
       sm.name = sm.engineName + "#" + C.SERVICE_ENGITYAUTO_FINDBYID;
       sm.invoke = C.SERVICE_ENGITYAUTO_FINDBYID;
-      viewName = jspViewBasePath + "/" + entityNameInUri + "/form.jsp";
+      viewName = wac.jspViewBasePath + "/" + entityNameInUri + "/form.jsp";
     }
     req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, viewName);
     //TODO 验证输入参数
-    serviceDispatcher.registerService(sm);
+    wac.serviceDispatcher.registerService(sm);
     if (sm.invoke != null) {
       if (reqAction.queryCondition != null) {
         webCtx.put(C.ENTITY_CONDTION, WebAppManager.parseCondition(reqAction.queryCondition, req));
       } else {
         webCtx.put(C.ENTITY_CONDTION, WebAppManager.parseConditionFromQueryString(req));
       }
-      result = serviceDispatcher.runSync(sm.name, webCtx);
+      result = wac.serviceDispatcher.runSync(sm.name, webCtx);
     }
     
-    handleResultAndRenderView(modelMap, result, webCtx, view, reqAction,entityNameInUri, req, resp);
+    handleResultAndRenderView(modelMap, result, webCtx, view, reqAction,entityNameInUri, req, resp,wac);
   }
 
   private void handleResultAndRenderView(Map<String,Object> modelMap,Map<String,Object> result,
@@ -332,7 +298,7 @@ public class DefaultRequestHandler implements RequestHandler {
                                                         View view,Action reqAction,
                                                         String entityNameInUri,
                                                         HttpServletRequest req,
-                                                        HttpServletResponse resp) throws ViewException {
+                                                        HttpServletResponse resp,WebAppContext wac) throws ViewException {
     if (result == null) {
       view.render(modelMap, req, resp);
       return ;
@@ -353,7 +319,7 @@ public class DefaultRequestHandler implements RequestHandler {
           int sIdx = viewName.indexOf("?");
           if (sIdx >= 0) {
             String newParamString = WebAppManager.parseQueryString(viewName.substring(sIdx + 1), req, result);
-            viewName = viewName.substring(0, sIdx) + uriSuffix + "?" + newParamString;
+            viewName = viewName.substring(0, sIdx) + wac.uriSuffix + "?" + newParamString;
           }
         }
         overrideRedirectFlag = true;
@@ -373,7 +339,7 @@ public class DefaultRequestHandler implements RequestHandler {
             } catch (OgnlException e) {
               throw new ViewException("Unable to get id");
             }
-            req.setAttribute("redirectUrl", req.getContextPath() + "/" + entityNameInUri + "/view" + uriSuffix + "?id=" + idValue);
+            req.setAttribute("redirectUrl", req.getContextPath() + "/" + entityNameInUri + "/view" + wac.uriSuffix + "?id=" + idValue);
           } else {
             req.setAttribute("redirectUrl",viewName);
           }
@@ -381,9 +347,9 @@ public class DefaultRequestHandler implements RequestHandler {
         }
       } else {
         String layout = reqAction.response == null ? "" : reqAction.response.layout;
-        req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, jspViewBasePath + layout);
+        req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, wac.jspViewBasePath + layout);
         if (req.getAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE) == null) {
-          if ( !(jspViewBasePath + layout).equals(viewName) ) {
+          if ( !(wac.jspViewBasePath + layout).equals(viewName) ) {
             req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, viewName);
           }
         }

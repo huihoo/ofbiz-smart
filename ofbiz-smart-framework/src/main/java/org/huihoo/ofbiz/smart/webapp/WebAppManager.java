@@ -38,10 +38,10 @@ public class WebAppManager {
     ServiceDispatcher serviceDispatcher =(ServiceDispatcher) sc.getAttribute(C.CTX_SERVICE_DISPATCHER);
     Properties applicationConfig = (Properties) sc.getAttribute(C.APPLICATION_CONFIG_PROP_KEY);
     
-    Map<String, Object> ctx =CommUtil.toMap(C.CTX_DELETAGOR, delegator
-                                           ,C.CTX_SERVICE_DISPATCHER, serviceDispatcher
-                                           ,C.APPLICATION_CONFIG_PROP_KEY, applicationConfig
-                                           ,C.CTX_WEB_HTTP_SERVLET_REQUEST, req
+    Map<String, Object> ctx = CommUtil.toMap(C.CTX_DELETAGOR, delegator
+                                            ,C.CTX_SERVICE_DISPATCHER, serviceDispatcher
+                                            ,C.APPLICATION_CONFIG_PROP_KEY, applicationConfig
+                                            ,C.CTX_WEB_HTTP_SERVLET_REQUEST, req
     );
     
     boolean isMultipart = ServletFileUpload.isMultipartContent(req);

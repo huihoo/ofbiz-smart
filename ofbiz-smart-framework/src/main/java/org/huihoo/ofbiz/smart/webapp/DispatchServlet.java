@@ -289,6 +289,10 @@ public class DispatchServlet extends HttpServlet {
 			}
 		}
     }
+    
+
+    WebAppContext webAppContext = new WebAppContext(servletContext);
+    servletContext.setAttribute("webAppContext", webAppContext);
   }
   
   protected void loadSeedData(ServletContext servletContext){
