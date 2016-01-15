@@ -166,14 +166,13 @@ public class DefaultRequestHandler implements RequestHandler {
             req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, tmpViewName);
           } else {
             if (tmpViewName == null) {
-              tmpViewName = wac.jspViewBasePath + targetUri + ".jsp";
+              tmpViewName = targetUri + ".jsp";
             }
-            req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, tmpViewName);
+            req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, wac.jspViewBasePath + tmpViewName);
           }
         } else {
           req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, wac.jspViewBasePath + targetUri + ".jsp");
         }
-        
       }
       try {
         handleResultAndRenderView(modelMap, lastResult, webCtx, view, reqAction,null, req, resp,wac);
@@ -347,12 +346,20 @@ public class DefaultRequestHandler implements RequestHandler {
         }
       } else {
         String layout = reqAction.response == null ? "" : reqAction.response.layout;
-        req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, wac.jspViewBasePath + layout);
-        if (req.getAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE) == null) {
-          if ( !(wac.jspViewBasePath + layout).equals(viewName) ) {
-            req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, viewName);
+        if (CommUtil.isNotEmpty(layout) && !"none".equals(layout)) {
+          //Apply Layout
+          req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, wac.jspViewBasePath + layout);
+          
+
+          if (req.getAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE) == null) {
+            if ( !(wac.jspViewBasePath + layout).equals(viewName) ) {
+              req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, wac.jspViewBasePath + viewName);
+            }
           }
+          
         }
+        
+        
         Log.d("layoutContentView : " + viewName, TAG);
         view.render(modelMap, req, resp);
         //clear temp object in session.

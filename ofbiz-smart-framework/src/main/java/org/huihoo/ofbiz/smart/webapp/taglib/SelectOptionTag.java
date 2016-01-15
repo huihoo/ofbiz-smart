@@ -28,6 +28,7 @@ public class SelectOptionTag extends TagSupport {
   private String valueName = "id";
   private Object currentValue;
   private String condition;
+  private boolean useCache;
   private int liveTimeInSeconds;
 
   @Override
@@ -35,7 +36,6 @@ public class SelectOptionTag extends TagSupport {
     try {
       Class<?> clazz = Class.forName(className);
       Delegator delegator = (Delegator) pageContext.getServletContext().getAttribute(C.CTX_DELETAGOR);
-      boolean useCache = liveTimeInSeconds > 0;
       
       Set<String> fieldsToSelect = new LinkedHashSet<>();
       List<String> orderBy = Arrays.asList(new String[]{});
@@ -142,6 +142,20 @@ public class SelectOptionTag extends TagSupport {
 
   public void setCurrentValue(Object currentValue) {
     this.currentValue = currentValue;
+  }
+
+
+
+
+  public boolean isUseCache() {
+    return useCache;
+  }
+
+
+
+
+  public void setUseCache(boolean useCache) {
+    this.useCache = useCache;
   }
 
 }

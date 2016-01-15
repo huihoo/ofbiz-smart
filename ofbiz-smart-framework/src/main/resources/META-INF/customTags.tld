@@ -172,10 +172,88 @@
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
-		
+
 		<attribute>
 			<description>
-					缓存有效时间，小于等于0，表示不缓存
+					useCache
+				</description>
+			<name>useCache</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+		<attribute>
+			<description>
+					缓存有效时间，0表示一直缓存(当useCache为true时启用)
+				</description>
+			<name>liveTimeInSeconds</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			在JSP页面里调用服务
+		</description>
+		<name>options</name>
+		<tagclass>org.huihoo.ofbiz.smart.webapp.taglib.ServiceCallTag</tagclass>
+		<attribute>
+			<description>
+					服务名称
+			</description>
+			<name>serviceName</name>
+			<rtexprvalue>true</rtexprvalue>
+			<required>true</required>
+		</attribute>
+		<attribute>
+			<description>
+					实体的名称(如果有)
+				</description>
+			<name>entityName</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+		<attribute>
+			<description>
+					实体的返回名称
+				</description>
+			<name>resultName</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+		<attribute>
+			<description>
+					参数对
+				</description>
+			<name>paramPairs</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+		<attribute>
+			<description>
+					额外的条件
+				</description>
+			<name>condition</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+		<attribute>
+			<description>
+					useCache
+				</description>
+			<name>useCache</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+		<attribute>
+			<description>
+					缓存有效时间，0表示一直缓存(当useCache为true时启用)
 				</description>
 			<name>liveTimeInSeconds</name>
 			<required>false</required>

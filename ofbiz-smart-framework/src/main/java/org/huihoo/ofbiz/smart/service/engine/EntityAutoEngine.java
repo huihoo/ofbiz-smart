@@ -68,15 +68,21 @@ public class EntityAutoEngine extends GenericAsyncEngine {
     }
     try {
       Boolean useCache = (Boolean) ctx.get(C.ENTITY_USE_CACHE);
+      Integer liveTimeInSeconds = (Integer) ctx.get(C.ENTITY_LIVETIMEIN_SECONDS);
       if (useCache == null) {
         useCache = Boolean.FALSE;
       }
+      if (liveTimeInSeconds == null) {
+        liveTimeInSeconds = 0;
+      }
+      
       Map<String,Object> successResult = ServiceUtil.returnSuccess();
       String resultName = (String) ctx.get(C.SERVICE_RESULT_NAME_ATTRIBUTE);
       String condition = (String) ctx.get(C.ENTITY_CONDTION);
       Map<String, Object> andMap = (Map<String, Object>) ctx.get(C.ENTITY_ANDMAP);
       Set<String> fieldsToSelect = (Set<String>) ctx.get(C.ENTITY_FIELDS_TO_SELECT);
       List<String> orderBy = (List<String>) ctx.get(C.ENTITY_ORDERBY);
+       
       
       switch (serviceModel.invoke) {
         case C.SERVICE_ENGITYAUTO_CREATE:
@@ -98,7 +104,7 @@ public class EntityAutoEngine extends GenericAsyncEngine {
           if (CommUtil.isEmpty(id)) {
             return ServiceUtil.returnProplem("ENTITY_ID_REQUIRED","The entity id required.");
           }
-          Object obj = delegator.findById(entityClazz, id);
+          Object obj = delegator.findById(entityClazz, id,useCache,liveTimeInSeconds);
           if (obj != null) {
             EntityConverter.convertFrom(obj, ctx, delegator);
             delegator.save(obj); 
@@ -150,9 +156,9 @@ public class EntityAutoEngine extends GenericAsyncEngine {
           }
           List<?> pList = null;
           if (CommUtil.isNotEmpty(condition)) {
-            pList = delegator.findListByCond(entityClazz, condition, fieldsToSelect, orderBy, useCache);
+            pList = delegator.findListByCond(entityClazz, condition, fieldsToSelect, orderBy, useCache,liveTimeInSeconds);
           } else {
-            pList = delegator.findListByAnd(entityClazz, andMap, fieldsToSelect, orderBy, useCache);
+            pList = delegator.findListByAnd(entityClazz, andMap, fieldsToSelect, orderBy, useCache,liveTimeInSeconds);
           }
           if (resultName != null) {
             successResult.put(resultName, pList);
@@ -174,9 +180,9 @@ public class EntityAutoEngine extends GenericAsyncEngine {
           
           Map<String, Object> pMap = null;
           if (CommUtil.isNotEmpty(condition)) {
-            pMap = delegator.findPageByCond(entityClazz, condition, pageNo, pageSize, fieldsToSelect, orderBy, useCache);
+            pMap = delegator.findPageByCond(entityClazz, condition, pageNo, pageSize, fieldsToSelect, orderBy, useCache,liveTimeInSeconds);
           } else {
-            pMap = delegator.findPageByAnd(entityClazz, andMap, pageNo, pageSize, fieldsToSelect, orderBy, useCache);
+            pMap = delegator.findPageByAnd(entityClazz, andMap, pageNo, pageSize, fieldsToSelect, orderBy, useCache,liveTimeInSeconds);
           }
           if (CommUtil.isNotEmpty(resultName)) {
             successResult.put(resultName, pMap);

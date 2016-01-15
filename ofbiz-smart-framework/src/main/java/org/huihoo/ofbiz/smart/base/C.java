@@ -68,6 +68,7 @@ public final class C {
   public static final String ENTITY_ORDERBY = "orderBy";
   public static final String ENTITY_ORDERBY_DEFAULT_FIELD = "updatedAt desc";
   public static final String ENTITY_UPDATED_AT = "updatedAt";
+  public static final String ENTITY_LIVETIMEIN_SECONDS = "liveTimeInSeconds";
   
   public static final String RESPOND_VALIDATION_ERRORS = "validation_errors";
   public static final String SERVICE_ENGITYAUTO_CREATE = "create";
