@@ -203,7 +203,6 @@ public class I18NUtil {
     private static final long serialVersionUID = 1L;
     protected Properties properties = null;
     protected Locale locale = null;
-    protected int hashCode = hashCode();
 
     public XmlResourceBundle() {
 
@@ -214,14 +213,10 @@ public class I18NUtil {
       this.locale = locale;
     }
 
-    @Override
-    public int hashCode() {
-      return this.hashCode;
-    }
 
     @Override
     public boolean equals(Object obj) {
-      return obj == null ? false : obj.hashCode() == this.hashCode;
+      return obj == null ? false : obj.hashCode() == this.hashCode();
     }
 
 

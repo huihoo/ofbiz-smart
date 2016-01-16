@@ -59,8 +59,8 @@ public class WebAppManager {
       int sizeMax = Integer.parseInt(applicationConfig.getProperty("file.upload.sizeinmb.max", "10"));
       ServletFileUpload upload = new ServletFileUpload();
       upload.setHeaderEncoding(C.UTF_8); 
-      upload.setFileSizeMax(1024 * 1024 * fileSizeMax);
-      upload.setSizeMax(1024 * 1024 * sizeMax);
+      upload.setFileSizeMax(1024L * 1024 * fileSizeMax);
+      upload.setSizeMax(1024L * 1024 * sizeMax);
       FileItemIterator iter;
       try {
         iter = upload.getItemIterator(req);

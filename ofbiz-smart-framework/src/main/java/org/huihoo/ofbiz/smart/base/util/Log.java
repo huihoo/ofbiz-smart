@@ -79,6 +79,13 @@ public class Log {
         else
           logger.debug(msg, t);
         break;
+      default:
+        if (!logger.isDebugEnabled()) return;
+        if (t == null)
+          logger.debug(msg);
+        else
+          logger.debug(msg, t);
+        break;
     }
 
 

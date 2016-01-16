@@ -44,7 +44,7 @@ public class DispatchServlet extends HttpServlet {
 
   private static final String TAG = DispatchServlet.class.getName();
 
-  private static volatile Cache<String, RequestHandler> HANDLER_CACHE;
+  private volatile Cache<String, RequestHandler> handlerCache;
 
   @SuppressWarnings("unchecked")
   private final static Cache<String,View> VIEW_CACHE = 
@@ -102,32 +102,31 @@ public class DispatchServlet extends HttpServlet {
       }
       RequestHandler requestHandler = null;
       if (targetUri.startsWith(restApiUrlBase)) {
-        requestHandler = HANDLER_CACHE.get("Rest");
+        requestHandler = handlerCache.get("Rest");
         if (requestHandler == null) {
           requestHandler = new RestfulRequestHandler();
-          HANDLER_CACHE.put("Rest", requestHandler);
+          handlerCache.put("Rest", requestHandler);
         }
       } else if (targetUri.startsWith(httpApiUrlBase)) {
-        requestHandler = HANDLER_CACHE.get("Api");
+        requestHandler = handlerCache.get("Api");
         if (requestHandler == null) {
           requestHandler = new HttpApiRequestHandler();
-          HANDLER_CACHE.put("Api", requestHandler);
+          handlerCache.put("Api", requestHandler);
         }
 
       } else if (targetUri.startsWith(apiDocUriBase)) {
-        requestHandler = HANDLER_CACHE.get("ApiDoc");
+        requestHandler = handlerCache.get("ApiDoc");
         if (requestHandler == null) {
           requestHandler = new ApiDocRequestHandler();
-          HANDLER_CACHE.put("ApiDoc", requestHandler);
+          handlerCache.put("ApiDoc", requestHandler);
         }
       } else {
-        requestHandler = HANDLER_CACHE.get("Default");
+        requestHandler = handlerCache.get("Default");
         if (requestHandler == null) {
           requestHandler = new DefaultRequestHandler();
-          HANDLER_CACHE.put("Default", requestHandler);
+          handlerCache.put("Default", requestHandler);
         }
       }
-      
       
       request.setAttribute("uri", targetUri);
       request.setAttribute("uriSuffix", uriSuffix);
@@ -198,7 +197,7 @@ public class DispatchServlet extends HttpServlet {
     
     initWebContext(sc);
 
-    HANDLER_CACHE =
+    handlerCache =
             (Cache<String, RequestHandler>) SimpleCacheManager.createCache("RequestHandler-Cache");
     
     loadSeedData(sc);

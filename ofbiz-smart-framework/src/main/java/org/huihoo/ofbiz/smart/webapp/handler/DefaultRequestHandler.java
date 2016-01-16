@@ -4,6 +4,7 @@ package org.huihoo.ofbiz.smart.webapp.handler;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -146,9 +147,7 @@ public class DefaultRequestHandler implements RequestHandler {
         //TODO
       } else if (ProcessType.ENTITY_AUTO.value().equals(reqAction.processType)) {
         try {
-          view = wac.viewCache.get("jsp");
           doEntityAutoAction(modelMap,req, resp,targetUri,reqAction,webCtx,layout,wac);
-          
         } catch (ViewException e) {
           throw new ServletException(e);
         }
@@ -349,17 +348,13 @@ public class DefaultRequestHandler implements RequestHandler {
         if (CommUtil.isNotEmpty(layout) && !"none".equals(layout)) {
           //Apply Layout
           req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, wac.jspViewBasePath + layout);
-          
 
           if (req.getAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE) == null) {
             if ( !(wac.jspViewBasePath + layout).equals(viewName) ) {
               req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, wac.jspViewBasePath + viewName);
             }
           }
-          
         }
-        
-        
         Log.d("layoutContentView : " + viewName, TAG);
         view.render(modelMap, req, resp);
         //clear temp object in session.
@@ -378,7 +373,10 @@ public class DefaultRequestHandler implements RequestHandler {
         //redirect to last uri
         String referer = req.getHeader("referer");
         String queryString = req.getQueryString();
-        String encodedRedirectURL = resp.encodeRedirectURL(queryString == null ? referer : referer + "?" + queryString);
+        String redirectUrl = queryString == null ? referer : referer + "?" + queryString;
+        // Remove CR and LF characters to prevent CRLF injection
+        String sanitizedLocation = redirectUrl.replaceAll("(\\r|\\n|%0D|%0A|%0a|%0d)", "");
+        String encodedRedirectURL = resp.encodeRedirectURL(sanitizedLocation);
         resp.setStatus(303);
         resp.setHeader("Location", encodedRedirectURL);
       } else {

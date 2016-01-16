@@ -11,7 +11,6 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
-
 import org.apache.commons.io.IOUtils;
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.util.Log;
@@ -52,16 +51,18 @@ public class DefaultFileUploadHandler implements FileUploadHandler {
     
     File uploadDir = new File(saveRootPath + fileSaveRelativePath);
     if (!uploadDir.exists()) {
-      uploadDir.mkdirs();
+      if ( !uploadDir.mkdirs() ) {
+        throw new RuntimeException("Directory " + uploadDir + " create failed.");
+      }
     }
     
     String fmtFolder = formatter.format(new Date());
     File fmtDir = new File(saveRootPath + fileSaveRelativePath + "/" + fmtFolder);
     if (!fmtDir.exists()) {
-      fmtDir.mkdirs();
+      if ( !fmtDir.mkdirs() ) {
+        throw new RuntimeException("Directory " + fmtDir + " create failed.");
+      }
     }
-    
-   
     
     Log.d("field[%s] file[%s] contentType[%s] will be saved in [%s]", TAG,fieldName,fileName,contentType,fmtDir);
     
@@ -74,7 +75,6 @@ public class DefaultFileUploadHandler implements FileUploadHandler {
     String fileNewName = UUID.randomUUID().toString().replaceAll("-", "") + fileSuffix;
     String fileRelativePath = fileSaveRelativePath + "/" + fmtFolder + "/" + fileNewName;
     File targetFile = new File(saveRootPath + fileRelativePath);
-    
     
     try {
       FileOutputStream fos = new FileOutputStream(targetFile);

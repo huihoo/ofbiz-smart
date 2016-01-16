@@ -18,8 +18,8 @@ public class ServiceModel implements Serializable {
   public boolean export = false;
   public boolean persist = true;
   public boolean transaction = false;
-  public Class<? extends ServiceCallback>[] callback;
-  public Parameter[] parameters;
+  public transient Class<? extends ServiceCallback>[] callback;
+  public transient Parameter[] parameters;
 
   @Override
   public String toString() {

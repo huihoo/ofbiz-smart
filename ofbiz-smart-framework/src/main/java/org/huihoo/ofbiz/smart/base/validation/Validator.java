@@ -42,7 +42,7 @@ public class Validator {
 
   private final static Map<Class<? extends Annotation>, List<? extends Class<?>>> builtinConstraints;
 
-  public static final String[] EXCLUDE_INCLUDE_NAMES = {"serialVersionUID", "_EBEAN_", "_ebean","_ctx","ebean","action.config."};
+  private final static String[] EXCLUDE_INCLUDE_NAMES = {"serialVersionUID", "_EBEAN_", "_ebean","_ctx","ebean","action.config."};
 
   static {
     Map<Class<? extends Annotation>, List<? extends Class<?>>> tmpConstraints = new HashMap<>();

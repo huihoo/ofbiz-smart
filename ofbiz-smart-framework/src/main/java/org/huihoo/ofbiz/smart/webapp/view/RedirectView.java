@@ -29,20 +29,19 @@ public class RedirectView implements View {
     
     if (redirectUrl == null) {
       redirectUrl = (String) request.getAttribute(C.JSP_VIEW_NAME_ATTRIBUTE);
-      
       if (CommUtil.isEmpty(redirectUrl) || redirectUrl.startsWith("/WEB-INF/")) {
         redirectUrl = (String) request.getAttribute("redirectUrl");
       }
-      
       if (redirectUrl == null) {
         redirectUrl = request.getContextPath() + "/" ;
       }
-      
     }
     
-    String encodedRedirectURL = response.encodeRedirectURL(redirectUrl);
+    // Remove CR and LF characters to prevent CRLF injection
+    String sanitizedLocation = redirectUrl.replaceAll("(\\r|\\n|%0D|%0A|%0a|%0d)", "");
+    String encodedRedirectURL = response.encodeRedirectURL(sanitizedLocation);
     Log.d("Redirect to [%s]", TAG,encodedRedirectURL);
-    response.setStatus(303);//http://tools.ietf.org/html/rfc7231#section-6.4.4
-    response.setHeader("Location", encodedRedirectURL);
+    response.setStatus(303);
+    response.setHeader("Location", sanitizedLocation);
   }
 }

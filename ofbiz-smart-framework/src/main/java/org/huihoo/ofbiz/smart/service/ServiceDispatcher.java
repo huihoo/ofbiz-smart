@@ -320,7 +320,7 @@ public class ServiceDispatcher {
     //NOTICE 会引发StackOverFlow异常，因为执行该方法的类就在这个包下面，
     //NOTICE 引起了递归执行，无法退出
     for (String scanResName : scanResNamesArray) {
-      if (getClass().getPackage().equals(scanResName)) {
+      if (getClass().getPackage().getName().equals(scanResName)) {
         Log.w("Resource name [" + getClass().getPackage() + "] ignored.", TAG);
         continue;
       }
@@ -417,16 +417,18 @@ public class ServiceDispatcher {
       }
     });
     
-    for (File f : files) {
-      if (f.isDirectory()) {
-        findAndAddServiceClazz(pkg, pgkPath, recursive, classes);
-      } else {
-        // remove .class suffix
-        String clazzName = f.getName().substring(0, f.getName().length() - 6);
-        try {
-          classes.add(Thread.currentThread().getContextClassLoader().loadClass(pkg + "." + clazzName));
-        } catch (ClassNotFoundException e) {
-          Log.w("Class[" + pkg + clazzName + "] not found.", TAG);
+    if (files != null) {
+      for (File f : files) {
+        if (f.isDirectory()) {
+          findAndAddServiceClazz(pkg, pgkPath, recursive, classes);
+        } else {
+          // remove .class suffix
+          String clazzName = f.getName().substring(0, f.getName().length() - 6);
+          try {
+            classes.add(Thread.currentThread().getContextClassLoader().loadClass(pkg + "." + clazzName));
+          } catch (ClassNotFoundException e) {
+            Log.w("Class[" + pkg + clazzName + "] not found.", TAG);
+          }
         }
       }
     }

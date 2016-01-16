@@ -1,6 +1,6 @@
 package org.huihoo.ofbiz.smart.webapp;
 
-import java.io.Serializable;
+
 import java.util.List;
 import java.util.Properties;
 
@@ -12,8 +12,7 @@ import org.huihoo.ofbiz.smart.entity.Delegator;
 import org.huihoo.ofbiz.smart.service.ServiceDispatcher;
 import org.huihoo.ofbiz.smart.webapp.view.View;
 
-public class WebAppContext implements Serializable {
-  private static final long serialVersionUID = 1L;
+public class WebAppContext{
 
   @SuppressWarnings("unchecked")
   public WebAppContext(ServletContext servletContext) {
