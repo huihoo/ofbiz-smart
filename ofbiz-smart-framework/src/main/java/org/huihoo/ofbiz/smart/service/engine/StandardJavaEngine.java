@@ -1,18 +1,17 @@
 package org.huihoo.ofbiz.smart.service.engine;
 
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.service.GenericServiceException;
 import org.huihoo.ofbiz.smart.service.ServiceDispatcher;
 import org.huihoo.ofbiz.smart.service.ServiceModel;
-
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class StandardJavaEngine extends GenericAsyncEngine {
   private final static String TAG = StandardJavaEngine.class.getName();
@@ -64,41 +63,15 @@ public class StandardJavaEngine extends GenericAsyncEngine {
           c = cl.loadClass(serviceModel.location);
           SERVICE_CLAZZ_MAP.put(serviceModel.location, c);
       }
-      Method m = c.getMethod(serviceModel.invoke, Map.class);
-      if (Modifier.isStatic(m.getModifiers())) {
-        result = m.invoke(null, ctx);
-      } else {
-        result = m.invoke(c.newInstance(), ctx);
-      }
-    } catch (ClassNotFoundException e) {
-      String msg = String.format("Service class [%s] not found.", serviceModel.location);
+      
+      MethodHandles.Lookup lookup = MethodHandles.lookup();
+      MethodHandle mh = lookup.findStatic(c, serviceModel.invoke, MethodType.methodType(Map.class,Map.class));
+      result = mh.invoke(ctx);
+      return result;
+    } catch (Throwable e) {
+      String msg = String.format("Service[%s] call[%s] failed.", serviceModel.location,serviceModel.invoke);
       Log.w(msg, TAG);
       throw new GenericServiceException(msg);
-    } catch (NoSuchMethodException e) {
-      String msg = String.format("Method [%s] of service class [%s] not found.", serviceModel.location,serviceModel.invoke);
-      Log.w(msg, TAG);
-      throw new GenericServiceException(msg);
-    } catch (SecurityException e) {
-      String msg = String.format("Method [%s] of service class [%s] can not access.", serviceModel.location,serviceModel.invoke);
-      Log.w(msg, TAG);
-      throw new GenericServiceException(msg);
-    } catch (IllegalAccessException e) {
-      String msg = String.format("Method [%s] of service class [%s] can not access.", serviceModel.location,serviceModel.invoke);
-      Log.w(msg, TAG);
-      throw new GenericServiceException(e);
-    } catch (IllegalArgumentException e) {
-      String msg = String.format("Method [%s] of service class [%s] can not access.", serviceModel.location,serviceModel.invoke);
-      Log.w(msg, TAG);
-      throw new GenericServiceException(e);
-    } catch (InvocationTargetException e) {
-      String msg = String.format("Method [%s] of service class [%s] can not access.", serviceModel.location,serviceModel.invoke);
-      Log.w(msg, TAG);
-      throw new GenericServiceException(e);
-    } catch (InstantiationException e) {
-      String msg = String.format("Method [%s] of service class [%s] can not access.", serviceModel.location,serviceModel.invoke);
-      Log.w(msg, TAG);
-      throw new GenericServiceException(e);
     }
-    return result;
   }
 }

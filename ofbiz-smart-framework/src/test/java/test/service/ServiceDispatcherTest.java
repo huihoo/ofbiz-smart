@@ -55,21 +55,21 @@ public class ServiceDispatcherTest extends BaseTestCase {
     Assert.assertEquals(true, ServiceUtil.isSuccess(resultMap));
     Assert.assertEquals(true, resultMap.containsKey(C.ENTITY_MODEL_NAME));
     
-    resultMap = serviceDispatcher.runSync("createOrder", ctx);
+    resultMap = serviceDispatcher.runSync("createOrderFail", ctx);
     Log.d("response > " + resultMap, TAG);
     Assert.assertEquals(true, ServiceUtil.isError(resultMap));
     
     Map<String, List<ConstraintViolation>> violationMap = (Map<String, List<ConstraintViolation>>) 
                                                                 resultMap.get(C.RESPOND_VALIDATION_ERRORS);
     Assert.assertNotNull(violationMap);
-    Assert.assertEquals(true, violationMap.containsKey("createOrder"));
-    List<ConstraintViolation> violations = violationMap.get("createOrder");
+    Assert.assertEquals(true, violationMap.containsKey("createOrderFail"));
+    List<ConstraintViolation> violations = violationMap.get("createOrderFail");
     Assert.assertEquals(3, violations.size());
     
     ctx.put("fromChannel", "WEB");
     ctx.put("paymentMethod", "PAYPAL_PAY");
     ctx.put("userId", "10000");
-    resultMap = serviceDispatcher.runSync("createOrder", ctx);
+    resultMap = serviceDispatcher.runSync("createOrderFail", ctx);
     Log.d("response > " + resultMap, TAG);
     Assert.assertEquals(true, ServiceUtil.isError(resultMap));
     
@@ -77,7 +77,7 @@ public class ServiceDispatcherTest extends BaseTestCase {
     ctx.put("fromChannel", "WEB");
     ctx.put("paymentMethod", "PAYPAL_PAY");
     ctx.put("userId", "10000");
-    resultMap = serviceDispatcher.runSync("createOrder2", ctx);
+    resultMap = serviceDispatcher.runSync("createOrderSuccess", ctx);
     Log.d("response > " + resultMap, TAG);
     Assert.assertEquals(true, ServiceUtil.isSuccess(resultMap));
   }
