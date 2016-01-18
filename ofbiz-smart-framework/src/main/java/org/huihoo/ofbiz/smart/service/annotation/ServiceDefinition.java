@@ -1,5 +1,6 @@
 package org.huihoo.ofbiz.smart.service.annotation;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -17,6 +18,7 @@ import org.huihoo.ofbiz.smart.service.ServiceCallback;
  *
  * @since 1.0
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 public @interface ServiceDefinition {
@@ -24,6 +26,9 @@ public @interface ServiceDefinition {
   /** 服务的名称 */
   String name();
 
+  /** 对应的API服务别名 */
+  String apiAlias() default "";
+  
   /** 服务的类型 */
   String type() default "java";
 
