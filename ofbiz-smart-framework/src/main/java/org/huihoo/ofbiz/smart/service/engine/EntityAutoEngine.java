@@ -149,6 +149,16 @@ public class EntityAutoEngine extends GenericAsyncEngine {
             successResult.put(C.ENTITY_MODEL_NAME, obj);
           }
           break;
+        case C.SERVICE_ENGITYAUTO_FINDUNIQUEBYAND:
+          andMap = (Map<String, Object>) ctx.get(C.ENTITY_ANDMAP);
+          fieldsToSelect = (Set<String>) ctx.get(C.ENTITY_FIELDS_TO_SELECT);
+          obj = delegator.findUniqueByAnd(entityClazz, andMap,fieldsToSelect,useCache,liveTimeInSeconds);
+          if (resultName != null) {
+            successResult.put(resultName, obj);
+          } else {
+            successResult.put(C.ENTITY_MODEL_NAME, obj);
+          }
+          break;
         case C.SERVICE_ENGITYAUTO_FINDLISTBYAND:
         case C.SERVICE_ENGITYAUTO_FINDLISTBYCOND:
           if (orderBy == null && hasUpdatedAtField(entityClazz)) {
