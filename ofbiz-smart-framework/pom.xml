@@ -4,8 +4,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.huihoo</groupId>
 	<artifactId>ofbiz-smart-framework</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-	<packaging>pom</packaging>
+	<version>1.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 
 	<name>ofbiz-smart</name>
 	<url>http://code.huihoo.com/huihoo/ofbiz-smart</url>
@@ -493,6 +493,7 @@
 				<snapshotRepository>
 					<id>oss</id>
 					<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+					<uniqueVersion>true</uniqueVersion>
 				</snapshotRepository>
 				<repository>
 					<id>oss</id>
