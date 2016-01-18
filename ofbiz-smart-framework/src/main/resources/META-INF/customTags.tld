@@ -196,7 +196,7 @@
 		<description>
 			在JSP页面里调用服务
 		</description>
-		<name>options</name>
+		<name>serviceCall</name>
 		<tagclass>org.huihoo.ofbiz.smart.webapp.taglib.ServiceCallTag</tagclass>
 		<attribute>
 			<description>
