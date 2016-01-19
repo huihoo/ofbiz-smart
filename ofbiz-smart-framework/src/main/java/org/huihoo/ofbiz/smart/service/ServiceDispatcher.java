@@ -153,13 +153,17 @@ public class ServiceDispatcher {
         if (ServiceUtil.isError(verifyResult)) {
           Log.w("Service[%s] output parameters is invalid.", TAG,serviceName);
           return verifyResult;
-        }
+        }        
       }
       
       if (CommUtil.isNotEmpty(serviceCallbacks)) {
         for (ServiceCallback sCallback : serviceCallbacks) {
           sCallback.receiveEvent(ctx, result);
         }
+      }
+      
+      if (ServiceUtil.isSuccess(result) && persist && transaction && delegator != null) {
+        delegator.commitTransaction();
       }
       
       return result;
