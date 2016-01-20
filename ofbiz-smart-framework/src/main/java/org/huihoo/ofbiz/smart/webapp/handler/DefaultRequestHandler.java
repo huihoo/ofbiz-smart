@@ -153,24 +153,23 @@ public class DefaultRequestHandler implements RequestHandler {
         }
         return ;
       } else if (ProcessType.BY_CONFIG.value().equals(reqAction.processType)) {
-        if (reqAction.response != null) {
-          String latyout = reqAction.response.layout;      
-          String tmpViewName = reqAction.response.viewName;
-          
-          if (latyout != null && !"none".equals(layout)) {
-            req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, wac.jspViewBasePath + layout);
-            if (tmpViewName == null) {
-              tmpViewName = wac.jspViewBasePath + targetUri + ".jsp";
-            }
-            req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, tmpViewName);
-          } else {
-            if (tmpViewName == null) {
-              tmpViewName = targetUri + ".jsp";
-            }
-            req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, wac.jspViewBasePath + tmpViewName);
+        if (reqAction.response == null) {
+          throw new IllegalArgumentException("Response element must be setting in [" + ProcessType.BY_CONFIG.value()+ "] ");
+        } 
+        String latyout = reqAction.response.layout;      
+        String viewName = reqAction.response.viewName;
+        //Apply Layout
+        if (CommUtil.isNotEmpty(latyout) && !"none".equals(latyout)) {
+          req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, wac.jspViewBasePath + latyout); 
+          if (CommUtil.isEmpty(viewName)) {
+            throw new IllegalArgumentException("Response element's attribute view-name must be setting in [" + ProcessType.BY_CONFIG.value()+ "] ");
           }
+          req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, wac.jspViewBasePath + viewName);
         } else {
-          req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, wac.jspViewBasePath + targetUri + ".jsp");
+          if ("jsp".equals(reqAction.processType) && CommUtil.isEmpty(viewName)) {
+            throw new IllegalArgumentException("Response element's attribute view-name must be setting in [" + ProcessType.BY_CONFIG.value()+ "] ");
+          }
+          req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, wac.jspViewBasePath + viewName); 
         }
       }
       try {
