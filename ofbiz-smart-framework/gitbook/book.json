@@ -10,7 +10,7 @@
       "title": "OFBiz Smart"
   	},
   	"plugins": [
-  		"emphasize"
+  		
     ],
     "styles": {
         "website": "styles/website.css"

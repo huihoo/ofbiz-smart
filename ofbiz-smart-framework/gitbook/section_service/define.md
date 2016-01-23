@@ -4,9 +4,10 @@
 
 > 凡是显示定义的服务类，都由 [标准Java服务引擎](../section_service/standard.md) 来执行。
 
-{% em color="#ff0000" %}
+<p style='color:#ff0000'>
 注意：除了用注解来标识服务类和具体的服务方法外，对服务方法以下要求:
-{% endem %}
+</p>
+
 1. 方法必须是 **static**的
 
 2. 有且只有一个类型为**Map<String,Object>**的参数

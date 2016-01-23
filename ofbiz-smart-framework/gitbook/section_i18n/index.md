@@ -66,6 +66,7 @@ xml文件格式如下:
  String btnOk = resourceBundle.getString("btnOk");
 ```
 
-{% em color="#ff0000" %}
+
+<p style='color:#ff0000'>
 注意：语言代码和地区代码必须和xml资源文件里一一对应
-{% endem %}
+</p>
