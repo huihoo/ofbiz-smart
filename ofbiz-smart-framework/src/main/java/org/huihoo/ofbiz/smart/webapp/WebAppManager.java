@@ -32,8 +32,7 @@ public class WebAppManager {
   private static volatile FileUploadHandler fileUploadHandler;
   
   public static Map<String, Object> buildWebCtx(HttpServletRequest req) {
-    ServletContext sc = req.getSession().getServletContext();
-    
+    ServletContext sc = req.getServletContext();
     Delegator delegator = (Delegator) sc.getAttribute(C.CTX_DELETAGOR);
     ServiceDispatcher serviceDispatcher =(ServiceDispatcher) sc.getAttribute(C.CTX_SERVICE_DISPATCHER);
     Properties applicationConfig = (Properties) sc.getAttribute(C.APPLICATION_CONFIG_PROP_KEY);
@@ -45,7 +44,6 @@ public class WebAppManager {
     );
     
     boolean isMultipart = ServletFileUpload.isMultipartContent(req);
-    
     if (isMultipart) {
       if (fileUploadHandler == null) {
         String handlerName = applicationConfig.getProperty("file.upload.handler", "org.huihoo.ofbiz.smart.webapp.DefaultFileUploadHandler");
@@ -83,7 +81,6 @@ public class WebAppManager {
       } catch (FileUploadException | IOException e) {
         Log.w("Process MultipartContent failed.", TAG);
       }
-      
     } else {
       Enumeration<String> parameterNames = req.getParameterNames();
       while (parameterNames.hasMoreElements()) {

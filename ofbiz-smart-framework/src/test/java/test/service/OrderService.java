@@ -15,6 +15,7 @@ public class OrderService {
   
   @ServiceDefinition(
     name = "createOrderFail"
+    ,apiAlias = "org.huihoo.order.createFail"
     ,description = "创建订单但参数验证不通过"
     ,parameters = {
         @Parameter(name = "fromChannel",optinal = false,mode="IN", description = "订单来源")
@@ -39,6 +40,7 @@ public class OrderService {
   
   @ServiceDefinition(
     name = "createOrderSuccess"
+    ,apiAlias = "org.huihoo.order.createSuccess"
     ,description = "成功创建订单"
     ,parameters = {
         @Parameter(name = "fromChannel",optinal = false,mode="IN", description = "订单来源")

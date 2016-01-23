@@ -113,7 +113,6 @@ public class DispatchServlet extends HttpServlet {
           requestHandler = new HttpApiRequestHandler();
           handlerCache.put("Api", requestHandler);
         }
-
       } else if (targetUri.startsWith(apiDocUriBase)) {
         requestHandler = handlerCache.get("ApiDoc");
         if (requestHandler == null) {
@@ -131,9 +130,7 @@ public class DispatchServlet extends HttpServlet {
       request.setAttribute("uri", targetUri);
       request.setAttribute("uriSuffix", uriSuffix);
       request.setAttribute("ctxPath", request.getContextPath());
-      
       requestHandler.handleRequest(request, response);
-
     } catch (ServletException ex) {
       failureCause = ex;
       throw ex;
@@ -178,15 +175,12 @@ public class DispatchServlet extends HttpServlet {
     if (CommUtil.isEmpty(jspViewBathPath)) {
       jspViewBathPath = "/WEB-INF/views";
     }
-
     if (CommUtil.isEmpty(uriSuffix)) {
       uriSuffix = "";
     }
-
     if (CommUtil.isEmpty(httpApiUrlBase)) {
       httpApiUrlBase = "/api/router";
     }
-
     if (CommUtil.isEmpty(restApiUrlBase)) {
       httpApiUrlBase = "/rest";
     }
@@ -201,7 +195,6 @@ public class DispatchServlet extends HttpServlet {
             (Cache<String, RequestHandler>) SimpleCacheManager.createCache("RequestHandler-Cache");
     
     loadSeedData(sc);
-
   }
 
   protected void initWebContext(ServletContext servletContext) throws ServletException {

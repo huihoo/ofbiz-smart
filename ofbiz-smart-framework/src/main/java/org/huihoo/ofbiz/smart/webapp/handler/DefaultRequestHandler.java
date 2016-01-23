@@ -46,14 +46,12 @@ public class DefaultRequestHandler implements RequestHandler {
   @Override
   public void handleRequest(HttpServletRequest req, HttpServletResponse resp)
           throws ServletException, IOException {
-    WebAppContext wac = (WebAppContext) req.getSession().getServletContext().getAttribute("webAppContext");
-    
+    WebAppContext wac = (WebAppContext) req.getServletContext().getAttribute("webAppContext");
     //remove contextpath
     String targetUri = req.getRequestURI();
     if (targetUri.startsWith(req.getContextPath())) {
       targetUri = targetUri.substring(req.getContextPath().length());
     }
-
     //remove uri suffix
     if (CommUtil.isNotEmpty(wac.uriSuffix) && targetUri.endsWith(wac.uriSuffix)) {
       targetUri = targetUri.substring(0, targetUri.indexOf(wac.uriSuffix));
@@ -61,7 +59,6 @@ public class DefaultRequestHandler implements RequestHandler {
     
     Action reqAction = matchAction(wac.actionModels, targetUri);
     Log.d("Action : " + reqAction, TAG);
-    
     if (reqAction != null) {
       String actionMethod = reqAction.method;
       String method = req.getMethod();
@@ -71,15 +68,12 @@ public class DefaultRequestHandler implements RequestHandler {
         allowedMethod = false;
       }
       if (!allowedMethod) {
-        resp.sendError(400, "Unsupported method.");
+        resp.sendError(400, "Un supported method : " + method);
         return ;
       }
-      
       Map<String, Object> modelMap = ServiceUtil.returnSuccess();
-      
       //build web ctx for service call.
       Map<String, Object> webCtx = WebAppManager.buildWebCtx(req);
-      
       //calling all available configured service
       Map<String, Object> lastResult = null; 
       List<ServiceCall> serviceCalls = reqAction.serviceCallList;
@@ -98,7 +92,6 @@ public class DefaultRequestHandler implements RequestHandler {
           } else {
             webCtx.put(C.ENTITY_CONDTION, WebAppManager.parseConditionFromQueryString(req));
           }
-          
           //entityAuto service
           if (serviceCall.serviceName.startsWith( ServiceEngineType.ENTITY_AUTO.value() + "#") ) {
             sm.name = serviceCall.serviceName;
@@ -130,8 +123,8 @@ public class DefaultRequestHandler implements RequestHandler {
       if (viewType == null) {
         viewType = "jsp";
       }
-      View view = wac.viewCache.get(viewType); 
       
+      View view = wac.viewCache.get(viewType); 
       if (ProcessType.URI_AUTO.value().equals(reqAction.processType)) {
         String viewName = null;
         if (layout != null && !"none".equals(layout)) {
@@ -347,7 +340,6 @@ public class DefaultRequestHandler implements RequestHandler {
         if (CommUtil.isNotEmpty(layout) && !"none".equals(layout)) {
           //Apply Layout
           req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, wac.jspViewBasePath + layout);
-
           if (req.getAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE) == null) {
             if ( !(wac.jspViewBasePath + layout).equals(viewName) ) {
               req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, wac.jspViewBasePath + viewName);
