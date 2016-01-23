@@ -43,13 +43,14 @@ import org.huihoo.ofbiz.smart.webapp.view.JspView;
 import org.huihoo.ofbiz.smart.webapp.view.RedirectView;
 import org.huihoo.ofbiz.smart.webapp.view.View;
 import org.huihoo.ofbiz.smart.webapp.view.XmlView;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockRequestDispatcher;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 
@@ -160,9 +161,10 @@ public class WebAppTest {
     dispatchServlet.doGet(req, resp);
     String viewContent = resp.getContentAsString();
     Log.d("View content:" + viewContent, TAG);
-    JSONObject jsonObject = new JSONObject(viewContent);
-    Assert.assertEquals(true, jsonObject.has("error"));
-    Assert.assertEquals(true, jsonObject.has("validation_errors"));
+    ObjectMapper objectMapper = new ObjectMapper();
+    Map jsonMap =  objectMapper.readValue(viewContent, Map.class);
+    Assert.assertEquals(true, jsonMap.containsKey("error"));
+    Assert.assertEquals(true, jsonMap.containsKey("validation_errors"));
   }
   
   @Test
@@ -184,8 +186,9 @@ public class WebAppTest {
     dispatchServlet.doGet(req, resp);
     String viewContent = resp.getContentAsString();
     Log.d("View content:" + viewContent, TAG);
-    JSONObject jsonObject = new JSONObject(viewContent);
-    Assert.assertEquals(true, jsonObject.has("success"));
+    ObjectMapper objectMapper = new ObjectMapper();
+    Map jsonMap =  objectMapper.readValue(viewContent, Map.class);
+    Assert.assertEquals(true, jsonMap.containsKey("success"));
   }
 
   @Test
