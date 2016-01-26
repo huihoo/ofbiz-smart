@@ -1,8 +1,25 @@
 package org.huihoo.ofbiz.smart.service;
 
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.huihoo.ofbiz.smart.base.C;
-import org.huihoo.ofbiz.smart.base.location.FlexibleLocation;
+import org.huihoo.ofbiz.smart.base.util.AppConfigUtil;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.base.util.ServiceUtil;
@@ -12,17 +29,6 @@ import org.huihoo.ofbiz.smart.service.annotation.Parameter;
 import org.huihoo.ofbiz.smart.service.annotation.Service;
 import org.huihoo.ofbiz.smart.service.annotation.ServiceDefinition;
 import org.huihoo.ofbiz.smart.service.engine.GenericEngine;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ServiceDispatcher {
   private final static String TAG = ServiceDispatcher.class.getName();
@@ -49,9 +55,7 @@ public class ServiceDispatcher {
   
   /** 服务执行过慢的毫秒 */
   private volatile int slowTimeInMilliSeconds;
-  
-  /** 当前属性配置 */
-  private volatile Properties applicationConfig;
+ 
 
   /** 服务执行依赖的数据库访问代理对象 */
   private final Delegator delegator;
@@ -60,18 +64,12 @@ public class ServiceDispatcher {
   private final String scanResNames;
 
   public ServiceDispatcher(Delegator delegator) throws GenericServiceException {
-    applicationConfig = new Properties();
-    try {
-      applicationConfig.load(FlexibleLocation.resolveLocation(C.APPLICATION_CONFIG_NAME).openStream());
-    } catch (IOException e) {
-      throw new GenericServiceException("Unable to load external properties");
-    }
 
-    scanResNames = applicationConfig.getProperty(C.SERVICE_SCANNING_NAMES);
-    profile = applicationConfig.getProperty(C.PROFILE_NAME);
-    slowTimeInMilliSeconds = Integer.parseInt(applicationConfig.getProperty(C.SERVICE_SLOWTIME_MILLISECONDS, "30000"));
+    scanResNames = AppConfigUtil.getProperty(C.SERVICE_SCANNING_NAMES);
+    profile = AppConfigUtil.getProperty(C.PROFILE_NAME);
+    slowTimeInMilliSeconds = Integer.parseInt(AppConfigUtil.getProperty(C.SERVICE_SLOWTIME_MILLISECONDS, "30000"));
     /**transaction**/
-    String transaction = applicationConfig.getProperty("service.scanning.transaction");
+    String transaction = AppConfigUtil.getProperty("service.scanning.transaction");
     if(CommUtil.isNotEmpty(transaction)){
     	TransactionScanning.setTransactionSacnning(transaction);
     }
@@ -133,7 +131,6 @@ public class ServiceDispatcher {
         return ServiceUtil.returnProplem("UNSUPPORTED_SERVICE_ENGINE", "Unsupported service ["+ serviceName + "]");
       }
       
-      ctx.put(C.APPLICATION_CONFIG_PROP_KEY, applicationConfig);
       
       if (persist && transaction) {
         delegator.beginTransaction();

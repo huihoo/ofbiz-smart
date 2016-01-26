@@ -28,6 +28,7 @@ import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.cache.Cache;
 import org.huihoo.ofbiz.smart.base.cache.SimpleCacheManager;
 import org.huihoo.ofbiz.smart.base.location.FlexibleLocation;
+import org.huihoo.ofbiz.smart.base.util.AppConfigUtil;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 
@@ -58,12 +59,7 @@ public class EbeanDelegator implements Delegator {
 
   @SuppressWarnings("unchecked")
   public EbeanDelegator() throws GenericEntityException {
-    Properties applicationProps = new Properties();
-    try {
-      applicationProps.load(FlexibleLocation.resolveLocation(C.APPLICATION_CONFIG_NAME).openStream());
-    } catch (IOException e) {
-      throw new GenericEntityException("Unable to load external properties");
-    }
+    Properties applicationProps = AppConfigUtil.getCurentProperties();
     
     String profile = applicationProps.getProperty("profile");
     if (!C.PROFILE_PRODUCTION.equals(profile)) {

@@ -20,6 +20,7 @@ import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.cache.Cache;
 import org.huihoo.ofbiz.smart.base.cache.SimpleCacheManager;
 import org.huihoo.ofbiz.smart.base.location.FlexibleLocation;
+import org.huihoo.ofbiz.smart.base.util.AppConfigUtil;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.base.util.xml.IXmlConverter;
@@ -206,27 +207,24 @@ public class DispatchServlet extends HttpServlet {
       throw new ServletException("Unable to initialize Delegator.");
     } catch (GenericServiceException e) {
       throw new ServletException("Unable to initialize ServiceDispatcher.");
-    } catch (MalformedURLException e) {
-      throw new ServletException("Unable to load gobal config file : " + C.APPLICATION_CONFIG_NAME);
-    } catch (IOException e) {
-      throw new ServletException("Unable to load gobal config file : " + C.APPLICATION_CONFIG_NAME);
     }
   }
   
-  protected void loadAppConfig(ServletContext servletContext) throws MalformedURLException, IOException, GenericServiceException {
+  protected void loadAppConfig(ServletContext servletContext) throws GenericServiceException {
     //NOTICE 以下对象可以重新加载,除了Delegator
     ServiceDispatcher serviceDispatcher = new ServiceDispatcher((Delegator)servletContext.getAttribute(C.CTX_DELETAGOR));
-    Properties applicationConfig = new Properties();
-    applicationConfig.load(FlexibleLocation.resolveLocation(C.APPLICATION_CONFIG_NAME).openStream());
     servletContext.setAttribute(C.CTX_SERVICE_DISPATCHER, serviceDispatcher);
-    servletContext.setAttribute(C.APPLICATION_CONFIG_PROP_KEY, applicationConfig);
-    String actionConfigBasePath = applicationConfig.getProperty(C.ACTION_CONFIG_BASEPATH_KEY, "./");
+    String actionConfigBasePath = AppConfigUtil.getProperty(C.ACTION_CONFIG_BASEPATH_KEY, "./");
     List<ActionModel> actionModels = new ArrayList<>();
-    ActionModelXmlConfigLoader.me().loadXml(FlexibleLocation.resolveLocation(actionConfigBasePath).getPath(),actionModels);
+    try {
+      ActionModelXmlConfigLoader.me().loadXml(FlexibleLocation.resolveLocation(actionConfigBasePath).getPath(),actionModels);
+    } catch (MalformedURLException e1) {
+      Log.e(e1, "Unable to load action config file in dir : " + actionConfigBasePath, TAG);
+    }
     servletContext.setAttribute(C.CTX_ACTION_MODEL,actionModels);
     
     String[] customSupportedView = null;
-    String supportedViews = applicationConfig.getProperty("webapp.supported.views");
+    String supportedViews = AppConfigUtil.getProperty("webapp.supported.views");
     if (CommUtil.isNotEmpty(supportedViews)) {
       customSupportedView = supportedViews.split(",");
     }
@@ -253,7 +251,7 @@ public class DispatchServlet extends HttpServlet {
     }
     servletContext.setAttribute(C.CTX_SUPPORTED_VIEW_ATTRIBUTE,VIEW_CACHE);  
     /**xml handle**/
-    String xmlhandle = applicationConfig.getProperty("smart.xml.handle");
+    String xmlhandle = AppConfigUtil.getProperty("smart.xml.handle");
     if(CommUtil.isEmpty(xmlhandle)){
     	xmlhandle = XML_HANDLE;
     }
