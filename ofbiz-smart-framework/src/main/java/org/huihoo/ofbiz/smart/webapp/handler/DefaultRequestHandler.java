@@ -13,6 +13,7 @@ import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.cache.Cache;
 import org.huihoo.ofbiz.smart.base.cache.SimpleCacheManager;
 import org.huihoo.ofbiz.smart.base.util.AntPathMatcher;
+import org.huihoo.ofbiz.smart.base.util.AppConfigUtil;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.base.util.PathMatcher;
@@ -20,10 +21,10 @@ import org.huihoo.ofbiz.smart.base.util.ServiceUtil;
 import org.huihoo.ofbiz.smart.service.ServiceEngineType;
 import org.huihoo.ofbiz.smart.service.ServiceModel;
 import org.huihoo.ofbiz.smart.webapp.ActionModel;
-import org.huihoo.ofbiz.smart.webapp.ProcessType;
-import org.huihoo.ofbiz.smart.webapp.WebAppContext;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.Action;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.ServiceCall;
+import org.huihoo.ofbiz.smart.webapp.ProcessType;
+import org.huihoo.ofbiz.smart.webapp.WebAppContext;
 import org.huihoo.ofbiz.smart.webapp.WebAppManager;
 import org.huihoo.ofbiz.smart.webapp.view.JsonView;
 import org.huihoo.ofbiz.smart.webapp.view.RedirectView;
@@ -217,7 +218,7 @@ public class DefaultRequestHandler implements RequestHandler {
     Log.d("Guessed Engity Name : " + guessEntityName, TAG);
     String entityClazzName = ENTITY_CLAZZ_NAME_CACHE.get(guessEntityName);
     if (entityClazzName == null) {
-      String entityScanningPkg = wac.applicationConfig.getProperty(C.ENTITY_SCANNING_PACKAGES);
+      String entityScanningPkg = AppConfigUtil.getProperty(C.ENTITY_SCANNING_PACKAGES);
       String[] espToken = entityScanningPkg.split(",");
       for (String t : espToken) {
         entityClazzName = t.substring(0,t.indexOf(".**")) + "." + guessEntityName;

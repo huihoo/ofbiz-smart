@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Properties;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration.Dynamic;
@@ -92,8 +91,7 @@ public class DispatchServlet extends HttpServlet {
     long startTime = System.currentTimeMillis();
     Throwable failureCause = null;
     try {
-      Properties applicationConfig = (Properties) getServletContext().getAttribute(C.APPLICATION_CONFIG_PROP_KEY);
-      if (!C.PROFILE_PRODUCTION.equals(applicationConfig.getProperty(C.PROFILE_NAME))) {
+      if (!C.PROFILE_PRODUCTION.equals(AppConfigUtil.getProperty(C.PROFILE_NAME))) {
         //非生产环境，总是重新加载
         try {
           loadAppConfig(getServletContext());

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +16,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.huihoo.ofbiz.smart.base.C;
+import org.huihoo.ofbiz.smart.base.util.AppConfigUtil;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.entity.Delegator;
@@ -35,26 +35,24 @@ public class WebAppManager {
     ServletContext sc = req.getServletContext();
     Delegator delegator = (Delegator) sc.getAttribute(C.CTX_DELETAGOR);
     ServiceDispatcher serviceDispatcher =(ServiceDispatcher) sc.getAttribute(C.CTX_SERVICE_DISPATCHER);
-    Properties applicationConfig = (Properties) sc.getAttribute(C.APPLICATION_CONFIG_PROP_KEY);
     
     Map<String, Object> ctx = CommUtil.toMap(C.CTX_DELETAGOR, delegator
                                             ,C.CTX_SERVICE_DISPATCHER, serviceDispatcher
-                                            ,C.APPLICATION_CONFIG_PROP_KEY, applicationConfig
                                             ,C.CTX_WEB_HTTP_SERVLET_REQUEST, req
     );
     
     boolean isMultipart = ServletFileUpload.isMultipartContent(req);
     if (isMultipart) {
       if (fileUploadHandler == null) {
-        String handlerName = applicationConfig.getProperty("file.upload.handler", "org.huihoo.ofbiz.smart.webapp.DefaultFileUploadHandler");
+        String handlerName = AppConfigUtil.getProperty("file.upload.handler", "org.huihoo.ofbiz.smart.webapp.DefaultFileUploadHandler");
         try {
           fileUploadHandler = (FileUploadHandler) Class.forName(handlerName).newInstance();
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
           Log.w("Unable to load file upload handler [%s]", TAG,handlerName);
         }
       }
-      int fileSizeMax = Integer.parseInt(applicationConfig.getProperty("file.upload.per.sizeinmb.max", "5"));
-      int sizeMax = Integer.parseInt(applicationConfig.getProperty("file.upload.sizeinmb.max", "10"));
+      int fileSizeMax = Integer.parseInt(AppConfigUtil.getProperty("file.upload.per.sizeinmb.max", "5"));
+      int sizeMax = Integer.parseInt(AppConfigUtil.getProperty("file.upload.sizeinmb.max", "10"));
       ServletFileUpload upload = new ServletFileUpload();
       upload.setHeaderEncoding(C.UTF_8); 
       upload.setFileSizeMax(1024L * 1024 * fileSizeMax);
