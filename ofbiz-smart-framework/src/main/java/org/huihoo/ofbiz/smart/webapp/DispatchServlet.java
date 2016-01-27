@@ -287,8 +287,7 @@ public class DispatchServlet extends HttpServlet {
   
   protected void loadSeedData(ServletContext servletContext){
     //Load seed data
-    Properties applicationConfig = (Properties) servletContext.getAttribute(C.APPLICATION_CONFIG_PROP_KEY);
-    String seedDataSqlFile = applicationConfig.getProperty(C.SEED_DATA_SQL_FILE_ATTRIBUTE);
+    String seedDataSqlFile = AppConfigUtil.getProperty(C.SEED_DATA_SQL_FILE_ATTRIBUTE);
     if (CommUtil.isNotEmpty(seedDataSqlFile)) {
       Delegator delegator = (Delegator) servletContext.getAttribute(C.CTX_DELETAGOR);
       try {
