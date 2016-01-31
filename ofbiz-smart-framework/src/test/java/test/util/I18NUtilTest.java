@@ -31,7 +31,6 @@ public class I18NUtilTest {
     resourceBundle = I18NUtil.getResourceBundle("ui", locale);
     Assert.assertNotNull(resourceBundle);
 
-
     btnOk = resourceBundle.getString("btnOk");
     Assert.assertEquals("确定", btnOk);
 
@@ -40,7 +39,6 @@ public class I18NUtilTest {
 
     btnCancle = resourceBundle.getString("btnCancle");
     Assert.assertEquals("取消", btnCancle);
-
 
     locale = new Locale("en", "US");
     resourceBundle = I18NUtil.getResourceBundle("i18n_ui", locale);
@@ -52,7 +50,6 @@ public class I18NUtilTest {
     btnCancle = resourceBundle.getString("btnCancle");
     Assert.assertEquals("Cancle", btnCancle);
 
-
     resourceBundle = I18NUtil.getResourceBundle("ui", locale);
     Assert.assertNotNull(resourceBundle);
 
@@ -61,6 +58,5 @@ public class I18NUtilTest {
 
     btnCancle = resourceBundle.getString("btnCancle");
     Assert.assertEquals("Cancle", btnCancle);
-
   }
 }

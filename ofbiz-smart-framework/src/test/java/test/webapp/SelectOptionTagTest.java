@@ -21,7 +21,6 @@ import org.mockito.Mockito;
 public class SelectOptionTagTest {
   
   private static final String CURRENT_CONTEXT = "/TagLibTestContext";
-  
   private static final String SEED_SQL_FILES = "/seed_data.sql";
 
   private SelectOptionTag tag = new SelectOptionTag();
@@ -35,7 +34,6 @@ public class SelectOptionTagTest {
   public void setup() throws GenericEntityException, GenericServiceException {
     delegator = new EbeanDelegator();
     delegator.loadSeedData(SEED_SQL_FILES);
-    
     tag.setPageContext(pageContext);
     Mockito.when(pageContext.getServletContext()).thenReturn(servletContext);
     Mockito.when(pageContext.getRequest()).thenReturn(httpServletRequest);
@@ -47,8 +45,6 @@ public class SelectOptionTagTest {
   @Test
   public void testSelectOptions() throws JspException, IOException {
      tag.setClassName("test.entity.CustomerType");
-     
-     
      tag.setLabelName("name");  
      tag.setValueName("id");
      tag.setLiveTimeInSeconds(3);
@@ -71,8 +67,7 @@ public class SelectOptionTagTest {
      tag.setCurrentValue(1);
      tag.doStartTag();
      tag.doEndTag();
-     Mockito.verify(jspWriter, Mockito.times(1)).println(sb.toString());
-     
+     Mockito.verify(jspWriter, Mockito.times(1)).println(sb.toString());     
   }
 }
 

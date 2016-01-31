@@ -261,4 +261,28 @@
 		</attribute>
 	</tag>
 
+	<tag>
+		<description>
+			国际化标签
+		</description>
+		<name>serviceCall</name>
+		<tagclass>org.huihoo.ofbiz.smart.webapp.taglib.I18nTag</tagclass>
+		<attribute>
+			<description>
+					资源文件名称
+			</description>
+			<name>resourceName</name>
+			<rtexprvalue>true</rtexprvalue>
+			<required>true</required>
+		</attribute>
+		<attribute>
+			<description>
+					资源的键
+				</description>
+			<name>key</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+
 </taglib> 
