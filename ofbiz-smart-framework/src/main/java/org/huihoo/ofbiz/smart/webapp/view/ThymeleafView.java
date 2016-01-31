@@ -18,6 +18,7 @@ public class ThymeleafView implements View {
   public void render(Map<String, Object> model, HttpServletRequest request,
           HttpServletResponse response) throws ViewException {
     //TODO
+    throw new RuntimeException("Not Implementation Yet.");
   }
 
 }

@@ -16,5 +16,6 @@ public class HttpApiDocView implements View {
   public void render(Map<String, Object> model, HttpServletRequest request,
           HttpServletResponse response) {
     //TODO
+    throw new RuntimeException("Not Implementation Yet.");
   }
 }

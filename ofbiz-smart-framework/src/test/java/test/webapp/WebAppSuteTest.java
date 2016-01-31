@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({WebAppTest.class})
+@SuiteClasses({WebAppTest.class,SelectOptionTagTest.class})
 public class WebAppSuteTest {
   public WebAppSuteTest() {}
 }

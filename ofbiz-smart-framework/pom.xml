@@ -51,7 +51,7 @@
 		<java.version>1.7</java.version>
 		<junit.version>4.12</junit.version>
 		<ebean.orm.version>6.15.1</ebean.orm.version>
-		<ebean.orm.agent.version>4.8.1</ebean.orm.agent.version>
+		<ebean.orm.agent.version>4.9.1</ebean.orm.agent.version>
 		<ebean.agentloader.version>2.1.2</ebean.agentloader.version>
 		<servlet.version>3.0.1</servlet.version>
 		<slf4j.version>1.7.13</slf4j.version>
@@ -369,11 +369,25 @@
 				</executions>
 			</plugin>
 
-			<!-- <plugin> <groupId>org.avaje.ebeanorm</groupId> <artifactId>avaje-ebeanorm-mavenenhancer</artifactId> 
-				<version>4.7.1</version> <executions> <execution> <id>main</id> <phase>process-classes</phase> 
-				<configuration> <packages>test.entity.**</packages> <transformArgs>debug=1</transformArgs> 
-				</configuration> <goals> <goal>enhance</goal> </goals> </execution> </executions> 
-				</plugin> -->
+			<plugin>
+				<groupId>org.avaje.ebeanorm</groupId>
+				<artifactId>avaje-ebeanorm-mavenenhancer</artifactId>
+				<version>4.9.1</version>
+				<executions>
+					<execution>
+						<id>main</id>
+						<phase>process-classes</phase>
+						<configuration>
+							<classSource>target/test-classes</classSource>
+							<packages>test.entity.**</packages>
+							<transformArgs>debug=1</transformArgs>
+						</configuration>
+						<goals>
+							<goal>enhance</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
 
 

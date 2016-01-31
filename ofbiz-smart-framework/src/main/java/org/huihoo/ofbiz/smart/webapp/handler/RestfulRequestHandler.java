@@ -11,5 +11,6 @@ public class RestfulRequestHandler implements RequestHandler {
   @Override
   public void handleRequest(HttpServletRequest req, HttpServletResponse resp)  throws ServletException, IOException{
     //TODO
+    throw new RuntimeException("Not Implementation Yet.");
   }
 }
