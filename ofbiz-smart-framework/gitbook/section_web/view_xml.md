@@ -7,6 +7,6 @@
      <action uri="/order/create" method="post">
 		<response view-type="xml"/>
 	 </action>
-    >``
+    >```
     
 > Xml响应输出的数据源为渲染方法中的**model**参数    

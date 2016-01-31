@@ -7,6 +7,6 @@
      <action uri="/order/create" method="post">
 		<response view-type="json"/>
 	 </action>
-    >``
+    >```
     
 > Json响应输出的数据源对象为渲染方法中的**model**参数    
