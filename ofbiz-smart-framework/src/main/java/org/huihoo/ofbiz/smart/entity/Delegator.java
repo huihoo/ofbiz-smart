@@ -231,4 +231,6 @@ public interface Delegator {
   
   
   void loadSeedData(String seedDataSqlCvs) throws GenericEntityException;
+  
+  void loadSeedData(String seedDataSqlCvs,boolean executeAnyway) throws GenericEntityException;
 }

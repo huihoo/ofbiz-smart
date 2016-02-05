@@ -42,6 +42,7 @@ import com.avaje.ebean.Query;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
 import com.avaje.ebean.SqlUpdate;
+import com.avaje.ebean.Transaction;
 import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.text.PathProperties;
 
@@ -140,17 +141,29 @@ public class EbeanDelegator implements Delegator {
 
   @Override
   public void rollback() {
-    currentServerMap.get(CURRENT_SERVER_NAME).rollbackTransaction();
+    EbeanServer es = currentServerMap.get(CURRENT_SERVER_NAME);
+    Transaction tx = es.currentTransaction();
+    if (tx != null && tx.isActive()) {
+      tx.rollback();
+    }
   }
 
   @Override
   public void commitTransaction() {
-    currentServerMap.get(CURRENT_SERVER_NAME).commitTransaction();
+    EbeanServer es = currentServerMap.get(CURRENT_SERVER_NAME);
+    Transaction tx = es.currentTransaction();
+    if (tx != null && tx.isActive()) {
+      tx.commit();
+    }
   }
 
   @Override
   public void endTransaction() {
-    currentServerMap.get(CURRENT_SERVER_NAME).endTransaction();
+    EbeanServer es = currentServerMap.get(CURRENT_SERVER_NAME);
+    Transaction tx = es.currentTransaction();
+    if (tx != null && tx.isActive()) {
+      tx.end();
+    }
   }
 
   @Override
@@ -1040,6 +1053,11 @@ public class EbeanDelegator implements Delegator {
 
   @Override
   public void loadSeedData(String seedDataSqlCvs) throws GenericEntityException {
+    loadSeedData(seedDataSqlCvs, false);
+  }
+  
+  @Override
+  public void loadSeedData(String seedDataSqlCvs,boolean executeAnyway) throws GenericEntityException {
     if (CommUtil.isEmpty(seedDataSqlCvs)) {
       return ;
     }
@@ -1050,13 +1068,13 @@ public class EbeanDelegator implements Delegator {
       for (String sqlFile : sqlFileArray) {
         List<String> sqlLine;
         try {
-          if (FlexibleLocation.resolveLocation(sqlFile + "_resolved") != null) {
+          if (!executeAnyway && FlexibleLocation.resolveLocation(sqlFile + "_resolved") != null) {
             Log.i("Seed data sql file [%s] has already been resolved.", TAG,sqlFile);
             continue;
           }
           URL sqlFileURL = FlexibleLocation.resolveLocation(sqlFile);
           if(null == sqlFileURL){
-        	  break ;
+              break ;
           }
           sqlLine = IOUtils.readLines(sqlFileURL.openStream());
           for (String sql : sqlLine) {

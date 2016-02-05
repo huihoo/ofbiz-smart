@@ -12,13 +12,13 @@ public class AppConfigUtilTest {
     Assert.assertEquals("./", acb);
     
     String currentProfile = AppConfigUtil.getProperty("profile");
-    Assert.assertEquals("develop", currentProfile);
+    Assert.assertEquals("test", currentProfile);
     
     String emailHost = AppConfigUtil.getProperty("email.host");
     Assert.assertEquals("mail@qq.com", emailHost);
     
     emailHost = AppConfigUtil.getPropertyByProfile("test","email.host");
-    Assert.assertEquals("127.0.0.1", emailHost);
+    Assert.assertEquals("mail@qq.com", emailHost);
     
     emailHost = AppConfigUtil.getPropertyByProfile("develop","email.host");
     Assert.assertEquals("mail@qq.com", emailHost);

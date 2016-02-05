@@ -111,7 +111,9 @@ public class DelegatorTest extends BaseTestCase {
 
     ids = delegator.findIdsByCond(Customer.class, "{lastName,eq,Peter}");
     Assert.assertEquals(1, ids.size());
-    delegator.useDataSource("mysql").save(customer);
+    
+    
+    
     Map<String, Object> pageResult =
         delegator.findPageByAnd(Customer.class, CommUtil.toMap("lastName", "Peter"), 1, 10);
     Assert.assertNotNull(pageResult);

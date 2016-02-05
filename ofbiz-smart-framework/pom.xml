@@ -71,6 +71,7 @@
 		<mockito.version>1.10.19</mockito.version>
 		<mysql.jdbc.version>5.1.26</mysql.jdbc.version>
 		<h2.database.version>1.4.185</h2.database.version>
+		<hsqldb.version>2.3.3</hsqldb.version>
 	</properties>
 
 
@@ -303,6 +304,15 @@
 			<version>${h2.database.version}</version>
 			<scope>test</scope>
 		</dependency>
+
+
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>${hsqldb.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 
@@ -376,7 +386,7 @@
 				<executions>
 					<execution>
 						<id>main</id>
-						<phase>process-classes</phase>
+						<phase>process-test-classes</phase>
 						<configuration>
 							<classSource>target/test-classes</classSource>
 							<packages>test.entity.**</packages>
