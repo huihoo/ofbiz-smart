@@ -52,11 +52,11 @@ public class DispatchServlet extends HttpServlet {
   
   private volatile boolean useSmartSession;
   /** JSP界面所在跟目录 */
-  private volatile String jspViewBathPath;
+  private volatile String jspViewBathPath ;
   /** 请求uri后缀 */
-  private volatile String uriSuffix;
+  private volatile String uriSuffix ;
   /** http api 类型的请求uri根 */
-  private volatile String httpApiUrlBase;
+  private volatile String httpApiUrlBase ;
   /** rest api 类型的请求uri根 */
   private volatile String restApiUrlBase;
   /** api 文档请求uri根 */
@@ -87,6 +87,7 @@ public class DispatchServlet extends HttpServlet {
 
   protected final void processRequest(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException {
+    Log.d("ContextPath->" + request.getContextPath(), TAG);
     String targetUri = request.getRequestURI().substring(request.getContextPath().length());
     long startTime = System.currentTimeMillis();
     Throwable failureCause = null;
@@ -161,7 +162,6 @@ public class DispatchServlet extends HttpServlet {
     apiDocUriBase = config.getInitParameter("api-doc-uri-base");
     String tmpUss = config.getInitParameter("use-smart-session");
     useSmartSession = Boolean.valueOf(tmpUss == null ? "false": tmpUss);
-    
     if (useSmartSession) {
       SessionRepository<ExpiringSession> sessionRepository =new MapSessionRepository();
       SessionRepositoryFilter<ExpiringSession> filter = new SessionRepositoryFilter<ExpiringSession>(sessionRepository);
@@ -175,13 +175,16 @@ public class DispatchServlet extends HttpServlet {
       jspViewBathPath = "/WEB-INF/views";
     }
     if (CommUtil.isEmpty(uriSuffix)) {
-      uriSuffix = "";
+      uriSuffix = ".htm";
     }
     if (CommUtil.isEmpty(httpApiUrlBase)) {
       httpApiUrlBase = "/api/router";
     }
     if (CommUtil.isEmpty(restApiUrlBase)) {
-      httpApiUrlBase = "/rest";
+      restApiUrlBase = "/rest";
+    }
+    if (CommUtil.isEmpty(apiDocUriBase)) {
+      apiDocUriBase = "/doc";
     }
 
     ServletContext sc = config.getServletContext();

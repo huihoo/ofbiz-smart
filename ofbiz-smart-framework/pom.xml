@@ -72,6 +72,8 @@
 		<mysql.jdbc.version>5.1.26</mysql.jdbc.version>
 		<h2.database.version>1.4.185</h2.database.version>
 		<hsqldb.version>2.3.3</hsqldb.version>
+		<jettyVersion>9.2.14.v20151106</jettyVersion>
+		<okhttp.version>2.7.4</okhttp.version>
 	</properties>
 
 
@@ -310,6 +312,34 @@
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
 			<version>${hsqldb.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>${jettyVersion}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-jmx</artifactId>
+			<version>${jettyVersion}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-webapp</artifactId>
+			<version>${jettyVersion}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.squareup.okhttp</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>${okhttp.version}</version>
 			<scope>test</scope>
 		</dependency>
 
