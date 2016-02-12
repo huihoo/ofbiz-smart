@@ -2,6 +2,9 @@
 <action-map xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="../../../main/resources/META-INF/action-map.xsd">
 
+	<action uri="/testUploadFileOk">
+		<response view-type="json" />
+	</action>
 	
 	<action uri="/testGetContentOk">
 		<service-call service-name="testGetContentOk" />

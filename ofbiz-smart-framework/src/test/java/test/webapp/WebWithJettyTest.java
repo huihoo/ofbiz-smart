@@ -1,5 +1,6 @@
 package test.webapp;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -14,6 +15,7 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.util.ByteArrayISO8859Writer;
+import org.huihoo.ofbiz.smart.base.location.FlexibleLocation;
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.webapp.DispatchServlet;
 import org.junit.After;
@@ -21,7 +23,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.MultipartBuilder;
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
 public class WebWithJettyTest {
@@ -58,9 +63,33 @@ public class WebWithJettyTest {
     Response response = client.newCall(request).execute();
 
     String result = response.body().string();
+    Log.i("result >" + result, TAG);
     Assert.assertEquals(true, result.contains("It works"));
   }
+  
+  @Test
+  public void testUploadFileOk() throws Exception {
+    OkHttpClient client = new OkHttpClient();
+    File file = new File(FlexibleLocation.resolveLocation("/java.jpg").getFile());
+    RequestBody requestBody = new MultipartBuilder()
+                .type(MultipartBuilder.FORM)
+                .addFormDataPart("file", file.getName(),RequestBody.create(MediaType.parse("image/jpeg"), file))
+                .addFormDataPart("some-field", "some-value")
+                .build();
+    
+    com.squareup.okhttp.Request request = new com.squareup.okhttp.Request.Builder()
+                .url("http://127.0.0.1:8080/testUploadFileOk.htm")
+                .post(requestBody)
+                .build();
 
+    Response response = client.newCall(request).execute();
+
+    String result = response.body().string();
+    Log.i("result >" + result, TAG);
+    Assert.assertEquals(true, result.contains("SUCCESS"));
+  }
+
+  @SuppressWarnings("unused")
   private class MockGetContentOkHandler extends AbstractHandler {
     @Override
     public void handle(String s, Request req, HttpServletRequest httpServletRequest,
