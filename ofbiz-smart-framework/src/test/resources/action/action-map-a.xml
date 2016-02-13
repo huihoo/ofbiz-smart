@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <action-map xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="../../../main/resources/META-INF/action-map.xsd">
-
 	<action uri="/testUploadFileOk">
+		<service-call service-name="testUploadFileOk" />
 		<response view-type="json" />
 	</action>
-	
+
 	<action uri="/testGetContentOk">
 		<service-call service-name="testGetContentOk" />
 		<response view-type="json" />
 	</action>
-	
+
 	<action uri="/order/createFail">
 		<service-call service-name="createOrderFail" />
 		<response view-type="json" />
@@ -28,21 +28,21 @@
 		<service-call />
 		<response view-type="json" />
 	</action>
-	
+
 	<action uri="/news/**" process-type="entityAuto">
 		<response view-type="auto" />
 	</action>
-	
+
 	<action uri="/customer/detail" process-type="urlAuto">
 		<response view-type="auto" />
 	</action>
-	
+
 	<action uri="/" process-type="uriAuto">
-		<response view-type="jsp"/>
+		<response view-type="jsp" />
 	</action>
-	
+
 	<action uri="/demo" process-type="uriAuto">
-		<response view-type="jsp" view-name="/demo.jsp"/>
+		<response view-type="jsp" view-name="/demo.jsp" />
 	</action>
 
 </action-map>

@@ -8,6 +8,7 @@ public final class C {
   public static final String ACTION_CONFIG_BASEPATH_KEY = "action.config.basepath";
   
   public static final String SEED_DATA_SQL_FILE_ATTRIBUTE = "seed.data.sql.file";
+  public static final String SEED_DATA_SQL_EXECUTE_ANYWAY_ATTRIBUTE = "seed.data.sql.execute.anyway";
   
   public static final String JSP_VIEW_NAME_ATTRIBUTE = "viewName";
   public static final String JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE = "layoutContentView";

@@ -18,15 +18,15 @@ public class JsonView implements View {
 
   @Override
   public void render(Map<String, Object> model, HttpServletRequest request,
-          HttpServletResponse response) throws ViewException{
-	  response.setContentType(getContentType());
-	  try{
-	      ObjectMapper objectMapper = new ObjectMapper();
-	      response.getWriter().write(objectMapper.writeValueAsString(model));
-		  response.getWriter().flush();
-	  }catch(Exception e){
-		   throw new ViewException(e);
-	  }
+          HttpServletResponse response) throws ViewException {
+    response.setContentType(getContentType());
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      response.getWriter().write(objectMapper.writeValueAsString(model));
+      response.getWriter().flush();
+    } catch (Exception e) {
+      throw new ViewException(e);
+    }
   }
-  
+
 }

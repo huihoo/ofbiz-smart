@@ -3,6 +3,10 @@ package test.webapp;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +20,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.util.ByteArrayISO8859Writer;
 import org.huihoo.ofbiz.smart.base.location.FlexibleLocation;
+import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.webapp.DispatchServlet;
 import org.junit.After;
@@ -43,7 +48,7 @@ public class WebWithJettyTest {
     
     ServletHandler handler = new ServletHandler();
     handler.addServletWithMapping(DispatchServlet.class, "*.htm");
-    handler.addServletWithMapping(DispatchServlet.class, "/api");
+    handler.addServletWithMapping(DispatchServlet.class, "/api/router");
     handler.addServletWithMapping(DispatchServlet.class, "/rest");
     
     context.setHandler(handler);
@@ -78,7 +83,7 @@ public class WebWithJettyTest {
                 .build();
     
     com.squareup.okhttp.Request request = new com.squareup.okhttp.Request.Builder()
-                .url("http://127.0.0.1:8080/testUploadFileOk.htm")
+                .url("http://127.0.0.1:8080/testUploadFileOk.htm?url-filed=url-value")
                 .post(requestBody)
                 .build();
 
@@ -87,6 +92,86 @@ public class WebWithJettyTest {
     String result = response.body().string();
     Log.i("result >" + result, TAG);
     Assert.assertEquals(true, result.contains("SUCCESS"));
+  }
+  
+  
+  @Test
+  public void testRequestApiOk() throws Exception {
+    OkHttpClient client = new OkHttpClient();
+    File file = new File(FlexibleLocation.resolveLocation("/java.jpg").getFile());
+    RequestBody requestBody = new MultipartBuilder()
+                .type(MultipartBuilder.FORM)
+                .addFormDataPart("file", file.getName(),RequestBody.create(MediaType.parse("image/jpeg"), file))
+                .addFormDataPart("some-field", "some-value")
+                .build();
+    String appKey = "201618181818";
+    String method = "smart.service.not.found";
+    String format = "json";
+    String signMethod = "hmac";
+    String timestamp = "" + System.currentTimeMillis();
+    Map<String,String> paraMap = new TreeMap<>();
+    paraMap.put("appKey", appKey);
+    paraMap.put("method", method);
+    paraMap.put("format", format);
+    paraMap.put("signMethod", signMethod);
+    paraMap.put("timestamp", timestamp);
+    String sign = createSignString(paraMap,signMethod);
+    
+    com.squareup.okhttp.Request request = new com.squareup.okhttp.Request.Builder()
+                .url("http://127.0.0.1:8080/api/router?appKey="+appKey+"&method="+method+"&format="+format+"&signMethod="+signMethod+"&timestamp="+timestamp+"&sign="+sign)
+                .post(requestBody)
+                .build();
+
+    Response response = client.newCall(request).execute();
+
+    String result = response.body().string();
+    Log.i("result >" + result, TAG);
+    Assert.assertEquals(true, result.contains("SERVICE_NOT_FOUND"));
+    
+    String fromChannel = "WEB_CHANNEL";
+    String userId = "10000";
+    String paymentMethod = "ALI_PAY";
+    
+    method = "org.huihoo.order.createSuccess";
+    paraMap.put("method", method);
+    paraMap.put("fromChannel", fromChannel);
+    paraMap.put("userId", userId);
+    paraMap.put("paymentMethod", paymentMethod);
+    sign = createSignString(paraMap,signMethod);
+    request = new com.squareup.okhttp.Request.Builder()
+            .url("http://127.0.0.1:8080/api/router?appKey="+appKey
+              +"&method="+method
+              +"&format="+format
+              +"&signMethod="+signMethod
+              +"&timestamp="+timestamp
+              +"&sign="+sign
+              +"&fromChannel="+fromChannel
+              +"&userId="+userId
+              +"&paymentMethod="+paymentMethod
+              )
+            .post(requestBody)
+            .build();
+    response = client.newCall(request).execute();
+    result = response.body().string();
+    Log.i("result >" + result, TAG);
+    Assert.assertEquals(true, result.contains("SUCCESS"));
+  }
+  
+  private String createSignString(Map<String,String> params,String signMethod) {
+    StringBuilder sb = new StringBuilder();
+    String appSecret = "df4fb8750ef7130947e41b48b3fbb815";
+    Iterator<Entry<String, String>> iter = params.entrySet().iterator();
+    while (iter.hasNext()) {
+      Entry<String, String> entry = iter.next();
+      sb.append(entry.getKey()).append(entry.getValue());
+    }
+    String sign = "";
+    if ("md5".equals(signMethod)) {
+      sign = CommUtil.md5(appSecret + sb.toString() + appSecret);
+    } else if ("hmac".equals(signMethod)) {
+      sign = CommUtil.hmacSha1(sb.toString(), appSecret);
+    }
+    return sign;
   }
 
   @SuppressWarnings("unused")

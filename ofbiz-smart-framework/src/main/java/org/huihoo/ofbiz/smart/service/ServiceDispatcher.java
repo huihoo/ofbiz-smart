@@ -347,8 +347,8 @@ public class ServiceDispatcher {
         sm.location = sClazz.getName();
         sm.invoke = method.getName();
         sm.name = sd.name();
+        sm.apiAlias = sd.apiAlias();
         sm.description = sd.description();
-        
         sm.persist = sd.persist();
         sm.transaction = sd.transaction();
         if(!sm.transaction){

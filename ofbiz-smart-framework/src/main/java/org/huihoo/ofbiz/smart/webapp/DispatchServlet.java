@@ -289,10 +289,11 @@ public class DispatchServlet extends HttpServlet {
   protected void loadSeedData(ServletContext servletContext){
     //Load seed data
     String seedDataSqlFile = AppConfigUtil.getProperty(C.SEED_DATA_SQL_FILE_ATTRIBUTE);
+    boolean executeAnyway = Boolean.valueOf(AppConfigUtil.getProperty(C.SEED_DATA_SQL_EXECUTE_ANYWAY_ATTRIBUTE,"false"));
     if (CommUtil.isNotEmpty(seedDataSqlFile)) {
       Delegator delegator = (Delegator) servletContext.getAttribute(C.CTX_DELETAGOR);
       try {
-        delegator.loadSeedData(seedDataSqlFile);
+        delegator.loadSeedData(seedDataSqlFile,executeAnyway);
       } catch (GenericEntityException e) {
         Log.e(e, e.getMessage(),TAG);
       }

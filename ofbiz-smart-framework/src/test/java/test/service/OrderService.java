@@ -41,6 +41,7 @@ public class OrderService {
   @ServiceDefinition(
     name = "createOrderSuccess"
     ,apiAlias = "org.huihoo.order.createSuccess"
+    ,export = true
     ,description = "成功创建订单"
     ,parameters = {
         @Parameter(name = "fromChannel",optinal = false,mode="IN", description = "订单来源")

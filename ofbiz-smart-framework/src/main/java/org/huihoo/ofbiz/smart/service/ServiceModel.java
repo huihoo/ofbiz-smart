@@ -9,6 +9,7 @@ import org.huihoo.ofbiz.smart.service.annotation.Parameter;
 public class ServiceModel implements Serializable {
   private static final long serialVersionUID = 1L;
   public String name;
+  public String apiAlias;
   public String location;
   public String invoke;
   public String engineName;
@@ -20,12 +21,14 @@ public class ServiceModel implements Serializable {
   public boolean transaction = false;
   public transient Class<? extends ServiceCallback>[] callback;
   public transient Parameter[] parameters;
-
+  
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
     builder.append("ServiceModel [name=");
     builder.append(name);
+    builder.append(", apiAlias=");
+    builder.append(apiAlias);
     builder.append(", location=");
     builder.append(location);
     builder.append(", invoke=");
@@ -51,6 +54,4 @@ public class ServiceModel implements Serializable {
     builder.append("]");
     return builder.toString();
   }
-
-
 }
