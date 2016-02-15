@@ -10,6 +10,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.huihoo.ofbiz.smart.base.C;
+import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.entity.Delegator;
 import org.huihoo.ofbiz.smart.entity.GenericEntityException;
@@ -28,6 +29,7 @@ public class SelectOptionTag extends TagSupport {
   private String valueName = "id";
   private Object currentValue;
   private String condition;
+  private String orderBy;
   private boolean useCache;
   private int liveTimeInSeconds;
 
@@ -38,8 +40,13 @@ public class SelectOptionTag extends TagSupport {
       Delegator delegator = (Delegator) pageContext.getServletContext().getAttribute(C.CTX_DELETAGOR);
       
       Set<String> fieldsToSelect = new LinkedHashSet<>();
-      List<String> orderBy = Arrays.asList(new String[]{});
-      List<?> allObjects = (List<?>) delegator.findListByCond(clazz,condition,fieldsToSelect,orderBy,useCache,liveTimeInSeconds);
+      List<String> orderByList = Arrays.asList(new String[]{});
+      if (CommUtil.isNotEmpty(orderBy)) {
+        String[] orderByToken = orderBy.split(",");
+        orderByList = Arrays.asList(orderByToken);
+      }
+      
+      List<?> allObjects = (List<?>) delegator.findListByCond(clazz,condition,fieldsToSelect,orderByList,useCache,liveTimeInSeconds);
       
       StringBuilder optionSb = new StringBuilder();
       for (Object obj : allObjects) {
@@ -156,6 +163,20 @@ public class SelectOptionTag extends TagSupport {
 
   public void setUseCache(boolean useCache) {
     this.useCache = useCache;
+  }
+
+
+
+
+  public String getOrderBy() {
+    return orderBy;
+  }
+
+
+
+
+  public void setOrderBy(String orderBy) {
+    this.orderBy = orderBy;
   }
 
 }

@@ -175,6 +175,16 @@
 
 		<attribute>
 			<description>
+					排序字符串，多个字段以逗号分隔(如id asc,createdAt desc)
+				</description>
+			<name>orderBy</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+
+		<attribute>
+			<description>
 					useCache
 				</description>
 			<name>useCache</name>
@@ -190,6 +200,8 @@
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
+
+
 	</tag>
 
 	<tag>
@@ -242,6 +254,15 @@
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 
+		<attribute>
+			<description>
+					排序字符串，多个字段以逗号分隔(如id asc,createdAt desc)
+				</description>
+			<name>orderBy</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		
 		<attribute>
 			<description>
 					useCache

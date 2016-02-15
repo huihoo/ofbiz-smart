@@ -1,5 +1,6 @@
 package org.huihoo.ofbiz.smart.webapp.taglib;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,6 +25,7 @@ public class ServiceCallTag extends TagSupport {
   private String resultName;
   private String paramPairs;
   private String condition;
+  private String orderBy;
   private boolean useCache;
   private int liveTimeInSeconds;
 
@@ -54,7 +56,9 @@ public class ServiceCallTag extends TagSupport {
     
     webCtx.put(C.ENTITY_USE_CACHE, useCache);
     webCtx.put(C.ENTITY_LIVETIMEIN_SECONDS, liveTimeInSeconds);
-    
+    if (CommUtil.isNotEmpty(orderBy)) {
+      webCtx.put(C.ENTITY_ORDERBY,Arrays.asList(orderBy.split(",")));
+    }
     
     if (serviceName.startsWith(ServiceEngineType.ENTITY_AUTO.value() + "#")) {
       sm.name = serviceName;
@@ -132,5 +136,13 @@ public class ServiceCallTag extends TagSupport {
 
   public void setUseCache(boolean useCache) {
     this.useCache = useCache;
+  }
+
+  public String getOrderBy() {
+    return orderBy;
+  }
+
+  public void setOrderBy(String orderBy) {
+    this.orderBy = orderBy;
   }
 }
