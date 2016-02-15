@@ -265,7 +265,7 @@
 		<description>
 			国际化标签
 		</description>
-		<name>serviceCall</name>
+		<name>i18n</name>
 		<tagclass>org.huihoo.ofbiz.smart.webapp.taglib.I18nTag</tagclass>
 		<attribute>
 			<description>
