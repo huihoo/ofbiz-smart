@@ -92,6 +92,7 @@ public class WebAppTest {
   @Test
   public void testDispatchServletInit() throws ServletException, IOException {
     when(context.getAttribute(C.APPLICATION_CONFIG_PROP_KEY)).thenReturn(applicationConfig);
+    when(context.getAttribute(C.CTX_DELETAGOR)).thenReturn(delegator);
     when(config.getInitParameter("jsp-view-base-path")).thenReturn("");
     when(config.getInitParameter("uri-suffix")).thenReturn("");
     when(config.getInitParameter("http-api-uri-base")).thenReturn("/api");
