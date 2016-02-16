@@ -23,7 +23,7 @@ import ognl.OgnlException;
 
 public class EntityConverter {
   
-  private static final String[] INGORE_INCLUDED_NAME = {"_ctx","ebean","action.config."};
+  private static final String[] INGORE_INCLUDED_NAME = {"_ctx","ebean","action.config.","condition","resultName","orderBy","andMap"};
   
   private static final String TAG = EntityConverter.class.getName();
   
