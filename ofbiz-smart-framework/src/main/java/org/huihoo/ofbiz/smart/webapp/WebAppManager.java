@@ -113,7 +113,7 @@ public class WebAppManager {
       if (t.startsWith("requestScope.")) {
         val = req.getParameter( t.substring("requestScope.".length()) );
       } else if (t.startsWith("sessionScope.")){
-        val = req.getSession().getAttribute( t.substring("requestScope.".length()) );
+        val = req.getSession().getAttribute( t.substring("sessionScope.".length()) );
       }
       if (CommUtil.isEmpty(val)) {
         val = "";
@@ -151,7 +151,7 @@ public class WebAppManager {
         if (t.startsWith("requestScope.")) {
           val = req.getParameter( t.substring("requestScope.".length()) );
         } else if (t.startsWith("sessionScope.")){
-          val = req.getSession().getAttribute( t.substring("requestScope.".length()) );
+          val = req.getSession().getAttribute( t.substring("sessionScope.".length()) );
         }
         if (CommUtil.isEmpty(val)) {
           val = "";
@@ -173,17 +173,7 @@ public class WebAppManager {
   
   public static String parseCondition(String condition,HttpServletRequest req) {
     StringBuilder sb = new StringBuilder();
-    List<Integer> braceIdxList = new ArrayList<>();
-    if (CommUtil.isNotEmpty(condition)) {
-      char[] chars = condition.toCharArray();
-      int clen = chars.length;
-      for (int i = 0; i < clen; i++) {
-        int c = (int) chars[i];
-        if (c == 123 || c == 125) {
-          braceIdxList.add(i);
-        }
-      }
-    }
+    List<Integer> braceIdxList = buildBraceList(condition);
     if (!braceIdxList.isEmpty()) {
       int bsize = braceIdxList.size();
       if (bsize % 2 == 0) {
@@ -197,7 +187,7 @@ public class WebAppManager {
           if (tmpVal.startsWith("requestScope.")) {
             val = req.getParameter( tmpVal.substring("requestScope.".length()) );
           } else if (tmpVal.startsWith("sessionScope.")) {
-            val = req.getSession().getAttribute( tmpVal.substring("requestScope.".length()) );
+            val = req.getSession().getAttribute( tmpVal.substring("sessionScope.".length()) );
           }
           if (CommUtil.isNotEmpty(val)) {
             sb.append("{")
@@ -261,6 +251,53 @@ public class WebAppManager {
     return sb.toString();
   }
   
+  public static String parseRedirectUrl(String redirectUrl,Map<String,Object> modelMap,HttpServletRequest req) {
+    StringBuilder sb = new StringBuilder(redirectUrl);
+    List<Integer> braceIdxList = buildBraceList(redirectUrl);
+    if (!braceIdxList.isEmpty()) {
+      int bsize = braceIdxList.size();
+      if (bsize % 2 == 0) {
+        for (int j = 0; j < bsize; j++) {
+          int fromIdx = braceIdxList.get(j) + 1;
+          int toIdx = braceIdxList.get(++j);
+          String tmpExpr = redirectUrl.substring(fromIdx,toIdx);
+          Object val = "";
+          if (tmpExpr.startsWith("requestScope.")) {
+            val = req.getParameter( tmpExpr.substring("requestScope.".length()) );
+          } else if (tmpExpr.startsWith("sessionScope.")) {
+            val = req.getSession().getAttribute( tmpExpr.substring("sessionScope.".length()) );
+          } else if (tmpExpr.equalsIgnoreCase("uriSuffix")) {
+            WebAppContext wac = (WebAppContext) req.getServletContext().getAttribute("webAppContext");
+            val = wac.uriSuffix;
+          } else {
+            try {
+              val = Ognl.getValue(tmpExpr, modelMap);
+            } catch (OgnlException e) {
+              Log.w("Unable to get %s's value of [%s]", TAG,tmpExpr,modelMap);
+            }
+          }
+          sb.replace(fromIdx - 1, toIdx + 1, "" + val);
+        }
+      }
+    }
+    Log.d("Origal redirectUrl[%s] parsed redirectUrl[%s]", TAG,redirectUrl,sb);
+    return sb.toString();
+  }
+  
+  public static List<Integer> buildBraceList(String str) {
+    List<Integer> braceIdxList = new ArrayList<>();
+    if (CommUtil.isNotEmpty(str)) {
+      char[] chars = str.toCharArray();
+      int clen = chars.length;
+      for (int i = 0; i < clen; i++) {
+        int c = (int) chars[i];
+        if (c == 123 || c == 125) {
+          braceIdxList.add(i);
+        }
+      }
+    }
+    return braceIdxList;
+  }
   
   public static void setModelAsRequestAttributies(Map<String, Object> model, HttpServletRequest request) {
     for (Map.Entry<String, Object> entry : model.entrySet()) {

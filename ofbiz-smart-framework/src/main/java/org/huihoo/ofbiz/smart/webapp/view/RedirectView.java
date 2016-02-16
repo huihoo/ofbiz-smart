@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
+import org.huihoo.ofbiz.smart.webapp.WebAppManager;
 
 public class RedirectView implements View {
   
@@ -36,7 +37,7 @@ public class RedirectView implements View {
         redirectUrl = request.getContextPath() + "/" ;
       }
     }
-    
+    redirectUrl = WebAppManager.parseRedirectUrl(redirectUrl, model, request);
     // Remove CR and LF characters to prevent CRLF injection
     String sanitizedLocation = redirectUrl.replaceAll("(\\r|\\n|%0D|%0A|%0a|%0d)", "");
     String encodedRedirectURL = response.encodeRedirectURL(sanitizedLocation);
