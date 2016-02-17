@@ -145,6 +145,7 @@ public class WebAppTest {
   }
   
   
+  @SuppressWarnings("rawtypes")
   @Test
   public void testRequestForJsonViewFail() throws Exception {
     //JspView
@@ -168,6 +169,7 @@ public class WebAppTest {
     Assert.assertEquals(true, jsonMap.containsKey("validation_errors"));
   }
   
+  @SuppressWarnings("rawtypes")
   @Test
   public void testRequestForJsonViewSuccess() throws Exception {
     String viewName = "";
