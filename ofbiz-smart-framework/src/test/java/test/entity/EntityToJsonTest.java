@@ -5,9 +5,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
+import org.junit.Assert;
 import org.junit.Test;
 
+import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,8 +18,14 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
+
+
+
+
 public class EntityToJsonTest {
-  @SuppressWarnings("deprecation")
+  ObjectMapper objectMapper = new ObjectMapper();
+  
+  
   @Test
   public void testIt() throws JsonProcessingException {
     Person p = new Person();
@@ -33,15 +42,37 @@ public class EntityToJsonTest {
 
     Map<String, Object> result = new LinkedHashMap<>();
     result.put("person", p);
-
-    ObjectMapper objectMapper = new ObjectMapper();
-    FilterProvider filterProvider = new SimpleFilterProvider().addFilter("jsonFilter",
-            SimpleBeanPropertyFilter.serializeAllExcept(new String[] {"person"}));
-    objectMapper.setFilterProvider(filterProvider);
-    objectMapper.addMixInAnnotations(Car.class, JsonFilterMixIn.class);
-    
+    setFilter(result,objectMapper);
     String json = objectMapper.writeValueAsString(result);
     Log.d("json>" + json, EntityToJsonTest.class.getName());
+    Assert.assertEquals(false, json.contains("cars"));
+  }
+  
+  @SuppressWarnings("deprecation")
+  private static void setFilter(Map<String, Object> result,ObjectMapper objectMapper) {
+    //org.huihoo.foo.A(a1,a2)#org.huihoo.foo.B(b1,b2)
+    String smartJsonFilter = "test.entity.Person(cars)";//AppConfigUtil.getProperty("smart.json.filter");
+    if (CommUtil.isNotEmpty(smartJsonFilter)) {
+      String[] jfToken = smartJsonFilter.split("#");
+      for (String t : jfToken) {
+        int leftBracketIdx = t.indexOf("(");
+        int rightBracketIdx = t.indexOf(")");
+        if (leftBracketIdx >= 0 && rightBracketIdx >= 0) {
+          try {
+            Class<?> clz = Class.forName(t.substring(0,leftBracketIdx));
+            String[] fft = t.substring(leftBracketIdx + 1,rightBracketIdx).split(","); 
+            
+            FilterProvider filterProvider = new SimpleFilterProvider().addFilter("jsonFilter",
+                                SimpleBeanPropertyFilter.serializeAllExcept(fft));
+            objectMapper.setFilterProvider(filterProvider);
+            objectMapper.addMixInAnnotations(clz, JsonFilterMixIn.class);
+
+          } catch (ClassNotFoundException e) {
+            
+          }
+        }
+      }
+    }
   }
 
   @JsonFilter("jsonFilter")
@@ -51,7 +82,7 @@ public class EntityToJsonTest {
 }
 
 
-class Person {
+class Person extends Model{
   private int id;
   private String username;
   private String drivingLicense;
@@ -91,7 +122,7 @@ class Person {
 }
 
 
-class Car {
+class Car extends Model{
   private int id;
   private String licensePlate;
   private Person person;
