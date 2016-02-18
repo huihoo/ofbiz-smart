@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -37,7 +38,7 @@ public class CommUtil {
   public static final String TAG = CommUtil.class.getName();
   public static final int INDEX_NOT_FOUND = -1;
   public static final int NOT_FOUND = -1;
-  
+
   private final static ThreadLocal<SimpleDateFormat> yyyyMMddFormater = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
@@ -54,17 +55,57 @@ public class CommUtil {
     return true;
   }
 
-  public static String clearXss(String input) {
-    if (isNotEmpty(input))
-      return StringEscapeUtil.escapeEcmaScript( StringEscapeUtil.escapeHtml4(input) );
-    return input;
+
+
+  public static String stripXSS(String value) {
+    if (value != null) {
+      // NOTE: It's highly recommended to use the ESAPI library and uncomment the following line to
+      // avoid encoded attacks.
+      // value = ESAPI.encoder().canonicalize(value);
+      // Avoid null characters
+      value = value.replaceAll("", "");
+      // Avoid anything between script tags
+      Pattern scriptPattern = Pattern.compile("<script>(.*?)</script>", Pattern.CASE_INSENSITIVE);
+      value = scriptPattern.matcher(value).replaceAll("");
+      // Avoid anything in a src="http://www.yihaomen.com/article/java/..." type of e­xpression
+      scriptPattern = Pattern.compile("src[\r\n]*=[\r\n]*\\\'(.*?)\\\'",
+          Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+      value = scriptPattern.matcher(value).replaceAll("");
+      scriptPattern = Pattern.compile("src[\r\n]*=[\r\n]*\\\"(.*?)\\\"",
+          Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+      value = scriptPattern.matcher(value).replaceAll("");
+      // Remove any lonesome </script> tag
+      scriptPattern = Pattern.compile("</script>", Pattern.CASE_INSENSITIVE);
+      value = scriptPattern.matcher(value).replaceAll("");
+      // Remove any lonesome <script ...> tag
+      scriptPattern = Pattern.compile("<script(.*?)>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+      value = scriptPattern.matcher(value).replaceAll("");
+      // Avoid eval(...) e­xpressions
+      scriptPattern = Pattern.compile("eval\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+      value = scriptPattern.matcher(value).replaceAll("");
+      // Avoid e­xpression(...) e­xpressions
+      scriptPattern =
+          Pattern.compile("e­xpression\\((.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+      value = scriptPattern.matcher(value).replaceAll("");
+      // Avoid javascript:... e­xpressions
+      scriptPattern = Pattern.compile("javascript:", Pattern.CASE_INSENSITIVE);
+      value = scriptPattern.matcher(value).replaceAll("");
+      // Avoid vbscript:... e­xpressions
+      scriptPattern = Pattern.compile("vbscript:", Pattern.CASE_INSENSITIVE);
+      value = scriptPattern.matcher(value).replaceAll("");
+      // Avoid onload= e­xpressions
+      scriptPattern = Pattern.compile("onload(.*?)=", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+      value = scriptPattern.matcher(value).replaceAll("");
+    }
+    return value;
   }
-  
-  public static String[] clearXss(String[] input) {
-    if (input != null) {
-      String[] newInput = new String[input.length];
-      for(int i = 0; i < newInput.length; i++) {
-        newInput[i] = StringEscapeUtil.escapeEcmaScript( StringEscapeUtil.escapeHtml4(input[i]));
+
+
+  public static String[] stripXSS(String[] value) {
+    if (value != null) {
+      String[] newInput = new String[value.length];
+      for (int i = 0; i < newInput.length; i++) {
+        newInput[i] = stripXSS(value[i]);
       }
       return newInput;
     }

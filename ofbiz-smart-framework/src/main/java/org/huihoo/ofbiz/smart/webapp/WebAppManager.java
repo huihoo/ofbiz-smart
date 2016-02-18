@@ -65,7 +65,7 @@ public class WebAppManager {
           String name = item.getFieldName();
           InputStream stream = item.openStream();
           if (item.isFormField()) {
-            String val = CommUtil.clearXss(Streams.asString(stream, C.UTF_8));
+            String val = CommUtil.stripXSS(Streams.asString(stream, C.UTF_8));
             ctx.put(name, val);
             req.setAttribute(name, val);
           } else {
@@ -83,12 +83,13 @@ public class WebAppManager {
       Enumeration<String> parameterNames = req.getParameterNames();
       while (parameterNames.hasMoreElements()) {
         String parameterName = parameterNames.nextElement();
-        String value = CommUtil.clearXss(req.getParameter(parameterName)) ;
+        String rawValue = req.getParameter(parameterName);
+        String value = CommUtil.stripXSS(rawValue) ;
         if (CommUtil.isNotEmpty(value)) {
           ctx.put(parameterName, value);
           req.setAttribute(parameterName, value);
         } else {
-          String[] arrayValue = CommUtil.clearXss(req.getParameterValues(parameterName));
+          String[] arrayValue = CommUtil.stripXSS(req.getParameterValues(parameterName));
           if (CommUtil.isNotEmpty(arrayValue) && CommUtil.isNotEmpty(arrayValue[0])) {
             ctx.put(parameterName, arrayValue);
             req.setAttribute(parameterName, arrayValue);
