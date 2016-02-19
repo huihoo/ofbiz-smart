@@ -44,7 +44,9 @@ public class ServiceCallTag extends TagSupport {
     
     if (CommUtil.isNotEmpty(paramPairs)) {
       String p = WebAppManager.parseParamPairString(paramPairs, req);
-      webCtx.put(C.ENTITY_ANDMAP, ServiceUtil.covertParamPairToMap(p));
+      Map<String,Object> paramMap = ServiceUtil.covertParamPairToMap(p);
+      webCtx.put(C.ENTITY_ANDMAP, paramMap);
+      webCtx.putAll(paramMap);
     }
     
     if (CommUtil.isNotEmpty(condition)) {

@@ -797,8 +797,8 @@ public class EbeanDelegator implements Delegator {
         continue;
       }
 
-      // NOTICE (cond.indexOf(C.EXPR_OR) >= 0) MUST BE HERE...
-      if (cond.indexOf(C.EXPR_OR) >= 0) {
+      // NOTICE (cond.indexOf("," + C.EXPR_OR + ",") >= 0) MUST BE HERE...
+      if (cond.indexOf("," + C.EXPR_OR + ",") >= 0) {
         String[] condToken = cond.split("," + C.EXPR_OR + ",");
         String leftCond = condToken[0];
         String rightCond = condToken[1];
