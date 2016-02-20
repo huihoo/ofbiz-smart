@@ -52,8 +52,14 @@ public class SelectOptionTag extends TagSupport {
       for (Object obj : allObjects) {
         String select = "";
         Object id = Ognl.getValue(valueName, obj);
-        if (id != null && String.valueOf(id).equals(String.valueOf(currentValue))) {
+        String idstr = String.valueOf(id);
+        String cstr = String.valueOf(currentValue);
+        if (id != null && idstr.equals(cstr)) {
           select = "selected='selected'";
+        } else {
+          if (CommUtil.isNotEmpty(cstr) && cstr.indexOf(",") >= 0 && Arrays.asList(cstr.split(",")).contains(idstr)) {
+            select = "selected='selected'";
+          }
         }
         optionSb.append("<option value='"+id+"' "+select+">"+Ognl.getValue(labelName, obj)+"</option>").append(lineSepa);
       }
