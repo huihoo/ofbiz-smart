@@ -1,7 +1,7 @@
 package org.huihoo.ofbiz.smart.webapp;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -13,11 +13,10 @@ import java.util.Map.Entry;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.fileupload.util.Streams;
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.util.AppConfigUtil;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
@@ -56,22 +55,20 @@ public class WebAppManager {
       }
       int fileSizeMax = Integer.parseInt(AppConfigUtil.getProperty("file.upload.per.sizeinmb.max", "5"));
       int sizeMax = Integer.parseInt(AppConfigUtil.getProperty("file.upload.sizeinmb.max", "10"));
-     
-      ServletFileUpload upload = new ServletFileUpload();
+      DiskFileItemFactory f = new DiskFileItemFactory();
+      f.setRepository((File)req.getServletContext().getAttribute(C.TEMP_DIR_CONTEXT_ATTRIBUTE));
+      f.setSizeThreshold(1024*8);
+      ServletFileUpload upload = new ServletFileUpload(f);
       upload.setHeaderEncoding(C.UTF_8); 
       upload.setFileSizeMax(1024L * 1024 * fileSizeMax);
       upload.setSizeMax(1024L * 1024 * sizeMax);
-      FileItemIterator iter;
       try {
         Map<String,String> multiValueMap = new LinkedHashMap<>();
-        iter = upload.getItemIterator(req);
-        while (iter.hasNext()) {
-          FileItemStream item = iter.next();
-          String name = item.getFieldName();
-          InputStream stream = item.openStream();
-          
-          if (item.isFormField()) {
-            String val = CommUtil.stripXSS(Streams.asString(stream, C.UTF_8));
+        List<FileItem> fiList = upload.parseRequest(req);
+        for (FileItem fi : fiList) {
+          String name = fi.getFieldName();
+          if (fi.isFormField()) {
+            String val = CommUtil.stripXSS(fi.getString(C.UTF_8));
             if (multiValueMap.containsKey(name)) { //多个值的处理
               ctx.remove(name);
               req.removeAttribute(name);
@@ -80,15 +77,17 @@ public class WebAppManager {
               multiValueMap.put(name, val);
               ctx.put(name, val);
               req.setAttribute(name, val);
-            }            
+            }       
           } else {
-            if (fileUploadHandler != null) {
-              String fileName = item.getName();
-              String contentType = item.getContentType();
-              ctx.putAll(fileUploadHandler.handle(name,fileName,contentType,stream, ctx));
+            long size = fi.getSize();
+            if (size >0 && fileUploadHandler != null) {
+              String fileName = fi.getName();
+              String contentType = fi.getContentType();
+              ctx.putAll(fileUploadHandler.handle(name,fileName,contentType,fi.getInputStream(), ctx));
             }
           }
         }
+        
         //多个值转换为数组
         Iterator<Entry<String, String>> mIter = multiValueMap.entrySet().iterator();
         while (mIter.hasNext()) {
