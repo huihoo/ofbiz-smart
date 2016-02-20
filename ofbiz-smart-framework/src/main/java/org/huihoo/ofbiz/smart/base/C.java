@@ -14,7 +14,15 @@ public final class C {
   public static final String JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE = "layoutContentView";
   
   public static final String REDIRECT_FLAG_ATTRIBUTE = "redirect://";
-  
+  //========================================================================================
+  // Multipart File Suffix Attribute
+  // ========================================================================================
+  public static final String MF_FILE_SAVED_FILE = "_file_saved_file";
+  public static final String MF_FILE_FIELD_NAME = "_file_field_name";
+  public static final String MF_FILE_NEW_NAME = "_file_new_name";
+  public static final String MF_FILE_ORIGAL_NAME = "_file_origal_name";
+  public static final String MF_FILE_CONTENT_TYPE = "_file_content_type";
+  public static final String MF_FILE_SIZE = "_file_size";
   // ========================================================================================
   // Servlet spec related attributies
   // ========================================================================================

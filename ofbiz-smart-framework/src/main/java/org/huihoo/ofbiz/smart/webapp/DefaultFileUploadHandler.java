@@ -80,12 +80,12 @@ public class DefaultFileUploadHandler implements FileUploadHandler {
       IOUtils.copy(inputStream, fos);
       Map<String,Object> resultMap = ServiceUtil.returnSuccess();
       resultMap.put(fieldName, fileRelativePath);
-      resultMap.put(fieldName + "_file_saved_file", targetFile);
-      resultMap.put(fieldName + "_file_field_name", fieldName);
-      resultMap.put(fieldName + "_file_new_name", fileNewName);
-      resultMap.put(fieldName + "_file_origal_name", fileName);
-      resultMap.put(fieldName + "_file_content_type", contentType);
-      resultMap.put(fieldName + "_file_size", targetFile.length());
+      resultMap.put(fieldName + C.MF_FILE_SAVED_FILE, targetFile);
+      resultMap.put(fieldName + C.MF_FILE_FIELD_NAME, fieldName);
+      resultMap.put(fieldName + C.MF_FILE_NEW_NAME, fileNewName);
+      resultMap.put(fieldName + C.MF_FILE_ORIGAL_NAME, fileName);
+      resultMap.put(fieldName + C.MF_FILE_CONTENT_TYPE, contentType);
+      resultMap.put(fieldName + C.MF_FILE_SIZE, targetFile.length());
       return resultMap; 
     } catch (Exception e) {
       Log.e(e, "Save File occurs an exception.", TAG);
