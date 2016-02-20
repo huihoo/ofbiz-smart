@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -53,27 +56,49 @@ public class WebAppManager {
       }
       int fileSizeMax = Integer.parseInt(AppConfigUtil.getProperty("file.upload.per.sizeinmb.max", "5"));
       int sizeMax = Integer.parseInt(AppConfigUtil.getProperty("file.upload.sizeinmb.max", "10"));
+     
       ServletFileUpload upload = new ServletFileUpload();
       upload.setHeaderEncoding(C.UTF_8); 
       upload.setFileSizeMax(1024L * 1024 * fileSizeMax);
       upload.setSizeMax(1024L * 1024 * sizeMax);
       FileItemIterator iter;
       try {
+        Map<String,String> multiValueMap = new LinkedHashMap<>();
         iter = upload.getItemIterator(req);
         while (iter.hasNext()) {
           FileItemStream item = iter.next();
           String name = item.getFieldName();
           InputStream stream = item.openStream();
+          
           if (item.isFormField()) {
             String val = CommUtil.stripXSS(Streams.asString(stream, C.UTF_8));
-            ctx.put(name, val);
-            req.setAttribute(name, val);
+            if (multiValueMap.containsKey(name)) { //多个值的处理
+              ctx.remove(name);
+              req.removeAttribute(name);
+              multiValueMap.put(name, multiValueMap.get(name) + "," + val);
+            } else {
+              multiValueMap.put(name, val);
+              ctx.put(name, val);
+              req.setAttribute(name, val);
+            }            
           } else {
             if (fileUploadHandler != null) {
               String fileName = item.getName();
               String contentType = item.getContentType();
               ctx.putAll(fileUploadHandler.handle(name,fileName,contentType,stream, ctx));
             }
+          }
+        }
+        //多个值转换为数组
+        Iterator<Entry<String, String>> mIter = multiValueMap.entrySet().iterator();
+        while (mIter.hasNext()) {
+          Entry<String, String>  entry = mIter.next();
+          String ekey = entry.getKey();
+          String eval = entry.getValue();
+          if (CommUtil.isNotEmpty(eval) && eval.indexOf(",") >= 0) {
+            String[] eArray = eval.split(",");
+            ctx.put(ekey, eArray);
+            req.setAttribute(ekey, eArray);
           }
         }
       } catch (FileUploadException | IOException e) {
