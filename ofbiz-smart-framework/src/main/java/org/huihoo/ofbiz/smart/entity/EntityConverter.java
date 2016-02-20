@@ -23,11 +23,21 @@ import ognl.OgnlException;
 
 public class EntityConverter {
   
-  private static final String[] INGORE_INCLUDED_NAME = {"_ctx","ebean","action.config.","condition","resultName","orderBy","andMap"};
+  private static final String[] INGORE_INCLUDED_NAME = {"_ctx","ebean",
+                                                        "action.config.",
+                                                        "condition",
+                                                        "resultName",
+                                                        "orderBy",
+                                                        "error",
+                                                        "message",
+                                                        "andMap"
+                                                        };
   
   private static final String TAG = EntityConverter.class.getName();
   
   private static final SimpleDateFormat FULL_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+  
+  private static final SimpleDateFormat YMDHM_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm");
   
   private static final SimpleDateFormat SIMPLE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
   
@@ -95,8 +105,10 @@ public class EntityConverter {
         } else {
           String sValue = (String) value;
           try {
-            if (sValue.length() > 10) {
+            if (sValue.length() == 19) {
               result = FULL_FORMATTER.parse(sValue);
+            } else if (sValue.length() == 16) {
+              result = YMDHM_FORMATTER.parse(sValue);
             } else {
               result = SIMPLE_FORMATTER.parse(sValue);
             }
