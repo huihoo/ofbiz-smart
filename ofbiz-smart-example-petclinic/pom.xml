@@ -13,8 +13,6 @@
 		<h2.version>1.4.185</h2.version>
 		<junit.version>4.11</junit.version>
 		<mockito.version>1.10.19</mockito.version>
-
-		<dnxtech.tsp.version>0.9.8.13</dnxtech.tsp.version>
 		<sonar.language>java</sonar.language>
 	</properties>
 
@@ -24,9 +22,6 @@
 			<artifactId>ofbiz-smart-framework</artifactId>
 			<version>${smart.version}</version>
 		</dependency>
-
-
-
 
 		<dependency>
 			<groupId>com.h2database</groupId>
@@ -47,8 +42,6 @@
 			<version>${mockito.version}</version>
 			<scope>test</scope>
 		</dependency>
-
-
 	</dependencies>
 
 	<build>
