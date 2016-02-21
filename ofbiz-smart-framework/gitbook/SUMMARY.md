@@ -1,10 +1,8 @@
 # Summary
 
 * [OFBiz Smart](section_intro/index.md)
-  * [OFBiz Smart是由来](section_intro/where_from.md)
-  * [OFBiz Smart的特点](section_intro/features.md)
-  * [OFBiz Smart的参考](section_intro/ref.md)
-  * [OFBiz Smart能解决什么问题](section_intro/solve.md)
+  * [OFBiz Smart简介](section_intro/intro.md)
+  * [OFBiz Smart的特性](section_intro/features.md)
   * [OFBiz Smart的架构](section_intro/arch.md)
 * [第一个Webapp](section_first_app/index.md)
   * [项目结构](section_first_app/project.md)
