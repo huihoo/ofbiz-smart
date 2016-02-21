@@ -9,7 +9,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.7</java.version>
-		<smart.version>1.0.0-SNAPSHOT</smart.version>
+		<smart.version>1.0.1-SNAPSHOT</smart.version>
 		<h2.version>1.4.185</h2.version>
 		<junit.version>4.11</junit.version>
 		<mockito.version>1.10.19</mockito.version>

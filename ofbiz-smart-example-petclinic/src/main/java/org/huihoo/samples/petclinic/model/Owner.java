@@ -68,7 +68,5 @@ public class Owner extends Person {
     builder.append(pets);
     builder.append("]");
     return builder.toString();
-  }
-  
-  
+  }  
 }
