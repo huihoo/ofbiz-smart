@@ -4,7 +4,7 @@
 
 ## BaseModel.java
 
-```
+```java
 @MappedSuperclass
 public class BaseModel {
   @Id
@@ -62,7 +62,7 @@ public class BaseModel {
 
 ## NamedModel.java
 
-```
+```java
 @MappedSuperclass
 public class NamedModel extends BaseModel {
   @Required
@@ -80,7 +80,7 @@ public class NamedModel extends BaseModel {
 
 ## Owner.java
 
-```
+```java
 @Entity
 @Table(name = "owners")
 public class Owner extends Person {
@@ -146,7 +146,7 @@ public class Owner extends Person {
 
 ## Person.java
 
-```
+```java
 @MappedSuperclass
 public class Person extends BaseModel {
 
@@ -187,7 +187,7 @@ public class Person extends BaseModel {
 
 ## Pet.java
 
-```
+```java
 @Entity
 @Table(name = "pets")
 public class Pet extends NamedModel {
@@ -251,7 +251,7 @@ public class Pet extends NamedModel {
 
 ## PetType.java
 
-```
+```java
 @Entity
 @Table(name = "pet_types")
 public class PetType extends NamedModel {
@@ -271,7 +271,7 @@ public class Specialty extends NamedModel {
 
 ## Vet.java
 
-```
+```java
 @Entity
 @Table(name = "vets")
 public class Vet extends Person {
@@ -291,7 +291,7 @@ public class Vet extends Person {
 
 ## Visit.java
 
-```
+```java
 @Entity
 @Table(name = "visits")
 public class Visit extends BaseModel {

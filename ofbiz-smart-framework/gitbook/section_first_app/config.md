@@ -2,7 +2,7 @@
 
 ## web.xml
 
-```
+```java
    <servlet>
 		<servlet-name>SmartServlet</servlet-name>
 		<servlet-class>org.huihoo.ofbiz.smart.webapp.DispatchServlet</servlet-class>
@@ -42,14 +42,14 @@
 
 ## application.properties
 
-```
+```java
 profile=develop
 active.profiles=develop
 ```
 
 ### application-develop.properties
 
-```
+```java
 action.config.basepath=/action
 entity.scanning.packages=org.huihoo.samples.petclinic.model.**
 service.scanning.resource.names=org.huihoo.samples.petclinic.service
@@ -84,7 +84,7 @@ datasource.h2.databaseDriver=org.h2.Driver
 
 ## seed_data.sql(初始化数据)
 
-```
+```java
 INSERT INTO vets VALUES (1, 'James', 'Carter','2016-01-01 00:00:00','2016-01-01 00:00:00');
 INSERT INTO vets VALUES (2, 'Helen', 'Leary','2016-01-01 00:00:00','2016-01-01 00:00:00');
 INSERT INTO vets VALUES (3, 'Linda', 'Douglas','2016-01-01 00:00:00','2016-01-01 00:00:00');

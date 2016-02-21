@@ -1,6 +1,6 @@
 # 项目结构
 
-```
+```java
 
 ofbiz-smart-example-petclinic
  |-src
