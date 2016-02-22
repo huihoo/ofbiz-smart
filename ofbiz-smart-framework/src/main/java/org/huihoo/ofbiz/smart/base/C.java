@@ -15,6 +15,15 @@ public final class C {
   
   public static final String REDIRECT_FLAG_ATTRIBUTE = "redirect://";
   //========================================================================================
+  // Flash Scope Attribute
+  // ========================================================================================
+  public static final String FLASH_SCOPE_MAP_ATTRIBUTE = "flashMap";
+  public static final String FLASH_SCOPE_VALIDATION_ERRORS_ATTRIBUTE = "validationErrors";
+  public static final String FLASH_SCOPE_ERROR_MESSAGE_ATTRIBUTE = "errorMessage";
+  public static final String FLASH_SCOPE_ERROR_ATTRIBUTE = "error";
+  public static final String FLASH_SCOPE_SUCCESS_FLAG_ATTRIBUTE = "successFlag";
+  
+  //========================================================================================
   // Multipart File Suffix Attribute
   // ========================================================================================
   public static final String MF_FILE_SAVED_FILE = "_file_saved_file";

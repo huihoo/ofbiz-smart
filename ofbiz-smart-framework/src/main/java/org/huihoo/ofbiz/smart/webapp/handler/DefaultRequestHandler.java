@@ -302,7 +302,10 @@ public class DefaultRequestHandler implements RequestHandler {
     
     //For JspView,RedirectView
     String viewName = (String) req.getAttribute(C.JSP_VIEW_NAME_ATTRIBUTE);
-    if (ServiceUtil.isSuccess(result)) {      
+    if (ServiceUtil.isSuccess(result)) { 
+      if (result.containsKey(C.FLASH_SCOPE_SUCCESS_FLAG_ATTRIBUTE)) {
+        req.getSession().setAttribute(C.FLASH_SCOPE_SUCCESS_FLAG_ATTRIBUTE, true);
+      }
       boolean overrideRedirectFlag = false;
       if (reqAction.response != null && "redirect".equals(reqAction.response.viewType)) {
         viewName = reqAction.response.viewName;
@@ -350,18 +353,20 @@ public class DefaultRequestHandler implements RequestHandler {
         Log.d("layoutContentView : " + viewName, TAG);
         view.render(modelMap, req, resp);
         //clear temp object in session.
-        req.getSession().removeAttribute("flashMap");
-        req.getSession().removeAttribute("validationErrors");
-        req.getSession().removeAttribute("errorMessage");
-        req.getSession().removeAttribute("error");
+        req.getSession().removeAttribute(C.FLASH_SCOPE_MAP_ATTRIBUTE);
+        req.getSession().removeAttribute(C.FLASH_SCOPE_VALIDATION_ERRORS_ATTRIBUTE);
+        req.getSession().removeAttribute(C.FLASH_SCOPE_ERROR_MESSAGE_ATTRIBUTE);
+        req.getSession().removeAttribute(C.FLASH_SCOPE_ERROR_ATTRIBUTE);
+        req.getSession().removeAttribute(C.FLASH_SCOPE_SUCCESS_FLAG_ATTRIBUTE);
       }
     } else {
       if ("post".equalsIgnoreCase(req.getMethod())) {
         //add temp object in session for next uri can get it.
-        req.getSession().setAttribute("flashMap", webCtx);
-        req.getSession().setAttribute("validationErrors", result.get(C.RESPOND_VALIDATION_ERRORS));
-        req.getSession().setAttribute("errorMessage", result.get(ServiceUtil.RESPONSE_MESSAGE));
-        req.getSession().setAttribute("error", result.get(ServiceUtil.RESPOND_ERROR));
+        req.getSession().setAttribute(C.FLASH_SCOPE_MAP_ATTRIBUTE, webCtx);
+        req.getSession().setAttribute(C.FLASH_SCOPE_VALIDATION_ERRORS_ATTRIBUTE, result.get(C.RESPOND_VALIDATION_ERRORS));
+        req.getSession().setAttribute(C.FLASH_SCOPE_ERROR_MESSAGE_ATTRIBUTE, result.get(ServiceUtil.RESPONSE_MESSAGE));
+        req.getSession().setAttribute(C.FLASH_SCOPE_ERROR_ATTRIBUTE, result.get(ServiceUtil.RESPOND_ERROR));
+        req.getSession().setAttribute(C.FLASH_SCOPE_SUCCESS_FLAG_ATTRIBUTE, ServiceUtil.isSuccess(result));
         //redirect to last uri
         String referer = req.getHeader("referer");
         String queryString = req.getQueryString();
