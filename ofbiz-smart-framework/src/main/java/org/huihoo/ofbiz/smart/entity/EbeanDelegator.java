@@ -576,6 +576,7 @@ public class EbeanDelegator implements Delegator {
     return findListByRawQuery(query, params, false);
   }
 
+  
   @SuppressWarnings("unchecked")
   @Override
   public List<Map<String, Object>> findListByRawQuery(String query, List<?> params, boolean useCache)
@@ -1117,5 +1118,49 @@ public class EbeanDelegator implements Delegator {
         }   
     }   
     return sb.toString();   
+  }
+
+  @Override
+  public Map<String, Object> findUniqueByRawQuery(String query, List<?> params) throws GenericEntityException {
+    return findUniqueByRawQuery(query,params,-1);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Map<String, Object> findUniqueByRawQuery(String query, List<?> params, int liveTimeInSeconds)
+      throws GenericEntityException {
+    try {
+      String cacheKey = getCacheKey("findUniqueByRawQuery",getClass(),params);
+      if (liveTimeInSeconds >= 0) {
+        Map<String, Object> cachedMap = (Map<String, Object>) CACHE.get(cacheKey);
+        if (cachedMap != null) {
+          Log.d("findUniqueByRawQuery[" + cacheKey + "]from cache.", TAG);
+          return cachedMap;
+        }
+      }
+      
+      SqlQuery sq = currentServerMap.get(CURRENT_SERVER_NAME).createSqlQuery(query);
+      if (CommUtil.isNotEmpty(params)) {
+        for (int i = 0; i < params.size(); i++) {
+          sq.setParameter(i + 1, params.get(i));
+        }
+      }
+      Map<String, Object> rowMap = new HashMap<>();
+      SqlRow row = sq.findUnique();
+      if (row != null) {
+        Iterator<String> cKeys = row.keys();
+        while (cKeys.hasNext()) {
+          String k = cKeys.next();
+          rowMap.put(k, row.get(k));
+        }
+      }
+      if (CommUtil.isNotEmpty(rowMap) && liveTimeInSeconds >= 0) {
+        CACHE.put(cacheKey, rowMap,liveTimeInSeconds);
+      }
+      return rowMap;
+    } catch (Exception e) {
+      Log.e(e, "EbeanDeletagor.findUniqueByRawQuery() occurs an exception.", TAG);
+      throw new GenericEntityException(e);
+    }
   }
 }

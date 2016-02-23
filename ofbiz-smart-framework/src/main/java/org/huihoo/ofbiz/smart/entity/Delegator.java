@@ -216,6 +216,9 @@ public interface Delegator {
   // ======================================================================================
   // Raw Query And Operation
   // =====================================================================================
+  Map<String, Object> findUniqueByRawQuery(String query, List<?> params) throws GenericEntityException;
+  Map<String, Object> findUniqueByRawQuery(String query, List<?> params,int liveTimeInSeconds) throws GenericEntityException;
+  
   List<Map<String, Object>> findListByRawQuery(String query, List<?> params) throws GenericEntityException;
 
   List<Map<String, Object>> findListByRawQuery(String query, List<?> params, 
