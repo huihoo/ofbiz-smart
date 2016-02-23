@@ -21,8 +21,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
@@ -246,7 +248,32 @@ public class CommUtil {
     return hexString.toString();
   }
 
-
+  public static Map<String, Object> convertUnderscoreKeyMapToCamelKeyMap(Map<String, Object> map) {
+    Map<String, Object> newMap = new HashMap<String, Object>();
+    Set<String> keys = map.keySet();
+    Iterator<String> kIter = keys.iterator();
+    while (kIter.hasNext()) {
+      String key = kIter.next();
+      if (key.indexOf("_") != -1) {
+        StringTokenizer st = new StringTokenizer(key, "_");
+        StringBuilder newKey = new StringBuilder();
+        int j = 0;
+        while (st.hasMoreElements()) {
+          String k = st.nextToken();
+          if (j == 0) {
+            newKey.append(k);
+          } else {
+            newKey.append(k.substring(0, 1).toUpperCase() + k.substring(1));
+          }
+          j++;
+        }
+        newMap.put(newKey.toString(), map.get(key));
+      } else {
+        newMap.put(key, map.get(key));
+      }
+    }
+    return newMap;
+  }
 
   public static String underscore(String camelString) {
 
