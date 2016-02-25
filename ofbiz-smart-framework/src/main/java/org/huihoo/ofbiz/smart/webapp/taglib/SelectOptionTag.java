@@ -2,6 +2,7 @@ package org.huihoo.ofbiz.smart.webapp.taglib;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,6 +34,7 @@ public class SelectOptionTag extends TagSupport {
   private boolean useCache;
   private int liveTimeInSeconds;
 
+  @SuppressWarnings("rawtypes")
   @Override
   public int doStartTag() throws JspException {
     try {
@@ -53,14 +55,27 @@ public class SelectOptionTag extends TagSupport {
         String select = "";
         Object id = Ognl.getValue(valueName, obj);
         String idstr = String.valueOf(id);
-        String cstr = String.valueOf(currentValue);
-        if (id != null && idstr.equals(cstr)) {
-          select = "selected='selected'";
+        
+        if (currentValue != null && currentValue instanceof Collection) {
+          Collection collection = (Collection) currentValue;
+          for (Object object : collection) {
+            Object cid = Ognl.getValue("id", object);
+            if (idstr.equals(String.valueOf(cid))) {
+              select = "selected='selected'";
+              break;
+            }
+          }
         } else {
-          if (CommUtil.isNotEmpty(cstr) && cstr.indexOf(",") >= 0 && Arrays.asList(cstr.split(",")).contains(idstr)) {
+          String cstr = String.valueOf(currentValue);
+          if (id != null && idstr.equals(cstr)) {
             select = "selected='selected'";
+          } else {
+            if (CommUtil.isNotEmpty(cstr) && cstr.indexOf(",") >= 0 && Arrays.asList(cstr.split(",")).contains(idstr)) {
+              select = "selected='selected'";
+            }
           }
         }
+        
         optionSb.append("<option value='"+id+"' "+select+">"+Ognl.getValue(labelName, obj)+"</option>").append(lineSepa);
       }
       Log.d("Select :" + optionSb, TAG);
