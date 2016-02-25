@@ -71,7 +71,7 @@ public class StandardJavaEngine extends GenericAsyncEngine {
     } catch (Throwable e) {
       String msg = String.format("Service[%s] call[%s] failed.", serviceModel.location,serviceModel.invoke);
       Log.w(msg, TAG);
-      throw new GenericServiceException(msg);
+      throw new GenericServiceException(e);
     }
   }
 }
