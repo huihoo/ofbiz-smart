@@ -23,6 +23,7 @@ import java.util.Set;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+import org.huihoo.ofbiz.smart.base.util.AppConfigUtil;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 
@@ -32,7 +33,8 @@ import ognl.OgnlException;
 
 public class EntityConverter {
 
-  private static final String[] INGORE_INCLUDED_NAME =
+  
+  private static final String[] INNER_INGORE_INCLUDED_NAME =
       {"_ctx", "ebean", "action.config.", "condition", "resultName", "orderBy", "error", "message", "andMap"};
 
   private static final String TAG = EntityConverter.class.getName();
@@ -142,11 +144,23 @@ public class EntityConverter {
   }
 
   private static boolean isIngore(String name) {
-    for (String s : INGORE_INCLUDED_NAME) {
+    
+    for (String s : INNER_INGORE_INCLUDED_NAME) {
       if (name.indexOf(s) >= 0) {
         return true;
       }
     }
+    
+    String excludeFields = AppConfigUtil.getProperty("smart.coonvert.exclude.fields");
+    if (CommUtil.isNotEmpty(excludeFields)) {
+      String[] excludeFieldArray = excludeFields.split(",");
+      for (String s : excludeFieldArray) {
+        if (name.indexOf(s) >= 0) {
+          return true;
+        }
+      }
+    }
+    
     return false;
   }
 
