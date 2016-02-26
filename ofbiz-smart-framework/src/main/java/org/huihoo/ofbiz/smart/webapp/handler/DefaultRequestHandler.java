@@ -2,6 +2,7 @@ package org.huihoo.ofbiz.smart.webapp.handler;
 
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -92,6 +93,15 @@ public class DefaultRequestHandler implements RequestHandler {
             webCtx.put(C.ENTITY_CONDTION, WebAppManager.parseCondition(serviceCall.condition, req));
           } else {
             webCtx.put(C.ENTITY_CONDTION, WebAppManager.parseConditionFromQueryString(req));
+          }
+          //set orderBy
+          if (CommUtil.isNotEmpty(serviceCall.orderBy)) {
+            webCtx.put(C.ENTITY_ORDERBY, serviceCall.orderBy);
+          } else {
+            String orderBy = (String) webCtx.get("order");
+            if (CommUtil.isNotEmpty(orderBy)) {
+              webCtx.put(C.ENTITY_ORDERBY, Arrays.asList(orderBy.split(",")));
+            }
           }
           //entityAuto service
           if (serviceCall.serviceName.startsWith( ServiceEngineType.ENTITY_AUTO.value() + "#") ) {
