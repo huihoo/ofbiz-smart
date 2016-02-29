@@ -96,7 +96,7 @@ public class DefaultRequestHandler implements RequestHandler {
           }
           //set orderBy
           if (CommUtil.isNotEmpty(serviceCall.orderBy)) {
-            webCtx.put(C.ENTITY_ORDERBY, serviceCall.orderBy);
+            webCtx.put(C.ENTITY_ORDERBY, Arrays.asList(serviceCall.orderBy.split(",")));
           } else {
             String orderBy = (String) webCtx.get("order");
             if (CommUtil.isNotEmpty(orderBy)) {
