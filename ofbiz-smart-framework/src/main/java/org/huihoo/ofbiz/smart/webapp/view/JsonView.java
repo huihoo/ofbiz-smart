@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.util.AppConfigUtil;
 import org.huihoo.ofbiz.smart.base.util.CommUtil;
+import org.huihoo.ofbiz.smart.base.util.Log;
 
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +17,8 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 public class JsonView implements View {
+  private static final String TAG= JsonView.class.getName();
+  
   private volatile ObjectMapper objectMapper = new ObjectMapper();
   private volatile boolean setFlag = false;
   
@@ -55,9 +58,12 @@ public class JsonView implements View {
           setFlag = true;
         }
       }
-      response.getWriter().write(objectMapper.writeValueAsString(model));
+      String jsonBody = objectMapper.writeValueAsString(model);
+      Log.d("jsonBody>" + jsonBody, TAG);
+      response.getWriter().write(jsonBody);
       response.getWriter().flush();
     } catch (Exception e) {
+      Log.e(e, "Render Json Has an exception : " + e.getMessage(), TAG);
       throw new ViewException(e);
     }
   }
