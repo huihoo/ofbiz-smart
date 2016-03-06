@@ -39,7 +39,7 @@ public class SelectOptionTag extends TagSupport {
   public int doStartTag() throws JspException {
     try {
       Class<?> clazz = Class.forName(className);
-      Delegator delegator = (Delegator) pageContext.getServletContext().getAttribute(C.CTX_DELETAGOR);
+      Delegator delegator = (Delegator) pageContext.getServletContext().getAttribute(C.CTX_DELEGATOR);
       
       Set<String> fieldsToSelect = new LinkedHashSet<>();
       List<String> orderByList = Arrays.asList(new String[]{});
