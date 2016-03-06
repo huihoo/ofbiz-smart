@@ -35,10 +35,10 @@ public class WebAppManager {
   
   public static Map<String, Object> buildWebCtx(HttpServletRequest req) {
     ServletContext sc = req.getServletContext();
-    Delegator delegator = (Delegator) sc.getAttribute(C.CTX_DELETAGOR);
+    Delegator delegator = (Delegator) sc.getAttribute(C.CTX_DELEGATOR);
     ServiceDispatcher serviceDispatcher =(ServiceDispatcher) sc.getAttribute(C.CTX_SERVICE_DISPATCHER);
     
-    Map<String, Object> ctx = CommUtil.toMap(C.CTX_DELETAGOR, delegator
+    Map<String, Object> ctx = CommUtil.toMap(C.CTX_DELEGATOR, delegator
                                             ,C.CTX_SERVICE_DISPATCHER, serviceDispatcher
                                             ,C.CTX_WEB_HTTP_SERVLET_REQUEST, req
     );
@@ -334,5 +334,23 @@ public class WebAppManager {
         request.removeAttribute(modelName);
       }
     }
+  }
+  
+  
+  public static String getClientIp(HttpServletRequest request) {
+    String ip = request.getHeader("x-forwarded-for");
+    if (CommUtil.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getHeader("Proxy-Client-IP");
+    }
+    if (CommUtil.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getHeader("WL-Proxy-Client-IP");
+    }
+    if (CommUtil.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getRemoteAddr();
+    }
+    if (ip != null && ip.indexOf(",") >= 0) {
+      ip = ip.substring(0, ip.indexOf(","));
+    }
+    return ip;
   }
 }
