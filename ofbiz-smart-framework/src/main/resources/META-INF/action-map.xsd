@@ -67,7 +67,7 @@
 
 							
 
-							<xs:element name="service-call" maxOccurs="unbounded">
+							<xs:element name="service-call" maxOccurs="unbounded" >
 								<xs:annotation>
 									<xs:documentation>
 										<![CDATA[
@@ -77,6 +77,19 @@
 								</xs:annotation>
 								<xs:complexType>
 									<xs:attributeGroup ref="attlist.service"></xs:attributeGroup>
+								</xs:complexType>
+							</xs:element>
+							
+							<xs:element name="custom-web-call" maxOccurs="1">
+								<xs:annotation>
+									<xs:documentation>
+										<![CDATA[
+											自定义action调用
+										]]>
+									</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attributeGroup ref="attlist.web-call"></xs:attributeGroup>
 								</xs:complexType>
 							</xs:element>
 
@@ -256,6 +269,32 @@
 				<xs:documentation>
 					<![CDATA[
 						缓存有效时间，0为一直有效
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		
+
+	</xs:attributeGroup>
+	
+	
+	<xs:attributeGroup name="attlist.web-call">
+	
+		<xs:attribute name="location">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						自定义Action的路径
+					]]>
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+
+		<xs:attribute name="invoke">
+			<xs:annotation>
+				<xs:documentation>
+					<![CDATA[
+						要调用的方法
 					]]>
 				</xs:documentation>
 			</xs:annotation>
