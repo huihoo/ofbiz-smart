@@ -329,6 +329,9 @@ public class DefaultRequestHandler implements RequestHandler {
                                                         String entityNameInUri,
                                                         HttpServletRequest req,
                                                         HttpServletResponse resp,WebAppContext wac) throws ViewException {
+    if (view == null) {
+      view = wac.viewCache.get("jsp");
+    }
     if (result == null) {
       view.render(modelMap, req, resp);
       return ;
@@ -385,7 +388,11 @@ public class DefaultRequestHandler implements RequestHandler {
           req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, wac.jspViewBasePath + layout);
           if (req.getAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE) == null) {
             if ( !(wac.jspViewBasePath + layout).equals(viewName) ) {
-              req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, wac.jspViewBasePath + viewName);
+              if (viewName.startsWith(wac.jspViewBasePath)) {
+                req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, viewName);
+              } else {
+                req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, wac.jspViewBasePath + viewName);
+              }
             }
           }
         }
