@@ -169,7 +169,7 @@ public class EbeanDelegator implements Delegator {
   @Override
   public void save(Collection<?> entities) throws GenericEntityException {
     try {
-      currentServerMap.get(CURRENT_SERVER_NAME).save(entities);
+      currentServerMap.get(CURRENT_SERVER_NAME).saveAll(entities);
     } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.save() occurs an exception.", TAG);
       throw new GenericEntityException(e);
@@ -189,7 +189,7 @@ public class EbeanDelegator implements Delegator {
   @Override
   public void update(Collection<?> entities) throws GenericEntityException {
     try {
-      currentServerMap.get(CURRENT_SERVER_NAME).update(entities);
+      currentServerMap.get(CURRENT_SERVER_NAME).updateAll(entities);
     } catch (Exception e) {
       Log.e(e, "EbeanDeletagor.update() occurs an exception.", TAG);
       throw new GenericEntityException(e);

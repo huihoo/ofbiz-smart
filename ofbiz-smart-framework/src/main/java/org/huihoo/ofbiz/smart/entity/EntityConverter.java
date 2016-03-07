@@ -168,7 +168,6 @@ public class EntityConverter {
   private static DefaultTypeConverter entityTypeConvertor = new DefaultTypeConverter() {
     @Override
     public Object convertValue(Map context, Object value, Class toType) {
-      Log.i("toType[%s] value[%s]", TAG, toType, value);
       Object result = null;
       if (toType == Date.class) {
         if (CommUtil.isEmpty(value)) {

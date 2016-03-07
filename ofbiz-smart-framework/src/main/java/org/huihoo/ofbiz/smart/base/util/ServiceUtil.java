@@ -20,7 +20,7 @@ public class ServiceUtil {
     if (ctx == null) {
       return null;
     }
-    return (Delegator) ctx.get(C.CTX_DELETAGOR);
+    return (Delegator) ctx.get(C.CTX_DELEGATOR);
   }
   
   public static boolean isSuccess(Map<String, Object> result) {

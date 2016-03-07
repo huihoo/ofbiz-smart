@@ -28,6 +28,8 @@ public class ActionModel implements Serializable {
     
     public String moreJavascripts;
 
+    public CustomWebCall customWebCall ;
+    
     public List<ServiceCall> serviceCallList = new ArrayList<>();
     
     public Response response;
@@ -86,6 +88,12 @@ public class ActionModel implements Serializable {
     
   }
 
+  public static class CustomWebCall implements Serializable {
+    private static final long serialVersionUID = 1L;
+    public String location;
+    public String invoke;
+  }
+  
   public static class ServiceCall implements Serializable {
     private static final long serialVersionUID = 1L;
     public String serviceName;

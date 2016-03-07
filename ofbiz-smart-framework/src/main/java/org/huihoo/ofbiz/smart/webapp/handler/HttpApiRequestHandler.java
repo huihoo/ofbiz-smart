@@ -58,8 +58,8 @@ public class HttpApiRequestHandler implements RequestHandler {
     String apiQuerySql = AppConfigUtil.getProperty("smart.api.apps.query.sql",APP_QUERY_SQL);
     WebAppContext wac = (WebAppContext) req.getServletContext().getAttribute("webAppContext");
     ServiceDispatcher serviceDispatcher = wac.serviceDispatcher;
-    Delegator delegator = (Delegator) req.getServletContext().getAttribute(C.CTX_DELETAGOR);    
-    Map<String, Object> ctx = CommUtil.toMap(C.CTX_DELETAGOR, delegator
+    Delegator delegator = (Delegator) req.getServletContext().getAttribute(C.CTX_DELEGATOR);    
+    Map<String, Object> ctx = CommUtil.toMap(C.CTX_DELEGATOR, delegator
                                             ,C.CTX_SERVICE_DISPATCHER, serviceDispatcher
                                             ,C.CTX_WEB_HTTP_SERVLET_REQUEST, req
     );

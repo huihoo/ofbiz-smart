@@ -12,6 +12,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.Action;
+import org.huihoo.ofbiz.smart.webapp.ActionModel.CustomWebCall;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.Response;
 import org.huihoo.ofbiz.smart.webapp.ActionModel.ServiceCall;
 import org.xml.sax.Attributes;
@@ -102,6 +103,12 @@ public class ActionModelXmlConfigLoader {
           action.requireAuth = Boolean.valueOf(attributes.getValue("require-auth") == null ? "false" : attributes.getValue("auth"));
           action.processType = attributes.getValue("process-type") == null ? "byConfig" : attributes.getValue("process-type");
           action.queryCondition = attributes.getValue("query-condition");
+          break;
+        case "custom-web-call":
+          CustomWebCall customWebCall = new CustomWebCall();
+          customWebCall.location = attributes.getValue("location");
+          customWebCall.invoke = attributes.getValue("invoke");
+          action.customWebCall = customWebCall;
           break;
         case "service-call":
           ServiceCall serviceCall = new ServiceCall();

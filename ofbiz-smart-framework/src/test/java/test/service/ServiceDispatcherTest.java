@@ -26,7 +26,7 @@ public class ServiceDispatcherTest extends BaseTestCase {
   @Test
   public void testAllInOne() throws GenericServiceException {
     Log.d("start testing.....", TAG);
-    Map<String, Object> ctx = CommUtil.toMap(C.CTX_DELETAGOR, delegator);
+    Map<String, Object> ctx = CommUtil.toMap(C.CTX_DELEGATOR, delegator);
     ServiceDispatcher serviceDispatcher = new ServiceDispatcher(delegator);
     Map<String,Object> resultMap = serviceDispatcher.runSync("serviceNotFound", ctx);
     Log.d("resultMap > " + resultMap, TAG);

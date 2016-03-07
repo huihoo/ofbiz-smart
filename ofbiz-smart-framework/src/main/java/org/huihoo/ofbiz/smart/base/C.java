@@ -46,7 +46,9 @@ public final class C {
   // Context Related Flag
   // ========================================================================================
   public static final String APPLICATION_CONFIG_PROP_KEY = "_ctx_application_config_properties_";
+  @Deprecated
   public static final String CTX_DELETAGOR = "_ctx_deletagor_"; 
+  public static final String CTX_DELEGATOR = "_ctx_deletagor_"; 
   public static final String CTX_SERVICE_DISPATCHER = "_ctx_service_dispatcher_"; 
   public static final String CTX_WEB_HTTP_SERVLET_REQUEST = "_ctx_httpservletrequest_"; 
   public static final String CTX_WEB_HTTP_SERVLET_RESPONSE = "_ctx_httpservletresponse_"; 

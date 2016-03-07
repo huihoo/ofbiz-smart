@@ -2,9 +2,13 @@ package org.huihoo.ofbiz.smart.webapp.handler;
 
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -43,7 +47,7 @@ public class DefaultRequestHandler implements RequestHandler {
   private final static Cache<String,String> ENTITY_CLAZZ_NAME_CACHE = 
                    (Cache<String,String>) SimpleCacheManager.createCache("Request-Handler-EntityClazz-Cache");
   
-  
+  private final static Map<String, Class<?>> CUSTOM_WEB_CALL_CLAZZ_MAP = new ConcurrentHashMap<>();
   
   @Override
   public void handleRequest(HttpServletRequest req, HttpServletResponse resp)
@@ -73,6 +77,31 @@ public class DefaultRequestHandler implements RequestHandler {
         resp.sendError(400, "Un supported method : " + method);
         return ;
       }
+      
+      //Custom web call
+      if (reqAction.customWebCall != null) {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        Class<?> c = CUSTOM_WEB_CALL_CLAZZ_MAP.get(reqAction.customWebCall.location);
+        try {
+          if (!C.PROFILE_PRODUCTION.equalsIgnoreCase(AppConfigUtil.getProperty("profile"))) {
+            c = null;
+          }
+          if (c == null) {
+             c = cl.loadClass(reqAction.customWebCall.location);
+             CUSTOM_WEB_CALL_CLAZZ_MAP.put(reqAction.customWebCall.location, c);
+          }
+          MethodHandles.Lookup lookup = MethodHandles.lookup();
+          MethodType methodType = MethodType.methodType(void.class, new Class<?>[]{HttpServletRequest.class,HttpServletResponse.class});
+          MethodHandle mh = lookup.findStatic(c, reqAction.customWebCall.invoke, methodType);
+          mh.invoke(req,resp);
+        } catch (Throwable e) {
+          String msg = String.format("Custom Web Call[%s][%s] failed.", reqAction.customWebCall.location,reqAction.customWebCall.invoke);
+          Log.w(msg, TAG);
+          throw new ServletException(e);
+        }
+        return ;
+      }
+      
       Map<String, Object> modelMap = ServiceUtil.returnSuccess();
       //build web ctx for service call.
       Map<String, Object> webCtx = WebAppManager.buildWebCtx(req);
@@ -96,7 +125,7 @@ public class DefaultRequestHandler implements RequestHandler {
           }
           //set orderBy
           if (CommUtil.isNotEmpty(serviceCall.orderBy)) {
-            webCtx.put(C.ENTITY_ORDERBY, serviceCall.orderBy);
+            webCtx.put(C.ENTITY_ORDERBY, Arrays.asList(serviceCall.orderBy.split(",")));
           } else {
             String orderBy = (String) webCtx.get("order");
             if (CommUtil.isNotEmpty(orderBy)) {

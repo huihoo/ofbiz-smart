@@ -202,7 +202,7 @@ public class DispatchServlet extends HttpServlet {
   protected void initWebContext(ServletContext servletContext) throws ServletException {
     try {
       Delegator delegator = new EbeanDelegator();
-      servletContext.setAttribute(C.CTX_DELETAGOR, delegator);
+      servletContext.setAttribute(C.CTX_DELEGATOR, delegator);
       loadAppConfig(servletContext);
     } catch (GenericEntityException e) {
       throw new ServletException("Unable to initialize Delegator.");
@@ -213,7 +213,7 @@ public class DispatchServlet extends HttpServlet {
   
   protected void loadAppConfig(ServletContext servletContext) throws GenericServiceException {
     //NOTICE 以下对象可以重新加载,除了Delegator
-    ServiceDispatcher serviceDispatcher = new ServiceDispatcher((Delegator)servletContext.getAttribute(C.CTX_DELETAGOR));
+    ServiceDispatcher serviceDispatcher = new ServiceDispatcher((Delegator)servletContext.getAttribute(C.CTX_DELEGATOR));
     servletContext.setAttribute(C.CTX_SERVICE_DISPATCHER, serviceDispatcher);
     String actionConfigBasePath = AppConfigUtil.getProperty(C.ACTION_CONFIG_BASEPATH_KEY, "./");
     List<ActionModel> actionModels = new ArrayList<>();
@@ -291,7 +291,7 @@ public class DispatchServlet extends HttpServlet {
     String seedDataSqlFile = AppConfigUtil.getProperty(C.SEED_DATA_SQL_FILE_ATTRIBUTE);
     boolean executeAnyway = Boolean.valueOf(AppConfigUtil.getProperty(C.SEED_DATA_SQL_EXECUTE_ANYWAY_ATTRIBUTE,"false"));
     if (CommUtil.isNotEmpty(seedDataSqlFile)) {
-      Delegator delegator = (Delegator) servletContext.getAttribute(C.CTX_DELETAGOR);
+      Delegator delegator = (Delegator) servletContext.getAttribute(C.CTX_DELEGATOR);
       try {
         delegator.loadSeedData(seedDataSqlFile,executeAnyway);
       } catch (GenericEntityException e) {

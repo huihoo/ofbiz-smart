@@ -40,7 +40,7 @@ public class SelectOptionTagTest {
     tag.setPageContext(pageContext);
     Mockito.when(pageContext.getServletContext()).thenReturn(servletContext);
     Mockito.when(pageContext.getRequest()).thenReturn(httpServletRequest);
-    Mockito.when(pageContext.getServletContext().getAttribute(C.CTX_DELETAGOR)).thenReturn(delegator);
+    Mockito.when(pageContext.getServletContext().getAttribute(C.CTX_DELEGATOR)).thenReturn(delegator);
     Mockito.when(httpServletRequest.getContextPath()).thenReturn(CURRENT_CONTEXT);
     Mockito.when(pageContext.getOut()).thenReturn(jspWriter);
   }

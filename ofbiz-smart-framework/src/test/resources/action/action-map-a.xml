@@ -8,6 +8,7 @@
 
 	<action uri="/testGetContentOk">
 		<service-call service-name="testGetContentOk" />
+		
 		<response view-type="json" />
 	</action>
 
