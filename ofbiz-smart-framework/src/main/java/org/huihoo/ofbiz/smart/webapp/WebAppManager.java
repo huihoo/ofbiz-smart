@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -33,7 +34,7 @@ public class WebAppManager {
   
   private static volatile FileUploadHandler fileUploadHandler;
   
-  public static Map<String, Object> buildWebCtx(HttpServletRequest req) {
+  public static Map<String, Object> buildWebCtx(HttpServletRequest req,HttpServletResponse resp) {
     ServletContext sc = req.getServletContext();
     Delegator delegator = (Delegator) sc.getAttribute(C.CTX_DELEGATOR);
     ServiceDispatcher serviceDispatcher =(ServiceDispatcher) sc.getAttribute(C.CTX_SERVICE_DISPATCHER);
@@ -41,6 +42,7 @@ public class WebAppManager {
     Map<String, Object> ctx = CommUtil.toMap(C.CTX_DELEGATOR, delegator
                                             ,C.CTX_SERVICE_DISPATCHER, serviceDispatcher
                                             ,C.CTX_WEB_HTTP_SERVLET_REQUEST, req
+                                            ,C.CTX_WEB_HTTP_SERVLET_RESPONSE,resp
     );
     
     boolean isMultipart = ServletFileUpload.isMultipartContent(req);

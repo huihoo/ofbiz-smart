@@ -104,7 +104,7 @@ public class DefaultRequestHandler implements RequestHandler {
       
       Map<String, Object> modelMap = ServiceUtil.returnSuccess();
       //build web ctx for service call.
-      Map<String, Object> webCtx = WebAppManager.buildWebCtx(req);
+      Map<String, Object> webCtx = WebAppManager.buildWebCtx(req,resp);
       //calling all available configured service
       Map<String, Object> lastResult = null; 
       List<ServiceCall> serviceCalls = reqAction.serviceCallList;
