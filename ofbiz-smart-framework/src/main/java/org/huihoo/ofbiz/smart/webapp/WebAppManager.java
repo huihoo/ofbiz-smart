@@ -109,21 +109,29 @@ public class WebAppManager {
       Enumeration<String> parameterNames = req.getParameterNames();
       while (parameterNames.hasMoreElements()) {
         String parameterName = parameterNames.nextElement();
-        String rawValue = req.getParameter(parameterName);
-        String value = CommUtil.stripXSS(rawValue) ;
-        if (CommUtil.isNotEmpty(value)) {
-          ctx.put(parameterName, value);
-          req.setAttribute(parameterName, value);
-        } else {
+        if (parameterName.endsWith("[]")) {
           String[] arrayValue = CommUtil.stripXSS(req.getParameterValues(parameterName));
           if (CommUtil.isNotEmpty(arrayValue) && CommUtil.isNotEmpty(arrayValue[0])) {
             ctx.put(parameterName, arrayValue);
             req.setAttribute(parameterName, arrayValue);
-          } else {
+          } 
+        } else {
+          String rawValue = req.getParameter(parameterName);
+          String value = CommUtil.stripXSS(rawValue) ;
+          if (CommUtil.isNotEmpty(value)) {
             ctx.put(parameterName, value);
             req.setAttribute(parameterName, value);
+          } else {
+            String[] arrayValue = CommUtil.stripXSS(req.getParameterValues(parameterName));
+            if (CommUtil.isNotEmpty(arrayValue) && CommUtil.isNotEmpty(arrayValue[0])) {
+              ctx.put(parameterName, arrayValue);
+              req.setAttribute(parameterName, arrayValue);
+            } else {
+              ctx.put(parameterName, value);
+              req.setAttribute(parameterName, value);
+            }
           }
-        }
+        }       
       }
     }
     return ctx;
