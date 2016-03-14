@@ -45,6 +45,7 @@
 				</description>
 			<name>pageLink</name>
 			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 
 		<attribute>
