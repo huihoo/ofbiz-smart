@@ -152,7 +152,7 @@ public class DefaultRequestHandler implements RequestHandler {
         }
       }
       
-      setPageAttributies(req, reqAction);
+      setPageAttributies(req, reqAction,modelMap);
       
       String viewType = null;
       String layout = null;
@@ -440,10 +440,10 @@ public class DefaultRequestHandler implements RequestHandler {
     return null;
   }
 
-  private void setPageAttributies(HttpServletRequest req, Action reqAction) {
+  private void setPageAttributies(HttpServletRequest req, Action reqAction,Map<String,Object> modelMap) {
     String ctxPath = req.getContextPath();
     req.setAttribute("navTag", reqAction.navTag);
-    req.setAttribute("pageTitle", reqAction.pageTitle);
+    req.setAttribute("pageTitle", WebAppManager.analyzeString(reqAction.pageTitle, modelMap, req));
     String moreCss = reqAction.moreCss;
     if (CommUtil.isNotEmpty(moreCss)) {
       String[] cssArray = moreCss.split(",");

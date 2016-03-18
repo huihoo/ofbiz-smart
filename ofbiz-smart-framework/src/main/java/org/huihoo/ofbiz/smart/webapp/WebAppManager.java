@@ -287,15 +287,25 @@ public class WebAppManager {
   }
   
   public static String parseRedirectUrl(String redirectUrl,Map<String,Object> modelMap,HttpServletRequest req) {
-    StringBuilder sb = new StringBuilder(redirectUrl);
-    List<Integer> braceIdxList = buildBraceList(redirectUrl);
+    String parsedRedirectUrl = WebAppManager.analyzeString(redirectUrl, modelMap, req);
+    Log.d("Origal redirectUrl[%s] parsed redirectUrl[%s]", TAG,redirectUrl,parsedRedirectUrl);
+    return parsedRedirectUrl;
+  }
+  
+  
+  public static String analyzeString(String input,Map<String,Object> modelMap,HttpServletRequest req) {
+    if (CommUtil.isEmpty(input)) {
+      return "";
+    }
+    StringBuilder sb = new StringBuilder(input);
+    List<Integer> braceIdxList = buildBraceList(input);
     if (!braceIdxList.isEmpty()) {
       int bsize = braceIdxList.size();
       if (bsize % 2 == 0) {
         for (int j = 0; j < bsize; j++) {
           int fromIdx = braceIdxList.get(j) + 1;
           int toIdx = braceIdxList.get(++j);
-          String tmpExpr = redirectUrl.substring(fromIdx,toIdx);
+          String tmpExpr = input.substring(fromIdx,toIdx);
           Object val = "";
           if (tmpExpr.startsWith("requestScope.")) {
             val = req.getParameter( tmpExpr.substring("requestScope.".length()) );
@@ -315,7 +325,6 @@ public class WebAppManager {
         }
       }
     }
-    Log.d("Origal redirectUrl[%s] parsed redirectUrl[%s]", TAG,redirectUrl,sb);
     return sb.toString();
   }
   
