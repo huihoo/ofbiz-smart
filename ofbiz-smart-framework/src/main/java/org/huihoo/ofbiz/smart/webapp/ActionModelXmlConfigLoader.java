@@ -140,6 +140,12 @@ public class ActionModelXmlConfigLoader {
         case "page-title":
           action.pageTitle = content;
           break;
+        case "page-meta-keywords":
+          action.pageMetaKeywords = content;
+          break;
+        case "page-meta-description":
+          action.pageMetaDescription = content;
+          break;
         case "more-css":
           action.moreCss = content;
           break;

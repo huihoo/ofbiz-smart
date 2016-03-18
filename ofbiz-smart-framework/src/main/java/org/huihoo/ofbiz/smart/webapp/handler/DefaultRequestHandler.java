@@ -444,6 +444,8 @@ public class DefaultRequestHandler implements RequestHandler {
     String ctxPath = req.getContextPath();
     req.setAttribute("navTag", reqAction.navTag);
     req.setAttribute("pageTitle", WebAppManager.analyzeString(reqAction.pageTitle, modelMap, req));
+    req.setAttribute("pageMetaKeywords", WebAppManager.analyzeString(reqAction.pageMetaKeywords, modelMap, req));
+    req.setAttribute("pageMetaDescription", WebAppManager.analyzeString(reqAction.pageMetaDescription, modelMap, req));
     String moreCss = reqAction.moreCss;
     if (CommUtil.isNotEmpty(moreCss)) {
       String[] cssArray = moreCss.split(",");

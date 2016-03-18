@@ -42,6 +42,26 @@
 									</xs:documentation>
 								</xs:annotation>
 							</xs:element>
+							
+							<xs:element maxOccurs="1" name="page-meta-keywords" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>
+										<![CDATA[
+											页面的关键字Meta标签
+										]]>
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							
+							<xs:element maxOccurs="1" name="page-meta-description" type="xs:string">
+								<xs:annotation>
+									<xs:documentation>
+										<![CDATA[
+											页面的描述Meta标签
+										]]>
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
 
 
 							<xs:element maxOccurs="1" name="more-css" type="xs:string">
