@@ -114,23 +114,77 @@ public interface Delegator {
   List<Object> findIdsByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException;
 
   List<Object> findIdsByCond(Class<?> entityClazz, String cond) throws GenericEntityException;
-
+  
+  //=======================================================================================
+  // Find Entity List By And Map Condition.
+  //=======================================================================================
+  /**
+   * 根据条件Map查找实体集合列表
+   * @param entityClazz   要查找的实体
+   * @param andMap        条件Map映射 
+   * @return              <code>List</code>
+   * @throws GenericEntityException
+   */
   List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException;
-
+  
+  /**
+   * 根据条件Map查找实体集合列表，并按指定的字段进行排序
+   * @param entityClazz   要查找的实体
+   * @param andMap        条件Map映射
+   * @param orderBy       要排序的字段(组合为字段 + asc 或  desc)<code>List</code>集合
+   * @return              <code>List</code>
+   * @throws GenericEntityException
+   */
   List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap, 
                                               List<String> orderBy) throws GenericEntityException;
-
+  
+  /**
+   * 根据条件Map查找实体集合列表，返回实体的指定字段，并按指定的字段进行排序
+   * @param entityClazz    要查找的实体
+   * @param andMap         条件Map映射
+   * @param fieldsToSelect 要返回的实体字段集合
+   * @param orderBy        要排序的字段(组合为字段 + asc 或  desc)<code>List</code>集合
+   * @return              <code>List</code>
+   * @throws GenericEntityException
+   */
+  List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap, 
+                                              Set<String> fieldsToSelect, 
+                                              List<String> orderBy) throws GenericEntityException;
+  
+  /**
+   * @see #findListByAnd(Class, Map, Set, List, int)
+   */
+  @Deprecated
   List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap,
                                               Set<String> fieldsToSelect, 
                                               List<String> orderBy, 
                                               boolean useCache) throws GenericEntityException;
-
+  /**
+   * @see #findListByAnd(Class, Map, Set, List, int)
+   */
+  @Deprecated
   List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap,
                                               Set<String> fieldsToSelect, 
                                               List<String> orderBy, 
                                               boolean useCache, 
                                               int liveTimeInSeconds) throws GenericEntityException;
-
+  
+  /**
+   * 根据条件Map查找实体集合列表，返回实体的指定字段，并按指定的字段进行排序，并按指定时间进行缓存
+   * @param entityClazz    要查找的实体
+   * @param andMap         条件Map映射
+   * @param fieldsToSelect 要返回的实体字段集合
+   * @param orderBy        要排序的字段(组合为字段 + asc 或  desc)<code>List</code>集合
+   * @param liveTimeInSeconds 要缓存的时间，以秒为单位。其中-1表示不缓存，0表示总是缓存, 大于0为实际的缓存时间.
+   * @return              <code>List</code>
+   * @throws GenericEntityException
+   */
+  List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap,
+                                              Set<String> fieldsToSelect, 
+                                              List<String> orderBy, 
+                                              int liveTimeInSeconds) throws GenericEntityException;
+  
+  
   Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap) throws GenericEntityException;
 
   Object findUniqueByAnd(Class<?> entityClazz, Map<String, Object> andMap,

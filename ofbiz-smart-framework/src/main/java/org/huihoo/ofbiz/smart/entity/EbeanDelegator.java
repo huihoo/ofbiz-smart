@@ -363,19 +363,36 @@ public class EbeanDelegator implements Delegator {
     return findListByAnd(entityClazz, andMap, fieldsToSelect, orderBy, useCache, 0);
   }
   
+  @Override
+  public List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap, Set<String> fieldsToSelect,
+      List<String> orderBy) throws GenericEntityException {
+    return findListByAnd(entityClazz, andMap, fieldsToSelect, orderBy, -1);
+  }
+
+  
   
   @Override
   public List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap,
           Set<String> fieldsToSelect, List<String> orderBy,boolean useCache,int liveTimeInSeconds) throws GenericEntityException {
+    return findListByAnd(entityClazz, andMap, fieldsToSelect, orderBy, -1);
+  }
+
+  @Override
+  public List<?> findListByCond(Class<?> entityClazz, String cond) throws GenericEntityException {
+    return findListByCond(entityClazz, cond, new HashSet<String>(), new ArrayList<String>(), false);
+  }
+  
+  @Override
+  public List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap, Set<String> fieldsToSelect,
+      List<String> orderBy, int liveTimeInSeconds) throws GenericEntityException {
     String cacheKey =  getCacheKey("findListByAnd",entityClazz,andMap,fieldsToSelect);
-    if (useCache) {
+    if (liveTimeInSeconds >= 0) {
       List<?> cachedObj = (List<?>) CACHE.get(cacheKey);
       if (cachedObj != null) {
         Log.d("findListByAnd[" + cacheKey + "]from cache.", TAG);
         return cachedObj;
       }
     }
-
     
     Query<?> query = currentServerMap.get(CURRENT_SERVER_NAME).find(entityClazz);
     buildSelectFields(query, fieldsToSelect);
@@ -385,15 +402,10 @@ public class EbeanDelegator implements Delegator {
       expList.allEq(andMap);
     }
     List<?> result = expList.findList();
-    if (useCache && result != null) {
+    if (liveTimeInSeconds >=0 && result != null) {
       CACHE.put(cacheKey, result,liveTimeInSeconds);
     }
     return result;
-  }
-
-  @Override
-  public List<?> findListByCond(Class<?> entityClazz, String cond) throws GenericEntityException {
-    return findListByCond(entityClazz, cond, new HashSet<String>(), new ArrayList<String>(), false);
   }
 
   @Override
@@ -1162,4 +1174,6 @@ public class EbeanDelegator implements Delegator {
       throw new GenericEntityException(e);
     }
   }
+
+  
 }
