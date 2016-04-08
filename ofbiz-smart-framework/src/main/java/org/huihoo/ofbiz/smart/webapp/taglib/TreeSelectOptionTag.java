@@ -1,6 +1,8 @@
 package org.huihoo.ofbiz.smart.webapp.taglib;
 
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.jsp.JspException;
@@ -40,7 +42,6 @@ public class TreeSelectOptionTag extends TagSupport {
 
       StringBuilder treeSb = new StringBuilder();
       for (Object obj : allObjects) {
-        int depth = 1;
         String select = "";
         Object id = Ognl.getValue(valueName, obj);
         if (id != null && String.valueOf(id).equals(String.valueOf(currentValue))) {
@@ -50,7 +51,7 @@ public class TreeSelectOptionTag extends TagSupport {
         treeSb.append(Ognl.getValue(labelName, obj));
         treeSb.append("</option>");
         treeSb.append(lineSepa);
-        recursion(obj, delegator, treeSb, depth, currentValue);
+        recursion(obj, delegator, treeSb,currentValue);
       }
 
       pageContext.getOut().println(treeSb.toString());
@@ -59,26 +60,60 @@ public class TreeSelectOptionTag extends TagSupport {
     }
     return EVAL_BODY_INCLUDE;
   }
+  
+  private int countObjectDepth(Object c) throws OgnlException {
+    int depth = 1;
+    if (c == null) {
+      return depth;
+    }
+    Object parent = Ognl.getValue("parent", c);
+    if (parent != null) {
+      depth++;
+      countObjectDepth(parent);
+    }
+    return depth;
+  }
 
-  private void recursion(Object c, Delegator delegator, StringBuilder sb, int depth, Object currentId)
+  private void recursion(Object c, Delegator delegator, StringBuilder sb, Object currentId)
       throws GenericEntityException, OgnlException {
     List<?> children =
         (List<?>) delegator.findListByAnd(c.getClass(), CommUtil.toMap("parent.id", Ognl.getValue("id", c)));
+   
     if (CommUtil.isNotEmpty(children)) {
+      int depth = countObjectDepth(c);
       for (Object obj : children) {
         StringBuilder space = new StringBuilder();
         for (int i = 0; i < depth; i++) {
-          space.append("&nbsp;&nbsp;");
+          space.append("&nbsp;&nbsp;&nbsp;&nbsp;");
         }
         String select = "";
         Object id = Ognl.getValue(valueName, obj);
-        if (id != null && String.valueOf(id).equals(String.valueOf(currentId))) {
-          select = "selected='selected'";
+        String idstr = String.valueOf(id);
+        
+        if (currentValue != null && currentValue instanceof Collection) {
+          Collection<?> collection = (Collection<?>) currentValue;
+          for (Object object : collection) {
+            Object cid = Ognl.getValue("id", object);
+            if (idstr.equals(String.valueOf(cid))) {
+              select = "selected='selected'";
+              break;
+            }
+          }
+        } else {
+          String cstr = String.valueOf(currentValue);
+          if (id != null && idstr.equals(cstr)) {
+            select = "selected='selected'";
+          } else {
+            if (CommUtil.isNotEmpty(cstr) && cstr.indexOf(",") >= 0 && Arrays.asList(cstr.split(",")).contains(idstr)) {
+              select = "selected='selected'";
+            }
+          }
         }
+        
         sb.append("<option value='" + id + "' " + select + ">");
         sb.append(space.toString() + Ognl.getValue(labelName, obj));
         sb.append("</option>").append(lineSepa);
-        recursion(obj, delegator, sb, depth, currentId);
+        recursion(obj, delegator, sb, currentId);
       }
     }
   }
@@ -131,5 +166,21 @@ public class TreeSelectOptionTag extends TagSupport {
 
   public void setCurrentValue(Object currentValue) {
     this.currentValue = currentValue;
+  }
+
+  public String getLabelName() {
+    return labelName;
+  }
+
+  public String getValueName() {
+    return valueName;
+  }
+
+  public void setLabelName(String labelName) {
+    this.labelName = labelName;
+  }
+
+  public void setValueName(String valueName) {
+    this.valueName = valueName;
   }
 }

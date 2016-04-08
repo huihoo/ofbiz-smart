@@ -49,7 +49,7 @@ public class I18NUtil {
     ResourceBundle resourceBundle = RESOURCE_BUNDLE_CACHE.get(key);
 
     if (resourceBundle != null) {
-      Log.w("The resource [" + key + "] from cache.", TAG);
+      Log.d("The resource [" + key + "] from cache.", TAG);
       return resourceBundle;
     }
 

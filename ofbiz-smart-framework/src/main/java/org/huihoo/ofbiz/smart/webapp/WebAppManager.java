@@ -3,6 +3,7 @@ package org.huihoo.ofbiz.smart.webapp;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -33,6 +34,7 @@ public class WebAppManager {
   private final static String TAG = WebAppManager.class.getName();
   
   private static volatile FileUploadHandler fileUploadHandler;
+  private static final List<String> INGORE_STRIPXSS_NAMES = Arrays.asList(AppConfigUtil.getProperty("smart.ingore.stripxss.names","").split(","));
   
   public static Map<String, Object> buildWebCtx(HttpServletRequest req,HttpServletResponse resp) {
     ServletContext sc = req.getServletContext();
@@ -69,12 +71,13 @@ public class WebAppManager {
         List<FileItem> fiList = upload.parseRequest(req);
         for (FileItem fi : fiList) {
           String name = fi.getFieldName();
+          boolean ignoreStripXSS = INGORE_STRIPXSS_NAMES.contains(name);
           if (fi.isFormField()) {
-            String val = CommUtil.stripXSS(fi.getString(C.UTF_8));
+            String val = ignoreStripXSS ? fi.getString(C.UTF_8) : CommUtil.stripXSS(fi.getString(C.UTF_8));
             if (multiValueMap.containsKey(name)) { //多个值的处理
               ctx.remove(name);
               req.removeAttribute(name);
-              multiValueMap.put(name, multiValueMap.get(name) + "," + val);
+              multiValueMap.put(name, multiValueMap.get(name) + "#ARRAY_JOINT#" + val);
             } else {
               multiValueMap.put(name, val);
               ctx.put(name, val);
@@ -88,16 +91,15 @@ public class WebAppManager {
               ctx.putAll(fileUploadHandler.handle(name,fileName,contentType,fi.getInputStream(), ctx));
             }
           }
-        }
-        
+        }        
         //多个值转换为数组
         Iterator<Entry<String, String>> mIter = multiValueMap.entrySet().iterator();
         while (mIter.hasNext()) {
           Entry<String, String>  entry = mIter.next();
           String ekey = entry.getKey();
           String eval = entry.getValue();
-          if (CommUtil.isNotEmpty(eval) && eval.indexOf(",") >= 0) {
-            String[] eArray = eval.split(",");
+          if (CommUtil.isNotEmpty(eval) && eval.indexOf("#ARRAY_JOINT#") >= 0) {
+            String[] eArray = eval.split("#ARRAY_JOINT#");
             ctx.put(ekey, eArray);
             req.setAttribute(ekey, eArray);
           }
@@ -109,20 +111,21 @@ public class WebAppManager {
       Enumeration<String> parameterNames = req.getParameterNames();
       while (parameterNames.hasMoreElements()) {
         String parameterName = parameterNames.nextElement();
+        boolean ignoreStripXSS = INGORE_STRIPXSS_NAMES.contains(parameterName);
         if (parameterName.endsWith("[]")) {
-          String[] arrayValue = CommUtil.stripXSS(req.getParameterValues(parameterName));
+          String[] arrayValue = ignoreStripXSS ? req.getParameterValues(parameterName) : CommUtil.stripXSS(req.getParameterValues(parameterName));
           if (CommUtil.isNotEmpty(arrayValue) && CommUtil.isNotEmpty(arrayValue[0])) {
             ctx.put(parameterName, arrayValue);
             req.setAttribute(parameterName, arrayValue);
           } 
         } else {
           String rawValue = req.getParameter(parameterName);
-          String value = CommUtil.stripXSS(rawValue) ;
+          String value = ignoreStripXSS ? rawValue : CommUtil.stripXSS(rawValue) ;
           if (CommUtil.isNotEmpty(value)) {
             ctx.put(parameterName, value);
             req.setAttribute(parameterName, value);
           } else {
-            String[] arrayValue = CommUtil.stripXSS(req.getParameterValues(parameterName));
+            String[] arrayValue = ignoreStripXSS ? req.getParameterValues(parameterName) : CommUtil.stripXSS(req.getParameterValues(parameterName));
             if (CommUtil.isNotEmpty(arrayValue) && CommUtil.isNotEmpty(arrayValue[0])) {
               ctx.put(parameterName, arrayValue);
               req.setAttribute(parameterName, arrayValue);
@@ -134,6 +137,7 @@ public class WebAppManager {
         }       
       }
     }
+    
     return ctx;
   }
   
@@ -199,6 +203,8 @@ public class WebAppManager {
             .append(",")
             .append(val)
             .append("}");
+          //将参数保存在请求上下文中，参数名的.号替换成_号，以便能在页面上正常读取
+          req.setAttribute(fieldName.replaceAll("\\.", "_"), val);
         }
       }
     }

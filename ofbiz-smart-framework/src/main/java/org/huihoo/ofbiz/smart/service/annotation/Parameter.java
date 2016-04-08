@@ -36,4 +36,7 @@ public @interface Parameter {
 
   /** 参数的默认值 */
   String defaultValue() default "";
+  
+  /** 参数的获取范围 context(直接在服务上下文获取) session(直接从会话中获取) config(直接从属性配置文件中获取) */
+  String scope() default "context";
 }

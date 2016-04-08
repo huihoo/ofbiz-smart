@@ -776,17 +776,16 @@ public class EbeanDelegator implements Delegator {
 
     List<Integer> leftBraceIdxList = new ArrayList<>();
     List<Integer> rightBraceIdxList = new ArrayList<>();
-
-    byte[] bytes = condition.getBytes();
-    for (int i = 0; i < bytes.length; i++) {
-      byte b = bytes[i];
-      if (b == 123) {
+    char[] chars = condition.toCharArray();    
+    for (int i = 0; i < chars.length; i++) {
+      int c = chars[i];
+      if (c == 123) {
         leftBraceIdxList.add(i);
-      } else if (b == 125) {
+      } else if (c == 125) {
         rightBraceIdxList.add(i);
       }
     }
-
+    
     if (leftBraceIdxList.size() == 0 || leftBraceIdxList.size() != rightBraceIdxList.size()) {
       throw new GenericEntityException("The condition [" + condition + "] is illegal.");
     }
