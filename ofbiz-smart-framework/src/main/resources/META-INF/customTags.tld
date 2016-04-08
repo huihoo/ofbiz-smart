@@ -45,6 +45,7 @@
 				</description>
 			<name>pageLink</name>
 			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
 		</attribute>
 
 		<attribute>
@@ -200,8 +201,77 @@
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
+	</tag>
 
 
+	<tag>
+		<description>
+				Tree Select Options Tag
+			</description>
+		<name>tree-options</name>
+		<tagclass>org.huihoo.ofbiz.smart.webapp.taglib.TreeSelectOptionTag</tagclass>
+		<attribute>
+			<description>
+					对象的类名
+				</description>
+			<name>className</name>
+			<rtexprvalue>true</rtexprvalue>
+			<required>true</required>
+		</attribute>
+		<attribute>
+			<description>
+					当前的值
+				</description>
+			<name>currentValue</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+		<attribute>
+			<description>
+					显示域的名称
+				</description>
+			<name>labelName</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+		<attribute>
+			<description>
+					值域的名称
+				</description>
+			<name>valueName</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+		<attribute>
+			<description>
+					额外的条件
+				</description>
+			<name>condition</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+		<attribute>
+			<description>
+					排序字符串，多个字段以逗号分隔(如id asc,createdAt desc)
+				</description>
+			<name>orderBy</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+
+
+		<attribute>
+			<description>
+					缓存有效时间，0表示一直缓存(当useCache为true时启用)
+				</description>
+			<name>liveTimeInSeconds</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
 	</tag>
 
 	<tag>
@@ -262,7 +332,7 @@
 			<required>false</required>
 			<rtexprvalue>true</rtexprvalue>
 		</attribute>
-		
+
 		<attribute>
 			<description>
 					useCache

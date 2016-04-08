@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
@@ -32,10 +33,11 @@ public class ServiceCallTag extends TagSupport {
   @Override
   public int doStartTag() throws JspException {
     HttpServletRequest req = (HttpServletRequest) pageContext.getRequest();
+    HttpServletResponse resp = (HttpServletResponse) pageContext.getResponse();
     ServiceDispatcher serviceDispatcher =
         (ServiceDispatcher) pageContext.getServletContext().getAttribute(C.CTX_SERVICE_DISPATCHER);
     
-    Map<String, Object> webCtx = WebAppManager.buildWebCtx(req);
+    Map<String, Object> webCtx = WebAppManager.buildWebCtx(req,resp);
     ServiceModel sm = new ServiceModel();
     
     if (CommUtil.isNotEmpty(resultName)) {

@@ -252,6 +252,40 @@ public class CommUtil {
     return hexString.toString();
   }
 
+  public static List<Map<String,Object>> convertUnderscoreKeyMapToCamelKeyMapInList(List<Map<String,Object>> list) {
+    List<Map<String,Object>> newMapList = new ArrayList<>();
+    if (CommUtil.isEmpty(list)) {
+      return newMapList;
+    }
+    for (Map<String, Object> map : list) {
+      Map<String, Object> newMap = new HashMap<String, Object>();
+      Set<String> keys = map.keySet();
+      Iterator<String> kIter = keys.iterator();
+      while (kIter.hasNext()) {
+        String key = kIter.next();
+        if (key.indexOf("_") != -1) {
+          StringTokenizer st = new StringTokenizer(key, "_");
+          StringBuilder newKey = new StringBuilder();
+          int j = 0;
+          while (st.hasMoreElements()) {
+            String k = st.nextToken();
+            if (j == 0) {
+              newKey.append(k);
+            } else {
+              newKey.append(k.substring(0, 1).toUpperCase() + k.substring(1));
+            }
+            j++;
+          }
+          newMap.put(newKey.toString(), map.get(key));
+        } else {
+          newMap.put(key, map.get(key));
+        }
+      }
+      newMapList.add(newMap);
+    }
+    return newMapList;
+  }
+  
   public static Map<String, Object> convertUnderscoreKeyMapToCamelKeyMap(Map<String, Object> map) {
     Map<String, Object> newMap = new HashMap<String, Object>();
     Set<String> keys = map.keySet();

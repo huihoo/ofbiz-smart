@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -33,7 +34,7 @@ public class WebAppManager {
   
   private static volatile FileUploadHandler fileUploadHandler;
   
-  public static Map<String, Object> buildWebCtx(HttpServletRequest req) {
+  public static Map<String, Object> buildWebCtx(HttpServletRequest req,HttpServletResponse resp) {
     ServletContext sc = req.getServletContext();
     Delegator delegator = (Delegator) sc.getAttribute(C.CTX_DELEGATOR);
     ServiceDispatcher serviceDispatcher =(ServiceDispatcher) sc.getAttribute(C.CTX_SERVICE_DISPATCHER);
@@ -41,6 +42,7 @@ public class WebAppManager {
     Map<String, Object> ctx = CommUtil.toMap(C.CTX_DELEGATOR, delegator
                                             ,C.CTX_SERVICE_DISPATCHER, serviceDispatcher
                                             ,C.CTX_WEB_HTTP_SERVLET_REQUEST, req
+                                            ,C.CTX_WEB_HTTP_SERVLET_RESPONSE,resp
     );
     
     boolean isMultipart = ServletFileUpload.isMultipartContent(req);
@@ -107,21 +109,29 @@ public class WebAppManager {
       Enumeration<String> parameterNames = req.getParameterNames();
       while (parameterNames.hasMoreElements()) {
         String parameterName = parameterNames.nextElement();
-        String rawValue = req.getParameter(parameterName);
-        String value = CommUtil.stripXSS(rawValue) ;
-        if (CommUtil.isNotEmpty(value)) {
-          ctx.put(parameterName, value);
-          req.setAttribute(parameterName, value);
-        } else {
+        if (parameterName.endsWith("[]")) {
           String[] arrayValue = CommUtil.stripXSS(req.getParameterValues(parameterName));
           if (CommUtil.isNotEmpty(arrayValue) && CommUtil.isNotEmpty(arrayValue[0])) {
             ctx.put(parameterName, arrayValue);
             req.setAttribute(parameterName, arrayValue);
-          } else {
+          } 
+        } else {
+          String rawValue = req.getParameter(parameterName);
+          String value = CommUtil.stripXSS(rawValue) ;
+          if (CommUtil.isNotEmpty(value)) {
             ctx.put(parameterName, value);
             req.setAttribute(parameterName, value);
+          } else {
+            String[] arrayValue = CommUtil.stripXSS(req.getParameterValues(parameterName));
+            if (CommUtil.isNotEmpty(arrayValue) && CommUtil.isNotEmpty(arrayValue[0])) {
+              ctx.put(parameterName, arrayValue);
+              req.setAttribute(parameterName, arrayValue);
+            } else {
+              ctx.put(parameterName, value);
+              req.setAttribute(parameterName, value);
+            }
           }
-        }
+        }       
       }
     }
     return ctx;
@@ -277,15 +287,25 @@ public class WebAppManager {
   }
   
   public static String parseRedirectUrl(String redirectUrl,Map<String,Object> modelMap,HttpServletRequest req) {
-    StringBuilder sb = new StringBuilder(redirectUrl);
-    List<Integer> braceIdxList = buildBraceList(redirectUrl);
+    String parsedRedirectUrl = WebAppManager.analyzeString(redirectUrl, modelMap, req);
+    Log.d("Origal redirectUrl[%s] parsed redirectUrl[%s]", TAG,redirectUrl,parsedRedirectUrl);
+    return parsedRedirectUrl;
+  }
+  
+  
+  public static String analyzeString(String input,Map<String,Object> modelMap,HttpServletRequest req) {
+    if (CommUtil.isEmpty(input)) {
+      return "";
+    }
+    StringBuilder sb = new StringBuilder(input);
+    List<Integer> braceIdxList = buildBraceList(input);
     if (!braceIdxList.isEmpty()) {
       int bsize = braceIdxList.size();
       if (bsize % 2 == 0) {
         for (int j = 0; j < bsize; j++) {
           int fromIdx = braceIdxList.get(j) + 1;
           int toIdx = braceIdxList.get(++j);
-          String tmpExpr = redirectUrl.substring(fromIdx,toIdx);
+          String tmpExpr = input.substring(fromIdx,toIdx);
           Object val = "";
           if (tmpExpr.startsWith("requestScope.")) {
             val = req.getParameter( tmpExpr.substring("requestScope.".length()) );
@@ -305,7 +325,6 @@ public class WebAppManager {
         }
       }
     }
-    Log.d("Origal redirectUrl[%s] parsed redirectUrl[%s]", TAG,redirectUrl,sb);
     return sb.toString();
   }
   

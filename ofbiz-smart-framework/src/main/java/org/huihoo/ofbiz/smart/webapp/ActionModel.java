@@ -24,6 +24,10 @@ public class ActionModel implements Serializable {
     
     public String pageTitle;
     
+    public String pageMetaKeywords;
+    
+    public String pageMetaDescription;
+    
     public String moreCss;
     
     public String moreJavascripts;

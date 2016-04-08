@@ -233,8 +233,17 @@ public class PaginationTag extends TagSupport {
     while(pNames.hasMoreElements()){
       String pName = pNames.nextElement();
       if(pName.equals(pageFlag)) continue;
-      String pValue = req.getParameter(pName);
-      tmpLink.append("&").append(pName).append("=").append(pValue);
+      if (pName.endsWith("[]")) {
+        String[] pValueArray = req.getParameterValues(pName);
+        if (pValueArray != null) {
+          for (String pv : pValueArray) {
+            tmpLink.append("&").append(pName).append("=").append(pv);
+          }
+        }
+      } else {
+        String pValue = req.getParameter(pName);
+        tmpLink.append("&").append(pName).append("=").append(pValue);
+      }
     }
 
     if (isNext) {

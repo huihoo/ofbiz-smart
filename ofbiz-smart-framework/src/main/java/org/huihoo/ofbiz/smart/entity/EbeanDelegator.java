@@ -354,7 +354,7 @@ public class EbeanDelegator implements Delegator {
   @Override
   public List<?> findListByAnd(Class<?> entityClazz, Map<String, Object> andMap,List<String> orderBy)
           throws GenericEntityException {
-    return findListByAnd(entityClazz, andMap, new HashSet<String>(),new ArrayList<String>(), false);
+    return findListByAnd(entityClazz, andMap, new HashSet<String>(),orderBy, false);
   }
 
   @Override

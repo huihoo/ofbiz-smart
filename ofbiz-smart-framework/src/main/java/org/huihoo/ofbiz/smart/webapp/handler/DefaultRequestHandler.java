@@ -104,7 +104,7 @@ public class DefaultRequestHandler implements RequestHandler {
       
       Map<String, Object> modelMap = ServiceUtil.returnSuccess();
       //build web ctx for service call.
-      Map<String, Object> webCtx = WebAppManager.buildWebCtx(req);
+      Map<String, Object> webCtx = WebAppManager.buildWebCtx(req,resp);
       //calling all available configured service
       Map<String, Object> lastResult = null; 
       List<ServiceCall> serviceCalls = reqAction.serviceCallList;
@@ -152,7 +152,7 @@ public class DefaultRequestHandler implements RequestHandler {
         }
       }
       
-      setPageAttributies(req, reqAction);
+      setPageAttributies(req, reqAction,modelMap);
       
       String viewType = null;
       String layout = null;
@@ -329,6 +329,9 @@ public class DefaultRequestHandler implements RequestHandler {
                                                         String entityNameInUri,
                                                         HttpServletRequest req,
                                                         HttpServletResponse resp,WebAppContext wac) throws ViewException {
+    if (view == null) {
+      view = wac.viewCache.get("jsp");
+    }
     if (result == null) {
       view.render(modelMap, req, resp);
       return ;
@@ -385,7 +388,11 @@ public class DefaultRequestHandler implements RequestHandler {
           req.setAttribute(C.JSP_VIEW_NAME_ATTRIBUTE, wac.jspViewBasePath + layout);
           if (req.getAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE) == null) {
             if ( !(wac.jspViewBasePath + layout).equals(viewName) ) {
-              req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, wac.jspViewBasePath + viewName);
+              if (viewName.startsWith(wac.jspViewBasePath)) {
+                req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, viewName);
+              } else {
+                req.setAttribute(C.JSP_VIEW_LAYOUT_CONTENT_VIEW_ATTRIBUTE, wac.jspViewBasePath + viewName);
+              }
             }
           }
         }
@@ -433,10 +440,12 @@ public class DefaultRequestHandler implements RequestHandler {
     return null;
   }
 
-  private void setPageAttributies(HttpServletRequest req, Action reqAction) {
+  private void setPageAttributies(HttpServletRequest req, Action reqAction,Map<String,Object> modelMap) {
     String ctxPath = req.getContextPath();
     req.setAttribute("navTag", reqAction.navTag);
-    req.setAttribute("pageTitle", reqAction.pageTitle);
+    req.setAttribute("pageTitle", WebAppManager.analyzeString(reqAction.pageTitle, modelMap, req));
+    req.setAttribute("pageMetaKeywords", WebAppManager.analyzeString(reqAction.pageMetaKeywords, modelMap, req));
+    req.setAttribute("pageMetaDescription", WebAppManager.analyzeString(reqAction.pageMetaDescription, modelMap, req));
     String moreCss = reqAction.moreCss;
     if (CommUtil.isNotEmpty(moreCss)) {
       String[] cssArray = moreCss.split(",");
