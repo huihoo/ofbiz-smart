@@ -90,6 +90,7 @@ public class DispatchServlet extends HttpServlet {
     Log.d("ContextPath->" + request.getContextPath(), TAG);
     String targetUri = request.getRequestURI().substring(request.getContextPath().length());
     long startTime = System.currentTimeMillis();
+    Log.i("Begin Process request [" + targetUri + "]", TAG);
     Throwable failureCause = null;
     try {
       if (!C.PROFILE_PRODUCTION.equals(AppConfigUtil.getProperty(C.PROFILE_NAME))) {
