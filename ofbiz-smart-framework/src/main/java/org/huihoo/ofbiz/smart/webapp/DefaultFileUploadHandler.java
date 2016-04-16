@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.IOUtils;
 import org.huihoo.ofbiz.smart.base.C;
 import org.huihoo.ofbiz.smart.base.util.AppConfigUtil;
+import org.huihoo.ofbiz.smart.base.util.CommUtil;
 import org.huihoo.ofbiz.smart.base.util.Log;
 import org.huihoo.ofbiz.smart.base.util.ServiceUtil;
 
@@ -30,6 +31,15 @@ public class DefaultFileUploadHandler implements FileUploadHandler {
     HttpServletRequest req = (HttpServletRequest) webCtx.get(C.CTX_WEB_HTTP_SERVLET_REQUEST);
     String saveRootPath = req.getServletContext().getRealPath("");
     String fileSaveRelativePath = AppConfigUtil.getProperty("file.upload.save.relative.path","/upload");
+    //!!!HACK!!!
+    String targetUri = req.getRequestURI();
+    if (targetUri.lastIndexOf(".") >= 0) {
+      targetUri = targetUri.substring(0, targetUri.lastIndexOf("."));
+    }
+    String customSavePathPerReq = AppConfigUtil.getProperty("customSavePath_" + targetUri.replaceAll("/", "_"));
+    if (CommUtil.isNotEmpty(customSavePathPerReq)) {
+      fileSaveRelativePath = customSavePathPerReq;
+    }
     String fileFolderDateFormatter = AppConfigUtil.getProperty("file.upload.folder.date.formatter","yyyy/MM/dd");
     String[] allowContentTypes = AppConfigUtil.getProperty("file.upload.allow.content.type",DEFAULT_CONTENT_TYPE_CVS).split(",");
     
