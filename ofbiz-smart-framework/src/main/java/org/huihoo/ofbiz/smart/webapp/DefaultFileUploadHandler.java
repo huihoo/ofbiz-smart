@@ -36,7 +36,7 @@ public class DefaultFileUploadHandler implements FileUploadHandler {
     if (targetUri.lastIndexOf(".") >= 0) {
       targetUri = targetUri.substring(0, targetUri.lastIndexOf("."));
     }
-    String customSavePathPerReq = AppConfigUtil.getProperty("customSavePath_" + targetUri.replaceAll("/", "_"));
+    String customSavePathPerReq = AppConfigUtil.getProperty("customSavePath" + targetUri.replaceAll("/", "_"));
     if (CommUtil.isNotEmpty(customSavePathPerReq)) {
       fileSaveRelativePath = customSavePathPerReq;
     }
