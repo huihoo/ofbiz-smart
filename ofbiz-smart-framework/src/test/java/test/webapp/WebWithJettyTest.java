@@ -155,6 +155,68 @@ public class WebWithJettyTest {
     result = response.body().string();
     Log.i("result >" + result, TAG);
     Assert.assertEquals(true, result.contains("SUCCESS"));
+    
+    
+    
+    fromChannel = "WEB_CHANNEL";
+    userId = "10000";
+    paymentMethod = "ALI_PAY";
+    
+    method = "org.huihoo.order.createSuccess.auth";
+    paraMap.put("method", method);
+    paraMap.put("fromChannel", fromChannel);
+    paraMap.put("userId", userId);
+    paraMap.put("paymentMethod", paymentMethod);
+    sign = createSignString(paraMap,signMethod);
+    request = new com.squareup.okhttp.Request.Builder()
+            .url("http://127.0.0.1:8080/api/router?appKey="+appKey
+              +"&method="+method
+              +"&format="+format
+              +"&signMethod="+signMethod
+              +"&timestamp="+timestamp
+              +"&sign="+sign
+              +"&fromChannel="+fromChannel
+              +"&userId="+userId
+              +"&paymentMethod="+paymentMethod
+              )
+            .post(requestBody)
+            .build();
+    response = client.newCall(request).execute();
+    result = response.body().string();
+    Log.i("result >" + result, TAG);
+    Assert.assertEquals(true, result.contains("ACCESS_TOKEN_REQUIRED"));
+    
+    
+    
+    fromChannel = "WEB_CHANNEL";
+    userId = "10000";
+    paymentMethod = "ALI_PAY";
+    String accessToken = "af4fb8750ef7140947e41b48b3fbb815";
+    method = "org.huihoo.order.createSuccess.auth";
+    paraMap.put("method", method);
+    paraMap.put("fromChannel", fromChannel);
+    paraMap.put("userId", userId);
+    paraMap.put("accessToken", accessToken);
+    paraMap.put("paymentMethod", paymentMethod);
+    sign = createSignString(paraMap,signMethod);
+    request = new com.squareup.okhttp.Request.Builder()
+            .url("http://127.0.0.1:8080/api/router?appKey="+appKey
+              +"&method="+method
+              +"&format="+format
+              +"&signMethod="+signMethod
+              +"&timestamp="+timestamp
+              +"&sign="+sign
+              +"&fromChannel="+fromChannel
+              +"&userId="+userId
+              +"&paymentMethod="+paymentMethod
+              +"&accessToken="+accessToken
+              )
+            .post(requestBody)
+            .build();
+    response = client.newCall(request).execute();
+    result = response.body().string();
+    Log.i("result >" + result, TAG);
+    Assert.assertEquals(true, result.contains("SUCCESS"));
   }
   
   private String createSignString(Map<String,String> params,String signMethod) {

@@ -168,7 +168,7 @@ public class EntityAutoEngine extends GenericAsyncEngine {
           if (CommUtil.isNotEmpty(condition)) {
             pList = delegator.findListByCond(entityClazz, condition, fieldsToSelect, orderBy, useCache,liveTimeInSeconds);
           } else {
-            pList = delegator.findListByAnd(entityClazz, andMap, fieldsToSelect, orderBy, useCache,liveTimeInSeconds);
+            pList = delegator.findListByAnd(entityClazz, andMap, fieldsToSelect, orderBy,liveTimeInSeconds);
           }
           if (resultName != null) {
             successResult.put(resultName, pList);

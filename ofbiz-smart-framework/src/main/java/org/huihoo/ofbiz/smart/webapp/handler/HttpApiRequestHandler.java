@@ -4,6 +4,7 @@ package org.huihoo.ofbiz.smart.webapp.handler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -47,6 +48,7 @@ public class HttpApiRequestHandler implements RequestHandler {
   private static volatile FileUploadHandler fileUploadHandler;
   private final static List<String> SIGN_METHODS = Arrays.asList(new String[]{"md5","hmac"});
   private final static String APP_QUERY_SQL = "select app_key,app_secret,app_status from apps where app_key = ?";
+  private final static String APP_USER_ACCESS_TOKEN_SQL = "select expired_in,created_at from app_user_access_tokens where access_token = ?";
   
   @Override
   public void handleRequest(HttpServletRequest req, HttpServletResponse resp)
@@ -110,17 +112,16 @@ public class HttpApiRequestHandler implements RequestHandler {
       }
       Map<String,Object> appMap = null;
       try {
-        List<Map<String,Object>> apiList = delegator.findListByRawQuery(apiQuerySql, Arrays.asList(new String[]{appKey}));
-        if (CommUtil.isNotEmpty(apiList)) {
-          appMap = apiList.get(0);
-        }
+        appMap = delegator.findUniqueByRawQuery(apiQuerySql, Arrays.asList(new String[]{appKey}));
       } catch (GenericEntityException ge) {
         Log.d("Finding app with key [%s] has an exception [%s]", TAG,appKey,ge.getMessage());
       }
+      
       if (appMap == null || CommUtil.isEmpty(appMap.get("app_key"))) {
         view.render(ServiceUtil.returnProplem("APP_IS_NOT_EXISTS", "App[" + appKey+ "] is not exists."), req, resp);
         return ;
       }
+      
       //Sign
       Map<String,String> paramsMap = new TreeMap<>();
       Enumeration<String> paraNames = req.getParameterNames();
@@ -166,11 +167,40 @@ public class HttpApiRequestHandler implements RequestHandler {
         view.render(ServiceUtil.returnProplem("SERVICE_NOT_FOUND", "Requested service [" + method + "] is not exist."), req, resp);
         return ;
       }
+      
+      //HTTP API ACCESS_TOKEN 
+      if (foundSm.requireAuth) {
+        String accessToken = req.getParameter("accessToken");
+        if (CommUtil.isEmpty(accessToken)) {
+          view.render(ServiceUtil.returnProplem("ACCESS_TOKEN_REQUIRED", "AccessToken required."), req, resp);
+          return ;
+        }
+        String appUserAccessTokenSql = AppConfigUtil.getProperty("smart.api.apps.query.sql",APP_USER_ACCESS_TOKEN_SQL);
+        try {
+          Map<String,Object> accessTokenMap = delegator.findUniqueByRawQuery(appUserAccessTokenSql, Arrays.asList(new String[]{accessToken}));
+          Date createdAt = (Date) accessTokenMap.get("created_at");
+          int expiredIn = (Integer) accessTokenMap.get("expired_in");
+          Date now = new Date();
+          long spanMs = now.getTime() - createdAt.getTime();
+          if (expiredIn * 1000 - spanMs <= 0) { //expired
+            view.render(ServiceUtil.returnProplem("ACCESS_TOKEN_EXPIRED", "AccessToken Expired."), req, resp);
+            return ;
+          }
+        } catch (GenericEntityException ge) {
+          Log.d("Finding accessToken with accessToken [%s] has an exception [%s]", TAG,accessToken,ge.getMessage());
+          view.render(ServiceUtil.returnProplem("ACCESS_TOKEN_FETCH_FAILED", "AccessToken fetch failed."), req, resp);
+          return ;
+        }
+      }
+      
       //二进制文件的处理 
       boolean isMultipart = ServletFileUpload.isMultipartContent(req);
       if (isMultipart) {
         if (fileUploadHandler == null) {
-          String handlerName = AppConfigUtil.getProperty("file.upload.handler", "org.huihoo.ofbiz.smart.webapp.DefaultFileUploadHandler");
+          String handlerName = AppConfigUtil.getProperty("http.api.file.upload.handler");
+          if (CommUtil.isEmpty(handlerName)) {
+            handlerName = AppConfigUtil.getProperty("file.upload.handler", "org.huihoo.ofbiz.smart.webapp.DefaultFileUploadHandler");
+          }
           try {
             fileUploadHandler = (FileUploadHandler) Class.forName(handlerName).newInstance();
           } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
@@ -178,11 +208,11 @@ public class HttpApiRequestHandler implements RequestHandler {
           }
         }
         if (fileUploadHandler != null) {
-          int fileSizeMax = Integer.parseInt(AppConfigUtil.getProperty("file.upload.per.sizeinmb.max", "5"));
-          int sizeMax = Integer.parseInt(AppConfigUtil.getProperty("file.upload.sizeinmb.max", "10"));
+          int fileSizeMax = Integer.parseInt(AppConfigUtil.getProperty("file.upload.per.sizeinmb.max", "5")); //file per max size : 5MB
+          int sizeMax = Integer.parseInt(AppConfigUtil.getProperty("file.upload.sizeinmb.max", "10"));        //all file max size:  10MB
           ServletFileUpload upload = new ServletFileUpload();
           upload.setHeaderEncoding(C.UTF_8); 
-          upload.setFileSizeMax(1024L * 1024 * fileSizeMax);
+          upload.setFileSizeMax(1024L * 1024 * fileSizeMax); 
           upload.setSizeMax(1024L * 1024 * sizeMax);
           FileItemIterator iter;
           try {

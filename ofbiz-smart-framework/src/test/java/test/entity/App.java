@@ -12,7 +12,7 @@ import com.avaje.ebean.annotation.WhenModified;
 
 @Entity
 @Table(name = "apps")
-public class Apps extends Model {
+public class App extends Model {
   @Id
   Long id;
 
