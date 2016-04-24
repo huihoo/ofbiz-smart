@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<action-map xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../main/resources/META-INF/action-map.xsd">
-  <action uri="/customer/detail22" process-type="urlAuto">
-		<response view-type="auto" />
-	</action>
-</action-map>
