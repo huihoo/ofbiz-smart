@@ -98,6 +98,7 @@ public class EntityAutoEngine extends GenericAsyncEngine {
           } else {
             successResult.put(C.ENTITY_MODEL_NAME, modelObj);
           }
+          successResult.put(C.FLASH_SCOPE_SUCCESS_FLAG_ATTRIBUTE, true); //XXX 成功标志
           break;
         case C.SERVICE_ENGITYAUTO_UPDATE:
           Object id = ctx.get(C.ENTITY_ID_NAME);
@@ -114,6 +115,7 @@ public class EntityAutoEngine extends GenericAsyncEngine {
             } else {
               successResult.put(C.ENTITY_MODEL_NAME, obj);
             }
+            successResult.put(C.FLASH_SCOPE_SUCCESS_FLAG_ATTRIBUTE, true); //XXX 成功标志
           }
           break;
         case C.SERVICE_ENGITYAUTO_REMOVE:
@@ -127,6 +129,7 @@ public class EntityAutoEngine extends GenericAsyncEngine {
               Object removedObj = obj;
               delegator.remove(obj);
               successResult.put(C.ENTITY_REMOVED_NAME, removedObj);
+              successResult.put(C.FLASH_SCOPE_SUCCESS_FLAG_ATTRIBUTE, true); //XXX 成功标志
             } catch(GenericEntityException e) {
               if (e.getMessage() != null && e.getMessage().indexOf("CONSTRAINT") != -1) {
                 return ServiceUtil.returnProplem("ENTITY_REFERENCED_CONSTRAINT", "The entity has referenced another entity.");
