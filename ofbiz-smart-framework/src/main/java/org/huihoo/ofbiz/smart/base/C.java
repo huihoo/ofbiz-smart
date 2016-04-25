@@ -57,6 +57,7 @@ public final class C {
   public static final String CTX_JSP_VIEW_BASEPATH = "_ctx_jsp_view_basepath_";
   public static final String CTX_SUPPORTED_VIEW_ATTRIBUTE = "_ctx_supported_view_";
   public static final String CTX_SUPPORTED_XML_HANDLE_ATTRIBUTE = "_ctx_supported_xml_handle";
+  public static final String CTX_HTTP_API_FLAG = "_ctx_http_api_";
   // ========================================================================================
   // Cache Related Flag
   // ========================================================================================

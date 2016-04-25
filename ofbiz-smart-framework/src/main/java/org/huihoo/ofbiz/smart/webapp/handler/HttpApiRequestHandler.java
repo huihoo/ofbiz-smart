@@ -65,7 +65,7 @@ public class HttpApiRequestHandler implements RequestHandler {
                                             ,C.CTX_SERVICE_DISPATCHER, serviceDispatcher
                                             ,C.CTX_WEB_HTTP_SERVLET_REQUEST, req
     );
-    
+    ctx.put(C.CTX_HTTP_API_FLAG, true);
     String method = req.getParameter("method");
     String format = req.getParameter("format");
     String appKey = req.getParameter("appKey");
