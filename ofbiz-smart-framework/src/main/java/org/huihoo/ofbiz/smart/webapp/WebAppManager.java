@@ -2,8 +2,6 @@ package org.huihoo.ofbiz.smart.webapp;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -173,11 +171,7 @@ public class WebAppManager {
   
   public static String parseConditionFromQueryString(HttpServletRequest req) {
     StringBuilder sb = new StringBuilder();
-    String queryString = null ;
-    try {
-      queryString = URLDecoder.decode(req.getQueryString(),C.UTF_8);
-    } catch (UnsupportedEncodingException e) {
-    }
+    String queryString = req.getQueryString();
     if (CommUtil.isNotEmpty(queryString)) {
       String[] paramPairArray = queryString.split("&");
       int len = paramPairArray.length;
