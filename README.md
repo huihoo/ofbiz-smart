@@ -1,4 +1,4 @@
-# 该项目寿终正寝.  另一个项目 [OFBiz-DDD-X]，孵化中。
+# 该项目已不再维护.  另一个项目 [OFBiz-DDD-X]，孵化中。
 
 # This project is end of life. Another project, [OFBiz-DDD-X], is in incubation.
 
